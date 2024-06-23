@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Custom
+/MTsfoni.CycloneDXLincenseEnricher/Properties/launchSettings.json
+**/*received.txt
+
+/src/MTsfoni.CycloneDXLincenseEnricher/Properties/launchSettings.json

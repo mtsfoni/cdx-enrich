@@ -1,0 +1,15 @@
+﻿ReplaceLicensesByURL:
+- URL: "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT"
+  Id: "MIT"
+- URL: "http://www.oracle.com/technetwork/licenses/distribution-license-152002.html"
+  Name: "Oracle Technology Network License Agreement"
+- URL: "http://go.microsoft.com/fwlink/?LinkID=262998"
+  Name: "MICROSOFT SOFTWARE LICENSE TERMS - MICROSOFT .NET LIBRARY"
+
+ReplaceLicenseByBomRef:
+- Ref: "pkg:nuget/Apache.NMS@1.8.0"
+  Id: "Apache-2.0"
+- Ref: "pkg:nuget/Apache.NMS.ActiveMQ@1.8.0"
+  Name: "Some License"
+- Ref: "pkg:nuget/Json.More.Net@1.9.0"
+  Id: "MIT"  

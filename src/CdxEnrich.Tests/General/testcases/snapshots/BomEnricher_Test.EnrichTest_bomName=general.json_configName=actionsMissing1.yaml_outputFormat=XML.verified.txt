@@ -1,0 +1,224 @@
+﻿{
+  Data:
+﻿<?xml version="1.0" encoding="utf-8"?>
+<bom xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" serialNumber="urn:uuid:69266ec5-519b-4ae5-92e1-df3a91f9a093" version="1" xmlns="http://cyclonedx.org/schema/bom/1.5">
+  <components>
+    <component type="library" bom-ref="pkg:nuget/Apache.NMS@1.8.0">
+      <author>Apache ActiveMQ</author>
+      <name>Apache.NMS</name>
+      <version>1.8.0</version>
+      <description>Apache NMS (.Net Standard Messaging Library): An abstract interface to Message Oriented Middleware (MOM) providers</description>
+      <scope>required</scope>
+      <hashes>
+        <hash alg="SHA-512">265532783F0B1D1577E249B6D931E23DA80F0D2580B87322A4BCBECAA6FB12F8E45D50A762AA4F336D9B33B2D23AA713CD698DEE4E1393067944C7A301B90BCC</hash>
+      </hashes>
+      <licenses>
+        <license>
+          <name>Unknown - See URL</name>
+          <url>https://aka.ms/deprecateLicenseUrl</url>
+        </license>
+      </licenses>
+      <copyright>Copyright (C) 2005-2019 Apache Software Foundation</copyright>
+      <purl>pkg:nuget/Apache.NMS@1.8.0</purl>
+      <externalReferences>
+        <reference type="website">
+          <url>https://activemq.apache.org/components/nms/</url>
+        </reference>
+        <reference type="vcs">
+          <url>https://github.com/apache/activemq-nms-api</url>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="pkg:nuget/Apache.NMS.ActiveMQ@1.8.0">
+      <author>Apache ActiveMQ</author>
+      <name>Apache.NMS.ActiveMQ</name>
+      <version>1.8.0</version>
+      <description>Apache NMS (.Net Standard Messaging Library): Openwire implementation of Apache NMS API</description>
+      <scope>required</scope>
+      <hashes>
+        <hash alg="SHA-512">FE127FBDD1A1CBB82DFDF4970314C4F1086DA73674B8B126BE8F33BC82D812B36DB7FD6D0E71210EB64852CF3BDDBD46A1D80E00582F02C364FC07C59A004109</hash>
+      </hashes>
+      <licenses>
+        <license>
+          <name>Unknown - See URL</name>
+          <url>https://aka.ms/deprecateLicenseUrl</url>
+        </license>
+      </licenses>
+      <copyright>Copyright (C) 2005-2019 Apache Software Foundation</copyright>
+      <purl>pkg:nuget/Apache.NMS.ActiveMQ@1.8.0</purl>
+      <externalReferences>
+        <reference type="website">
+          <url>https://activemq.apache.org/components/nms/</url>
+        </reference>
+        <reference type="vcs">
+          <url>https://github.com/apache/activemq-nms-openwire</url>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="pkg:nuget/EntityFramework@6.2.0">
+      <author>Microsoft</author>
+      <name>EntityFramework</name>
+      <version>6.2.0</version>
+      <description>Entity Framework is Microsoft's recommended data access technology for new applications.</description>
+      <scope>required</scope>
+      <hashes>
+        <hash alg="SHA-512">F9A07F727100AFD2AA54C8E6670BBE173CB710E3E3088CCDB0F014CA7D7D59B076BB72C51DDD8E0775F9EA88408FB1017F6869A65F4CDBB9E5467910C4E86800</hash>
+      </hashes>
+      <licenses>
+        <license>
+          <name>Unknown - See URL</name>
+          <url>http://go.microsoft.com/fwlink/?LinkID=262998</url>
+        </license>
+      </licenses>
+      <purl>pkg:nuget/EntityFramework@6.2.0</purl>
+      <externalReferences>
+        <reference type="website">
+          <url>http://go.microsoft.com/fwlink/?LinkID=263480</url>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="pkg:nuget/Microsoft.CSharp@4.7.0">
+      <author>Microsoft</author>
+      <name>Microsoft.CSharp</name>
+      <version>4.7.0</version>
+      <description>Provides support for compilation and code generation, including dynamic, using the C# language.
+
+Commonly Used Types:
+Microsoft.CSharp.RuntimeBinder.Binder
+Microsoft.CSharp.RuntimeBinder.RuntimeBinderException
+Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo
+Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfoFlags
+Microsoft.CSharp.RuntimeBinder.CSharpBinderFlags
+ 
+When using NuGet 3.x this package requires at least version 3.4.</description>
+      <scope>required</scope>
+      <hashes>
+        <hash alg="SHA-512">2C96988515F95714D4B83F5650F183DC6A564E0B3CF5255FA0E3EF48476DEBAB4BDE542F9F2F6C47F6620B7A71D6A515E4415E6D2E388B60817A29621D5690DF</hash>
+      </hashes>
+      <licenses>
+        <license>
+          <id>MIT</id>
+        </license>
+      </licenses>
+      <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+      <purl>pkg:nuget/Microsoft.CSharp@4.7.0</purl>
+      <externalReferences>
+        <reference type="website">
+          <url>https://github.com/dotnet/corefx</url>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="pkg:nuget/Oracle.ManagedDataAccess@12.1.2400">
+      <author>Oracle</author>
+      <name>Oracle.ManagedDataAccess</name>
+      <version>12.1.2400</version>
+      <description>The official Oracle Data Provider for .NET, Managed Driver for Oracle Database.</description>
+      <scope>required</scope>
+      <hashes>
+        <hash alg="SHA-512">9E0D389FC34725D630D9D31B9E9D9B03703112A7DD7A6D98851A977896C675120C84E74802EBE19870692D19B4F32213E0AED457502642655F53AF8809C41535</hash>
+      </hashes>
+      <licenses>
+        <license>
+          <name>Unknown - See URL</name>
+          <url>http://www.oracle.com/technetwork/licenses/distribution-license-152002.html</url>
+        </license>
+      </licenses>
+      <copyright>2015</copyright>
+      <purl>pkg:nuget/Oracle.ManagedDataAccess@12.1.2400</purl>
+      <externalReferences>
+        <reference type="website">
+          <url>http://www.oracle.com/technetwork/topics/dotnet/whatsnew/index.html</url>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="pkg:nuget/Oracle.ManagedDataAccess.EntityFramework@12.1.2400">
+      <author>Oracle</author>
+      <name>Oracle.ManagedDataAccess.EntityFramework</name>
+      <version>12.1.2400</version>
+      <description>The ODP.NET, Managed Driver Entity Framework package for EF 6 applications.</description>
+      <scope>required</scope>
+      <hashes>
+        <hash alg="SHA-512">4FFBFB343F7EEEB65870EF5E9CE2088DFC84CA62A92BAD94FB21D6D4145FE71D0460D086846C0EDDBDEFA45BA212FA6600B89FB089B98F1A158F6660D2BBA046</hash>
+      </hashes>
+      <licenses>
+        <license>
+          <name>Unknown - See URL</name>
+          <url>http://www.oracle.com/technetwork/licenses/distribution-license-152002.html</url>
+        </license>
+      </licenses>
+      <copyright>2015</copyright>
+      <purl>pkg:nuget/Oracle.ManagedDataAccess.EntityFramework@12.1.2400</purl>
+      <externalReferences>
+        <reference type="website">
+          <url>http://www.oracle.com/technetwork/topics/dotnet/whatsnew/index.html</url>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="pkg:nuget/System.Buffers@4.5.1">
+      <author>Microsoft</author>
+      <name>System.Buffers</name>
+      <version>4.5.1</version>
+      <description>Provides resource pooling of any type for performance-critical applications that allocate and deallocate objects frequently.
+
+Commonly Used Types:
+System.Buffers.ArrayPool&lt;T&gt;
+ 
+7601f4f6225089ffb291dc7d58293c7bbf5c5d4f 
+When using NuGet 3.x this package requires at least version 3.4.</description>
+      <scope>required</scope>
+      <hashes>
+        <hash alg="SHA-512">80DA6158E55B9BCF7E0B5E6379B9CF45A632914F037B53C5BF5609576E3CD7821F7861956B73D74470D2D0C2E56DD235A5EF4CA6FFE7E192B820DC2D023AAFF2</hash>
+      </hashes>
+      <licenses>
+        <license>
+          <name>Unknown - See URL</name>
+          <url>https://github.com/dotnet/corefx/blob/master/LICENSE.TXT</url>
+        </license>
+      </licenses>
+      <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+      <purl>pkg:nuget/System.Buffers@4.5.1</purl>
+      <externalReferences>
+        <reference type="website">
+          <url>https://dot.net/</url>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="pkg:nuget/System.Memory@4.5.4">
+      <author>Microsoft</author>
+      <name>System.Memory</name>
+      <version>4.5.4</version>
+      <description>Provides types for efficient representation and pooling of managed, stack, and native memory segments and sequences of such segments, along with primitives to parse and format UTF-8 encoded text stored in those memory segments.
+
+Commonly Used Types:
+System.Span
+System.ReadOnlySpan
+System.Memory
+System.ReadOnlyMemory
+System.Buffers.MemoryPool
+System.Buffers.ReadOnlySequence
+System.Buffers.Text.Utf8Parser
+System.Buffers.Text.Utf8Formatter
+ 
+7601f4f6225089ffb291dc7d58293c7bbf5c5d4f 
+When using NuGet 3.x this package requires at least version 3.4.</description>
+      <scope>required</scope>
+      <hashes>
+        <hash alg="SHA-512">8ECE5491EB0FE332BC190F40CF76B3BEEE0C5F996325034861BE221FDB0FF02FD59E4F7020B3C4A1F29A457F76FF76C4C95D46D38555E4F48C7A3BF172D87966</hash>
+      </hashes>
+      <licenses>
+        <license>
+          <name>Unknown - See URL</name>
+          <url>https://github.com/dotnet/corefx/blob/master/LICENSE.TXT</url>
+        </license>
+      </licenses>
+      <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+      <purl>pkg:nuget/System.Memory@4.5.4</purl>
+      <externalReferences>
+        <reference type="website">
+          <url>https://dot.net/</url>
+        </reference>
+      </externalReferences>
+    </component>
+  </components>
+</bom>
+}

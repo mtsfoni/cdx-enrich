@@ -1,0 +1,4 @@
+﻿ReplaceLicenseByBomRef:
+- Ref: "pkg:nuget/EntityFramework@6.2.0"
+  Id: "MIT"
+  Name: "MICROSOFT SOFTWARE LICENSE TERMS - MICROSOFT .NET LIBRARY"

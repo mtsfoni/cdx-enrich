@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MTsfoni.CycloneDXLincenseEnricher": {
+      "commandName": "Project",
+      "commandLineArgs": "-i C:\\Temp\\zekis.json -o C:\\Temp\\enriched_bom.json -c C:\\Temp\\licenseEnricher.yaml"
+    }
+  }
+}

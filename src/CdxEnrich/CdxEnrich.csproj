@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>1.0.0</Version>
+
+		<AssemblyName>cdx-enrich</AssemblyName>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackAsTool>true</PackAsTool>
+		<PackageOutputPath>./nupkg</PackageOutputPath>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackageId>cdx-enrich</PackageId>
+		<PackageVersion>$(Version)</PackageVersion>
+		<Authors>Michael Tsfoni</Authors>
+		<Description>A .NET tool to enrich a CycloneDX Bill-of-Materials (BOM) with predefined data.</Description>
+		<Copyright>Michael Tsfoni</Copyright>
+		<PackageProjectUrl>https://github.com/mtsfoni/cdx-enrich</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/mtsfoni/cdx-enrich</RepositoryUrl>
+		<PackageTags>sbom;license;cyclonedx;enrich;cli;pipeline;spdx</PackageTags>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>		
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="../../README.md" Pack="true" PackagePath="\"/>		
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CycloneDX.Core" Version="7.0.1" />
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="9.26.0.92422">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+		<PackageReference Include="YamlDotNet" Version="15.1.4" />
+	</ItemGroup>
+
+</Project>

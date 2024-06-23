@@ -1,0 +1,94 @@
+﻿{
+  BomFormat: CycloneDX,
+  SpecVersion: v1_5,
+  SpecVersionString: 1.5,
+  SerialNumber: urn:uuid:69266ec5-519b-4ae5-92e1-df3a91f9a093,
+  Version: 1,
+  NonNullableVersion: 1,
+  Components: [
+    {
+      Type: Library,
+      BomRef: pkg:nuget/EntityFramework@6.2.0,
+      Author: Microsoft,
+      Name: EntityFramework,
+      Version: 6.2.0,
+      Description: Entity Framework is Microsoft's recommended data access technology for new applications.,
+      Scope: Required,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown - See URL,
+            Url: http://go.microsoft.com/fwlink/?LinkID=262998
+          }
+        }
+      ],
+      Purl: pkg:nuget/EntityFramework@6.2.0,
+      ExternalReferences: []
+    },
+    {
+      Type: Library,
+      BomRef: pkg:nuget/Oracle.ManagedDataAccess.EntityFramework@12.1.2400,
+      Author: Oracle,
+      Name: Oracle.ManagedDataAccess.EntityFramework,
+      Version: 12.1.2400,
+      Description: The ODP.NET, Managed Driver Entity Framework package for EF 6 applications.,
+      Scope: Required,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown - See URL,
+            Url: http://www.oracle.com/technetwork/licenses/distribution-license-152002.html
+          }
+        }
+      ],
+      Copyright: 2015,
+      Purl: pkg:nuget/Oracle.ManagedDataAccess.EntityFramework@12.1.2400,
+      ExternalReferences: []
+    },
+    {
+      Type: Library,
+      BomRef: pkg:nuget/System.Buffers@4.5.1,
+      Author: Microsoft,
+      Name: System.Buffers,
+      Version: 4.5.1,
+      Description: ,
+      Scope: Required,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown - See URL,
+            Url: https://github.com/dotnet/corefx/blob/master/LICENSE.TXT
+          }
+        }
+      ],
+      Copyright: © Microsoft Corporation. All rights reserved.,
+      Purl: pkg:nuget/System.Buffers@4.5.1,
+      ExternalReferences: []
+    },
+    {
+      Type: Library,
+      BomRef: pkg:nuget/System.Memory@4.5.4,
+      Author: Microsoft,
+      Name: System.Memory,
+      Version: 4.5.4,
+      Description: ,
+      Scope: Required,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown - See URL,
+            Url: https://github.com/dotnet/corefx/blob/master/LICENSE.TXT
+          }
+        }
+      ],
+      Copyright: © Microsoft Corporation. All rights reserved.,
+      Purl: pkg:nuget/System.Memory@4.5.4,
+      ExternalReferences: []
+    }
+  ],
+  Dependencies: [],
+  Vulnerabilities: [],
+  Annotations: [],
+  Properties: [],
+  Formulation: []
+}

@@ -1,0 +1,267 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:69266ec5-519b-4ae5-92e1-df3a91f9a093",
+  "version": 1, 
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Apache.NMS@1.8.0",
+      "author": "Apache ActiveMQ",
+      "name": "Apache.NMS",
+      "version": "1.8.0",
+      "description": "Apache NMS (.Net Standard Messaging Library): An abstract interface to Message Oriented Middleware (MOM) providers",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "265532783F0B1D1577E249B6D931E23DA80F0D2580B87322A4BCBECAA6FB12F8E45D50A762AA4F336D9B33B2D23AA713CD698DEE4E1393067944C7A301B90BCC"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "https://aka.ms/deprecateLicenseUrl"
+          }
+        }
+      ],
+      "copyright": "Copyright (C) 2005-2019 Apache Software Foundation",
+      "purl": "pkg:nuget/Apache.NMS@1.8.0",
+      "externalReferences": [
+        {
+          "url": "https://activemq.apache.org/components/nms/",
+          "type": "website"
+        },
+        {
+          "url": "https://github.com/apache/activemq-nms-api",
+          "type": "vcs"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Apache.NMS.ActiveMQ@1.8.0",
+      "author": "Apache ActiveMQ",
+      "name": "Apache.NMS.ActiveMQ",
+      "version": "1.8.0",
+      "description": "Apache NMS (.Net Standard Messaging Library): Openwire implementation of Apache NMS API",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "FE127FBDD1A1CBB82DFDF4970314C4F1086DA73674B8B126BE8F33BC82D812B36DB7FD6D0E71210EB64852CF3BDDBD46A1D80E00582F02C364FC07C59A004109"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "https://aka.ms/deprecateLicenseUrl"
+          }
+        }
+      ],
+      "copyright": "Copyright (C) 2005-2019 Apache Software Foundation",
+      "purl": "pkg:nuget/Apache.NMS.ActiveMQ@1.8.0",
+      "externalReferences": [
+        {
+          "url": "https://activemq.apache.org/components/nms/",
+          "type": "website"
+        },
+        {
+          "url": "https://github.com/apache/activemq-nms-openwire",
+          "type": "vcs"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/EntityFramework@6.2.0",
+      "author": "Microsoft",
+      "name": "EntityFramework",
+      "version": "6.2.0",
+      "description": "Entity Framework is Microsoft\u0027s recommended data access technology for new applications.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "F9A07F727100AFD2AA54C8E6670BBE173CB710E3E3088CCDB0F014CA7D7D59B076BB72C51DDD8E0775F9EA88408FB1017F6869A65F4CDBB9E5467910C4E86800"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "http://go.microsoft.com/fwlink/?LinkID=262998"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/EntityFramework@6.2.0",
+      "externalReferences": [
+        {
+          "url": "http://go.microsoft.com/fwlink/?LinkID=263480",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Microsoft.CSharp@4.7.0",
+      "author": "Microsoft",
+      "name": "Microsoft.CSharp",
+      "version": "4.7.0",
+      "description": "Provides support for compilation and code generation, including dynamic, using the C# language.\n\nCommonly Used Types:\nMicrosoft.CSharp.RuntimeBinder.Binder\nMicrosoft.CSharp.RuntimeBinder.RuntimeBinderException\nMicrosoft.CSharp.RuntimeBinder.CSharpArgumentInfo\nMicrosoft.CSharp.RuntimeBinder.CSharpArgumentInfoFlags\nMicrosoft.CSharp.RuntimeBinder.CSharpBinderFlags\n \nWhen using NuGet 3.x this package requires at least version 3.4.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "2C96988515F95714D4B83F5650F183DC6A564E0B3CF5255FA0E3EF48476DEBAB4BDE542F9F2F6C47F6620B7A71D6A515E4415E6D2E388B60817A29621D5690DF"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+      "purl": "pkg:nuget/Microsoft.CSharp@4.7.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/dotnet/corefx",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Oracle.ManagedDataAccess@12.1.2400",
+      "author": "Oracle",
+      "name": "Oracle.ManagedDataAccess",
+      "version": "12.1.2400",
+      "description": "The official Oracle Data Provider for .NET, Managed Driver for Oracle Database.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "9E0D389FC34725D630D9D31B9E9D9B03703112A7DD7A6D98851A977896C675120C84E74802EBE19870692D19B4F32213E0AED457502642655F53AF8809C41535"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "http://www.oracle.com/technetwork/licenses/distribution-license-152002.html"
+          }
+        }
+      ],
+      "copyright": "2015",
+      "purl": "pkg:nuget/Oracle.ManagedDataAccess@12.1.2400",
+      "externalReferences": [
+        {
+          "url": "http://www.oracle.com/technetwork/topics/dotnet/whatsnew/index.html",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Oracle.ManagedDataAccess.EntityFramework@12.1.2400",
+      "author": "Oracle",
+      "name": "Oracle.ManagedDataAccess.EntityFramework",
+      "version": "12.1.2400",
+      "description": "The ODP.NET, Managed Driver Entity Framework package for EF 6 applications.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "4FFBFB343F7EEEB65870EF5E9CE2088DFC84CA62A92BAD94FB21D6D4145FE71D0460D086846C0EDDBDEFA45BA212FA6600B89FB089B98F1A158F6660D2BBA046"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "http://www.oracle.com/technetwork/licenses/distribution-license-152002.html"
+          }
+        }
+      ],
+      "copyright": "2015",
+      "purl": "pkg:nuget/Oracle.ManagedDataAccess.EntityFramework@12.1.2400",
+      "externalReferences": [
+        {
+          "url": "http://www.oracle.com/technetwork/topics/dotnet/whatsnew/index.html",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Buffers@4.5.1",
+      "author": "Microsoft",
+      "name": "System.Buffers",
+      "version": "4.5.1",
+      "description": "Provides resource pooling of any type for performance-critical applications that allocate and deallocate objects frequently.\n\nCommonly Used Types:\nSystem.Buffers.ArrayPool\u003CT\u003E\n \n7601f4f6225089ffb291dc7d58293c7bbf5c5d4f \nWhen using NuGet 3.x this package requires at least version 3.4.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "80DA6158E55B9BCF7E0B5E6379B9CF45A632914F037B53C5BF5609576E3CD7821F7861956B73D74470D2D0C2E56DD235A5EF4CA6FFE7E192B820DC2D023AAFF2"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT"
+          }
+        }
+      ],
+      "copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+      "purl": "pkg:nuget/System.Buffers@4.5.1",
+      "externalReferences": [
+        {
+          "url": "https://dot.net/",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Memory@4.5.4",
+      "author": "Microsoft",
+      "name": "System.Memory",
+      "version": "4.5.4",
+      "description": "Provides types for efficient representation and pooling of managed, stack, and native memory segments and sequences of such segments, along with primitives to parse and format UTF-8 encoded text stored in those memory segments.\n\nCommonly Used Types:\nSystem.Span\nSystem.ReadOnlySpan\nSystem.Memory\nSystem.ReadOnlyMemory\nSystem.Buffers.MemoryPool\nSystem.Buffers.ReadOnlySequence\nSystem.Buffers.Text.Utf8Parser\nSystem.Buffers.Text.Utf8Formatter\n \n7601f4f6225089ffb291dc7d58293c7bbf5c5d4f \nWhen using NuGet 3.x this package requires at least version 3.4.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "8ECE5491EB0FE332BC190F40CF76B3BEEE0C5F996325034861BE221FDB0FF02FD59E4F7020B3C4A1F29A457F76FF76C4C95D46D38555E4F48C7A3BF172D87966"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT"
+          }
+        }
+      ],
+      "copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+      "purl": "pkg:nuget/System.Memory@4.5.4",
+      "externalReferences": [
+        {
+          "url": "https://dot.net/",
+          "type": "website"
+        }
+      ]
+    }   
+  ],
+  "dependencies":  [],  
+  "vulnerabilities": [],
+  "annotations": [],
+  "properties": [],
+  "formulation": []
+}

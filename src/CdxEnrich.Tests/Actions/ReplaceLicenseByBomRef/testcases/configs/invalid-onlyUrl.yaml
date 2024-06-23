@@ -1,0 +1,2 @@
+﻿ReplaceLicenseByBomRef:
+- Ref: "pkg:nuget/EntityFramework@6.2.0"

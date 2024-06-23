@@ -1,0 +1,6 @@
+﻿{
+  ErrorType: {
+    ErrorMessage: Error when Deserializing the Config-File: Provided config-file is empty.
+  },
+  ErrorMessage: Error when Deserializing the Config-File: Provided config-file is empty.
+}

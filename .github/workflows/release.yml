@@ -1,0 +1,61 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: release
+
+on:
+  workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+        run:
+          working-directory: ./src
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Extract Version from .csproj
+      id: extract_version
+      run: |
+        VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" CdxEnrich/CdxEnrich.csproj)
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+      
+    - name: SBOM
+      run: |
+        dotnet tool install cyclonedx --version 3.0.8 -g
+        dotnet-CycloneDX -dpr -j -sv ${{ env.VERSION }} CdxEnrich/CdxEnrich.csproj
+        
+    - name: Create Release            
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.VERSION }}
+        release_name: ${{ env.VERSION }}
+        draft: false
+        prerelease: false    
+        
+    - name: Upload SBOM to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        #seems to ignore working dir:
+        asset_path: src/bom.json
+        asset_name: bom.json
+        asset_content_type: application/json
+    - name: push
+      run: dotnet nuget push --source https://api.nuget.org/v3/index.json --api-key "${{ secrets.NUGET_API_KEY }}" "./CdxEnrich/nupkg/*"

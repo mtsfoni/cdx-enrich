@@ -1,0 +1,92 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:69266ec5-519b-4ae5-92e1-df3a91f9a093",
+  "version": 1, 
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/EntityFramework@6.2.0",
+      "author": "Microsoft",
+      "name": "EntityFramework",
+      "version": "6.2.0",
+      "description": "Entity Framework is Microsoft\u0027s recommended data access technology for new applications.",
+      "scope": "required",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "http://go.microsoft.com/fwlink/?LinkID=262998"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/EntityFramework@6.2.0",
+      "externalReferences": []
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Oracle.ManagedDataAccess.EntityFramework@12.1.2400",
+      "author": "Oracle",
+      "name": "Oracle.ManagedDataAccess.EntityFramework",
+      "version": "12.1.2400",
+      "description": "The ODP.NET, Managed Driver Entity Framework package for EF 6 applications.",
+      "scope": "required",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "http://www.oracle.com/technetwork/licenses/distribution-license-152002.html"
+          }
+        }
+      ],
+      "copyright": "2015",
+      "purl": "pkg:nuget/Oracle.ManagedDataAccess.EntityFramework@12.1.2400",
+      "externalReferences": []
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Buffers@4.5.1",
+      "author": "Microsoft",
+      "name": "System.Buffers",
+      "version": "4.5.1",
+      "description": "",
+      "scope": "required",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT"
+          }
+        }
+      ],
+      "copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+      "purl": "pkg:nuget/System.Buffers@4.5.1",
+      "externalReferences": []
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Memory@4.5.4",
+      "author": "Microsoft",
+      "name": "System.Memory",
+      "version": "4.5.4",
+      "description": "",
+      "scope": "required",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT"
+          }
+        }
+      ],
+      "copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+      "purl": "pkg:nuget/System.Memory@4.5.4",
+      "externalReferences": []
+    }   
+  ],
+  "dependencies":  [],  
+  "vulnerabilities": [],
+  "annotations": [],
+  "properties": [],
+  "formulation": []
+}

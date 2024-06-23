@@ -1,0 +1,582 @@
+﻿{
+  Data:
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:574fae65-6797-4a98-83a1-0d2c969b8d1d",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-06-04T13:51:48Z",
+    "tools": [
+      {
+        "vendor": "CycloneDX",
+        "name": "CycloneDX module for .NET",
+        "version": "3.0.4.0",
+        "hashes": [],
+        "externalReferences": []
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "CdxEnrich@0.0.0",
+      "name": "CdxEnrich",
+      "version": "0.0.0"
+    },
+    "lifecycles": []
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/CycloneDX.Core@7.0.1",
+      "author": "Patrick Dwyer \u0026 Steve Springett",
+      "name": "CycloneDX.Core",
+      "version": "7.0.1",
+      "description": "A .NET Standard library for CycloneDX bill-of-material documents.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "12C891FFC196C8449EC357122C37B2E154C5DB17EE4693323DD8575C904B157039C9B4749526FA622E6716BE79AF2C0ABE5EF7B11E001644999678FFBEF96079"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "properties": []
+          }
+        }
+      ],
+      "copyright": "Copyright (c) OWASP Foundation",
+      "purl": "pkg:nuget/CycloneDX.Core@7.0.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/CycloneDX/cyclonedx-dotnet-library",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/CycloneDX/cyclonedx-dotnet-library.git",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/JetBrains.Annotations@2021.2.0",
+      "author": "JetBrains",
+      "name": "JetBrains.Annotations",
+      "version": "2021.2.0",
+      "description": "Annotations to increase accuracy of ReSharper code inspections",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "E4F1E8A7A6890B2116A2A5B4483346E1BDD0AC7B30D67B5C026B8596C5150A86868BB2D3EACA22D0E22E80DBCFEEEDAE755EC1C29258C8895ACFC3F9710517C5"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "properties": []
+          }
+        }
+      ],
+      "purl": "pkg:nuget/JetBrains.Annotations@2021.2.0",
+      "externalReferences": [
+        {
+          "url": "https://www.jetbrains.com/help/resharper/Code_Analysis__Code_Annotations.html",
+          "type": "website",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Json.More.Net@1.9.0",
+      "author": "Greg Dennis",
+      "name": "Json.More.Net",
+      "version": "1.9.0",
+      "description": "Provides extended functionality for the System.Text.Json namespace.\n\t\n\t\tRead the full documentation at https://docs.json-everything.net/more/json-more/.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "B1EB68F44425F6FA875B92FA59ABC1E6148F520558C86E9F090884019C8524EAC863A96F21D97A589BB613A173C888C58349301B642ACCE3B9A0065B3B42A7ED"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "https://aka.ms/deprecateLicenseUrl",
+            "properties": []
+          }
+        }
+      ],
+      "purl": "pkg:nuget/Json.More.Net@1.9.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/gregsdennis/json-everything",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/gregsdennis/json-everything",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/JsonPointer.Net@3.0.3",
+      "author": "Greg Dennis",
+      "name": "JsonPointer.Net",
+      "version": "3.0.3",
+      "description": "[JSON Pointer](https://tools.ietf.org/html/rfc6901) built on the System.Text.Json namespace.\n\t\n\t\tRead the full documentation at https://docs.json-everything.net/pointer/basics/.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "D3A88FEBAE2B165BEA48A15BD785D63DB062C5A6D19A5748B2BB882AABC515D9D2362695A75004FEF2419D45DCE887F99A68F9823E36FE57429259171A9857CC"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown - See URL",
+            "url": "https://aka.ms/deprecateLicenseUrl",
+            "properties": []
+          }
+        }
+      ],
+      "purl": "pkg:nuget/JsonPointer.Net@3.0.3",
+      "externalReferences": [
+        {
+          "url": "https://github.com/gregsdennis/json-everything",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/gregsdennis/json-everything",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/JsonSchema.Net@5.3.1",
+      "author": "Greg Dennis",
+      "name": "JsonSchema.Net",
+      "version": "5.3.1",
+      "description": "JSON Schema built on the System.Text.Json namespace.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "D95F0B0760055EBB3FEBD86767C8ABBD6719C89A13B4BA5F8E29D8C2E4505B9ADA7C9B939ED6DDFC8150DFA94ACAED03343B6A13857A938FE8162135BC4E16AC"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "properties": []
+          }
+        }
+      ],
+      "purl": "pkg:nuget/JsonSchema.Net@5.3.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/gregsdennis/json-everything",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/gregsdennis/json-everything",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/protobuf-net@3.2.26",
+      "author": "Marc Gravell",
+      "name": "protobuf-net",
+      "version": "3.2.26",
+      "description": "Provides simple access to fast and efficient \u0022Protocol Buffers\u0022 serialization from .NET applications",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "D69971E1C6E8254A1EF3398CD9F3FE5C57F9026911C6129DD5B390244AA8A549DBED9015ADC5E24A9BA456C139F30B78142B9F636C7F0027F2172288BEF47A62"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "properties": []
+          }
+        }
+      ],
+      "copyright": "See https://github.com/protobuf-net/protobuf-net",
+      "purl": "pkg:nuget/protobuf-net@3.2.26",
+      "externalReferences": [
+        {
+          "url": "https://github.com/protobuf-net/protobuf-net",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/protobuf-net/protobuf-net",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/protobuf-net.Core@3.2.26",
+      "author": "Marc Gravell",
+      "name": "protobuf-net.Core",
+      "version": "3.2.26",
+      "description": "Provides simple access to fast and efficient \u0022Protocol Buffers\u0022 serialization from .NET applications",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "2247E93C92350AC38F352325B684D25B3D3CC1A8489EAC5075B55662A0F6964975D10BF5A26C66F3246A3C0B44125864FC5AE24FC93F83DE670C7ED9609FF8B5"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "properties": []
+          }
+        }
+      ],
+      "copyright": "See https://github.com/protobuf-net/protobuf-net",
+      "purl": "pkg:nuget/protobuf-net.Core@3.2.26",
+      "externalReferences": [
+        {
+          "url": "https://github.com/protobuf-net/protobuf-net",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/protobuf-net/protobuf-net",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/SonarAnalyzer.CSharp@9.26.0.92422",
+      "author": "SonarSource",
+      "name": "SonarAnalyzer.CSharp",
+      "version": "9.26.0.92422",
+      "description": "Roslyn analyzers that spot Bugs, Vulnerabilities and Code Smells in your code. For an even better overall experience, you can use SonarLint for Visual Studio or Rider, which is a free extension that can be used standalone or with SonarQube and/or SonarCloud.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "52AE8BF224DCC2FC295BCFD38B821B5C679C5B239755ACD5FDDC7E8B765AFC8839862E445666CC668D0B00306EC423F80FEE3DC47128D449A3E70E1FC32FB4ED"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-only",
+            "properties": []
+          }
+        }
+      ],
+      "copyright": "Copyright \u00A9 2015-2024 SonarSource SA",
+      "purl": "pkg:nuget/SonarAnalyzer.CSharp@9.26.0.92422",
+      "externalReferences": [
+        {
+          "url": "https://redirect.sonarsource.com/doc/sonar-visualstudio.html",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/SonarSource/sonar-dotnet",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Collections.Immutable@7.0.0",
+      "author": "Microsoft",
+      "name": "System.Collections.Immutable",
+      "version": "7.0.0",
+      "description": "This package provides collections that are thread safe and guaranteed to never change their contents, also known as immutable collections. Like strings, any methods that perform modifications will not change the existing instance but instead return a new instance. For efficiency reasons, the implementation uses a sharing mechanism to ensure that newly created instances share as much data as possible with the previous instance while ensuring that operations have a predictable time complexity.\n\nThe System.Collections.Immutable library is built-in as part of the shared framework in .NET Runtime. The package can be installed when you need to use it in other target frameworks.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "F084AFC9395D74B4F252C47B7D0E378E676D6B8B6033A68636B648B58805E3772DD22FF1DED05D3C8C8553D2E7685B29B753FE1CBB5A333F018ABE6422A3EBFA"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "properties": []
+          }
+        }
+      ],
+      "copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+      "purl": "pkg:nuget/System.Collections.Immutable@7.0.0",
+      "externalReferences": [
+        {
+          "url": "https://dot.net/",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/dotnet/runtime",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.CommandLine@2.0.0-beta4.22272.1",
+      "author": "Microsoft",
+      "name": "System.CommandLine",
+      "version": "2.0.0-beta4.22272.1",
+      "description": "This package includes a powerful command line parser and other tools for building command line applications, including:\n    \n    * Shell-agnostic support for command line completions\n    * Method invocation and an extensible middleware pipeline\n    * Constructor- and property-based model binding for complex types\n    * Test and debug support",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "979A7E66BA29E17BC5BEC42E926ED15362E23AE403E498C955E09DFFC4D3BAA14777A06F95E25D591FC9757A0EAA18DEB9E4662A1CA1663FA300F509A4A0383C"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "properties": []
+          }
+        }
+      ],
+      "copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+      "purl": "pkg:nuget/System.CommandLine@2.0.0-beta4.22272.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/dotnet/command-line-api",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/dotnet/command-line-api",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Text.Encodings.Web@7.0.0",
+      "author": "Microsoft",
+      "name": "System.Text.Encodings.Web",
+      "version": "7.0.0",
+      "description": "Provides types for encoding and escaping strings for use in JavaScript, HyperText Markup Language (HTML), and uniform resource locators (URL).\n\nCommonly Used Types:\nSystem.Text.Encodings.Web.HtmlEncoder\nSystem.Text.Encodings.Web.UrlEncoder\nSystem.Text.Encodings.Web.JavaScriptEncoder",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "D164C15DF021A99D18ED0C39B6B7C0290B7F948D8F09BF07140B47BAE6403F1CB9A822C1504AABD7A6094367AD9FCF8CED1EA186B0662A51815EBBB37A3B0434"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "properties": []
+          }
+        }
+      ],
+      "copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+      "purl": "pkg:nuget/System.Text.Encodings.Web@7.0.0",
+      "externalReferences": [
+        {
+          "url": "https://dot.net/",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/dotnet/runtime",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Text.Json@7.0.2",
+      "author": "Microsoft",
+      "name": "System.Text.Json",
+      "version": "7.0.2",
+      "description": "Provides high-performance and low-allocating types that serialize objects to JavaScript Object Notation (JSON) text and deserialize JSON text to objects, with UTF-8 support built-in. Also provides types to read and write JSON text encoded as UTF-8, and to create an in-memory document object model (DOM), that is read-only, for random access of the JSON elements within a structured view of the data.\n\nThe System.Text.Json library is built-in as part of the shared framework in .NET Runtime. The package can be installed when you need to use it in other target frameworks.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "20AB3A9E729CB3E019F624986B5489341ACA89700B31F86F1A7945485B073C715D60B804FC6EA27C628A30D6D46015D1D1EFA0B75FB8842F620D0A95F749C648"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "properties": []
+          }
+        }
+      ],
+      "copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+      "purl": "pkg:nuget/System.Text.Json@7.0.2",
+      "externalReferences": [
+        {
+          "url": "https://dot.net/",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/dotnet/runtime",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/YamlDotNet@15.1.4",
+      "author": "Antoine Aubry",
+      "name": "YamlDotNet",
+      "version": "15.1.4",
+      "description": "This package contains the YAML parser and serializer.",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "6EFFD0BFBA1C573283CA3910BD6613FAF4244FE23049F931D4AAC6A0954BE47E3CFB7AADBDB8678B3528248B4549419DEC70586B4FF99128782F20F8D8029DBA"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "properties": []
+          }
+        }
+      ],
+      "purl": "pkg:nuget/YamlDotNet@15.1.4",
+      "externalReferences": [
+        {
+          "url": "https://github.com/aaubry/YamlDotNet/wiki",
+          "type": "website",
+          "hashes": []
+        },
+        {
+          "url": "https://github.com/aaubry/YamlDotNet.git",
+          "type": "vcs",
+          "hashes": []
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "CdxEnrich@0.0.0",
+      "dependsOn": [
+        "pkg:nuget/CycloneDX.Core@7.0.1",
+        "pkg:nuget/SonarAnalyzer.CSharp@9.26.0.92422",
+        "pkg:nuget/System.CommandLine@2.0.0-beta4.22272.1",
+        "pkg:nuget/YamlDotNet@15.1.4"
+      ]
+    },
+    {
+      "ref": "pkg:nuget/CycloneDX.Core@7.0.1",
+      "dependsOn": [
+        "pkg:nuget/JsonSchema.Net@5.3.1",
+        "pkg:nuget/System.Text.Json@7.0.2",
+        "pkg:nuget/protobuf-net@3.2.26"
+      ]
+    },
+    {
+      "ref": "pkg:nuget/JetBrains.Annotations@2021.2.0"
+    },
+    {
+      "ref": "pkg:nuget/Json.More.Net@1.9.0",
+      "dependsOn": [
+        "pkg:nuget/System.Text.Json@7.0.2"
+      ]
+    },
+    {
+      "ref": "pkg:nuget/JsonPointer.Net@3.0.3",
+      "dependsOn": [
+        "pkg:nuget/Json.More.Net@1.9.0"
+      ]
+    },
+    {
+      "ref": "pkg:nuget/JsonSchema.Net@5.3.1",
+      "dependsOn": [
+        "pkg:nuget/JetBrains.Annotations@2021.2.0",
+        "pkg:nuget/Json.More.Net@1.9.0",
+        "pkg:nuget/JsonPointer.Net@3.0.3"
+      ]
+    },
+    {
+      "ref": "pkg:nuget/protobuf-net.Core@3.2.26",
+      "dependsOn": [
+        "pkg:nuget/System.Collections.Immutable@7.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:nuget/protobuf-net@3.2.26",
+      "dependsOn": [
+        "pkg:nuget/protobuf-net.Core@3.2.26"
+      ]
+    },
+    {
+      "ref": "pkg:nuget/SonarAnalyzer.CSharp@9.26.0.92422"
+    },
+    {
+      "ref": "pkg:nuget/System.Collections.Immutable@7.0.0"
+    },
+    {
+      "ref": "pkg:nuget/System.CommandLine@2.0.0-beta4.22272.1"
+    },
+    {
+      "ref": "pkg:nuget/System.Text.Encodings.Web@7.0.0"
+    },
+    {
+      "ref": "pkg:nuget/System.Text.Json@7.0.2",
+      "dependsOn": [
+        "pkg:nuget/System.Text.Encodings.Web@7.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:nuget/YamlDotNet@15.1.4"
+    }
+  ],
+  "vulnerabilities": [],
+  "annotations": [],
+  "properties": [],
+  "formulation": []
+}
+}

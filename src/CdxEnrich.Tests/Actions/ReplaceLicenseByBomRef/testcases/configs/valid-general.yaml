@@ -1,0 +1,9 @@
+﻿ReplaceLicenseByBomRef:
+- Ref: "pkg:nuget/System.Buffers@4.5.1"
+  Id: "MIT"
+- Ref: "pkg:nuget/Oracle.ManagedDataAccess.EntityFramework@12.1.2400"
+  Name: "Oracle Technology Network License Agreement"
+- Ref: "pkg:nuget/EntityFramework@6.2.0"
+  Name: "MICROSOFT SOFTWARE LICENSE TERMS - MICROSOFT .NET LIBRARY"
+- Ref: "pkg:nuget/github@1.0.0"
+  Name: "Package that doesn't exist in the BOM"

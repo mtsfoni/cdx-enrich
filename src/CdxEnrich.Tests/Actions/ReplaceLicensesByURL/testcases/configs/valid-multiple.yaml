@@ -1,0 +1,7 @@
+﻿ReplaceLicensesByURL:
+- URL: "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT"
+  Id: "MIT"
+- URL: "http://www.oracle.com/technetwork/licenses/distribution-license-152002.html"
+  Name: "Oracle Technology Network License Agreement"
+- URL: "http://go.microsoft.com/fwlink/?LinkID=262998"
+  Name: "MICROSOFT SOFTWARE LICENSE TERMS - MICROSOFT .NET LIBRARY"
