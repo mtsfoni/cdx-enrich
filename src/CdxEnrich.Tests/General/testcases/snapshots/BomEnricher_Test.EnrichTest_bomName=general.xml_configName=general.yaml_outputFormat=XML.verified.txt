@@ -9,7 +9,6 @@
         <vendor>CycloneDX</vendor>
         <name>CycloneDX module for .NET</name>
         <version>3.0.4.0</version>
-        <hashes />
       </tool>
     </tools>
     <component type="application" bom-ref="CdxEnrich@0.0.0">

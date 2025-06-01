@@ -258,11 +258,6 @@
         }
       ]
     }
-  ],
-  "dependencies": [],
-  "vulnerabilities": [],
-  "annotations": [],
-  "properties": [],
-  "formulation": []
+  ]
 }
 }
