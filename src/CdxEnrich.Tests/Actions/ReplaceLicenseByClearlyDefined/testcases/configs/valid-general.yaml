@@ -1,0 +1,4 @@
+﻿ReplaceLicenseByClearlyDefined:
+  - Ref: "pkg:nuget/System.Collections@4.0.11"
+  - Ref: "pkg:nuget/System.Runtime@4.3.0"
+  - Ref: "pkg:nuget/Newtonsoft.Json@13.0.1"
