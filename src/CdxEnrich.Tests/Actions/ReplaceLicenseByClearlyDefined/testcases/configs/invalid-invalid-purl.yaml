@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - OtherProperty: "value"
+  - Ref: "not-a-valid-purl"

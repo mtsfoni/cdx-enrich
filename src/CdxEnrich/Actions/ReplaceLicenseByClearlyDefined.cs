@@ -1,6 +1,7 @@
 ﻿using CdxEnrich;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
+using CdxEnrich.PackageUrl;
 using CycloneDX.Models;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace CdxEnrich.Actions
     public static class ReplaceLicenseByClearlyDefined
     {
         static readonly string moduleName = nameof(ReplaceLicenseByClearlyDefined);
-        private static readonly HttpClient HttpClient = new() { Timeout = TimeSpan.FromSeconds(30) };
+        private static readonly HttpClient HttpClient = new() { Timeout = TimeSpan.FromSeconds(60) };
         private const string ClearlyDefinedApiBase = "https://api.clearlydefined.io/definitions";
 
         public static Component? GetComponentByBomRef(Bom bom, string bomRef)
@@ -35,9 +36,26 @@ namespace CdxEnrich.Actions
             }
         }
 
+        private static Result<ConfigRoot> RefMustBeValidPurl(ConfigRoot config)
+        {
+            if (config.ReplaceLicenseByClearlyDefined == null)
+                return new Ok<ConfigRoot>(config);
+
+            foreach (var item in config.ReplaceLicenseByClearlyDefined)
+            {
+                if (item.Ref != null && !PackageUrl.PackageUrl.TryParse(item.Ref, out _))
+                {
+                    return InvalidConfigError.Create<ConfigRoot>(moduleName, $"Invalid PURL format: {item.Ref}");
+                }
+            }
+
+            return new Ok<ConfigRoot>(config);
+        }
+
         public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
-            return RefMustNotBeNullOrEmpty(config);
+            return RefMustNotBeNullOrEmpty(config)
+                .Bind(RefMustBeValidPurl);
         }
 
         public static InputTuple Execute(InputTuple inputs)
@@ -91,15 +109,10 @@ namespace CdxEnrich.Actions
             }
         }
 
-        private static async Task<List<string>> GetClearlyDefinedLicensesAsync(string purl)
+        private static async Task<List<string>> GetClearlyDefinedLicensesAsync(string purlString)
         {
-            if (!TryParsePurl(purl, out var type, out var provider, out var name, out var version))
-            {
-                Console.Error.WriteLine($"Invalid PURL format: {purl}");
-                return null;
-            }
-
-            var apiUrl = $"{ClearlyDefinedApiBase}/{type}/{provider}/-/{name}/{version}?expand=-files";
+            var packageUrl = PackageUrl.PackageUrl.Parse(purlString);
+            var apiUrl = packageUrl.ToClearlyDefinedApiUrl(ClearlyDefinedApiBase);
 
             const int maxRetries = 3;
             for (int retry = 0; retry < maxRetries; retry++)
@@ -118,14 +131,17 @@ namespace CdxEnrich.Actions
                 catch (HttpRequestException ex)
                 {
                     if (retry == maxRetries - 1)
+                    {
+                        Console.Error.WriteLine($"Fehler bei API-Aufruf: {apiUrl}");
                         throw;
+                    }
                     
                     Console.Error.WriteLine($"HTTP error calling ClearlyDefined API (attempt {retry+1}/{maxRetries}): {ex.Message}");
                     await Task.Delay(1000 * (retry + 1)); // Exponential backoff
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"Error parsing ClearlyDefined response: {ex.Message}");
+                    Console.Error.WriteLine($"Error parsing ClearlyDefined response for URL {apiUrl}: {ex.Message}");
                     throw;
                 }
             }
@@ -133,42 +149,6 @@ namespace CdxEnrich.Actions
             return null;
         }
 
-        private static bool TryParsePurl(string purl, out string type, out string provider, out string name, out string version)
-        {
-            type = provider = name = version = null;
-            
-            if (!purl.StartsWith("pkg:"))
-                return false;
-
-            var withoutPrefix = purl.Substring(4);
-            var parts = withoutPrefix.Split(new[] {'/'}, 2);
-            
-            if (parts.Length < 2)
-                return false;
-            
-            type = parts[0].ToLowerInvariant();
-            
-            if (type == "nuget")
-            {
-                provider = "nuget";
-                var nameParts = parts[1].Split(new[] {'@'}, 2);
-                name = nameParts[0];
-                version = nameParts.Length > 1 ? nameParts[1] : null;
-            }
-            else
-            {
-                var providerAndRest = parts[1].Split(new[] {'/'}, 2);
-                provider = providerAndRest[0];
-                if (providerAndRest.Length > 1)
-                {
-                    var nameAndVersion = providerAndRest[1].Split(new[] {'@'}, 2);
-                    name = nameAndVersion[0];
-                    version = nameAndVersion.Length > 1 ? nameAndVersion[1] : null;
-                }
-            }
-            
-            return !string.IsNullOrEmpty(type) && !string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(version);
-        }
 
         private class ClearlyDefinedResponse
         {

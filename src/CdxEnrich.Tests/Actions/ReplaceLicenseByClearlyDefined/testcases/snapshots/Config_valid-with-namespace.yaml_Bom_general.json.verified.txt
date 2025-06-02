@@ -32,17 +32,7 @@
       Licenses: [
         {
           License: {
-            Id: LicenseRef-scancode-ms-net-library
-          }
-        },
-        {
-          License: {
-            Id: LicenseRef-scancode-ms-net-library-2018-11
-          }
-        },
-        {
-          License: {
-            Id: LicenseRef-scancode-unknown-license-reference AND MIT
+            Id: MIT
           }
         }
       ],
@@ -86,11 +76,6 @@
           License: {
             Id: MIT
           }
-        },
-        {
-          License: {
-            Id: MIT AND CC0-1.0
-          }
         }
       ],
       Purl: pkg:npm/lodash@4.17.21
@@ -118,21 +103,6 @@
         {
           License: {
             Id: Apache-2.0
-          }
-        },
-        {
-          License: {
-            Id: Apache-2.0 AND MIT
-          }
-        },
-        {
-          License: {
-            Id: Apache-2.0 AND NOASSERTION
-          }
-        },
-        {
-          License: {
-            Id: NOASSERTION
           }
         }
       ],
