@@ -1,0 +1,31 @@
+﻿{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-03-15T12:00:00Z",
+    "tools": [
+      {
+        "vendor": "Example",
+        "name": "SBOM Generator",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Collections@4.0.11",
+      "name": "System.Collections",
+      "version": "4.0.11",
+      "purl": "pkg:nuget/System.Collections@4.0.11",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    }
+  ]
+}

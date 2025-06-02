@@ -1,0 +1,52 @@
+﻿{
+  BomFormat: CycloneDX,
+  SpecVersion: v1_4,
+  SpecVersionString: 1.4,
+  Version: 1,
+  NonNullableVersion: 1,
+  Metadata: {
+    Timestamp: DateTime_1,
+    Tools: {
+      Tools: [
+        {
+          Vendor: Example,
+          Name: SBOM Generator,
+          Version: 1.0.0
+        }
+      ]
+    },
+    ProtobufTools: [
+      {
+        Vendor: Example,
+        Name: SBOM Generator,
+        Version: 1.0.0
+      }
+    ]
+  },
+  Components: [
+    {
+      Type: Library,
+      BomRef: pkg:nuget/System.Collections@4.0.11,
+      Name: System.Collections,
+      Version: 4.0.11,
+      Licenses: [
+        {
+          License: {
+            Id: LicenseRef-scancode-ms-net-library
+          }
+        },
+        {
+          License: {
+            Id: LicenseRef-scancode-ms-net-library-2018-11
+          }
+        },
+        {
+          License: {
+            Id: LicenseRef-scancode-unknown-license-reference AND MIT
+          }
+        }
+      ],
+      Purl: pkg:nuget/System.Collections@4.0.11
+    }
+  ]
+}

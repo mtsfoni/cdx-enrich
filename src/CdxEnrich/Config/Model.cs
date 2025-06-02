@@ -12,6 +12,7 @@ namespace CdxEnrich.Config
     {
         public List<LicenseByUrl>? ReplaceLicensesByURL { get; set; }
         public List<LicenseByBomRef>? ReplaceLicenseByBomRef { get; set; }
+        public List<ReplaceLicenseByClearlyDefinedConfig>? ReplaceLicenseByClearlyDefined { get; set; }
     }
 
     public class LicenseByUrl
@@ -26,5 +27,10 @@ namespace CdxEnrich.Config
         public string? Ref { get; set; }
         public string? Id { get; set; }
         public string? Name { get; set; }
+    }
+    
+    public class ReplaceLicenseByClearlyDefinedConfig
+    {
+        public string? Ref { get; set; }
     }
 }
