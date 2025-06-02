@@ -22,9 +22,9 @@ namespace CdxEnrich.Tests.Actions
         }
 
         [Test]
-        [TestCaseSource(nameof(GetConfigs), new object[] { ""} )]
+        [TestCaseSource(nameof(GetConfigs), new object[] { "" })]
         public void CanParseConfig(string configPath)
-        {            
+        {
             var configContent = File.ReadAllText(configPath);
             var parseConfigResult = ConfigLoader.ParseConfig(configContent);
 
@@ -40,7 +40,7 @@ namespace CdxEnrich.Tests.Actions
             var configContent = File.ReadAllText(configPath);
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
                 .Bind(ReplaceLicensesByUrl.CheckConfig);
-            
+
             Assert.That(checkConfigResult is Failure);
         }
 
@@ -63,13 +63,13 @@ namespace CdxEnrich.Tests.Actions
             {
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 string testFilesPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../../..", "Actions/ReplaceLicensesByURL/testcases/boms"));
-                
+
                 foreach (string bomPath in Directory.GetFiles(testFilesPath))
                 {
                     yield return new object[] { Path.GetFullPath(filePath), bomPath };
                     returnedAtLeastOneSet = true;
                 }
-                
+
             }
             if (!returnedAtLeastOneSet)
             {
@@ -88,8 +88,8 @@ namespace CdxEnrich.Tests.Actions
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                        .Bind(ReplaceLicensesByUrl.CheckConfig))
-                    .Map(ReplaceLicensesByUrl.Execute);
+                    .Bind(ReplaceLicensesByUrl.CheckConfig))
+                .Map(ReplaceLicensesByUrl.Execute);
 
             Assert.That(executionResult is Success);
 

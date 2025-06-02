@@ -11,9 +11,7 @@
       {
         "vendor": "CycloneDX",
         "name": "CycloneDX module for .NET",
-        "version": "3.0.4.0",
-        "hashes": [],
-        "externalReferences": []
+        "version": "3.0.4.0"
       }
     ],
     "component": {
@@ -21,8 +19,7 @@
       "bom-ref": "CdxEnrich@0.0.0",
       "name": "CdxEnrich",
       "version": "0.0.0"
-    },
-    "lifecycles": []
+    }
   },
   "components": [
     {
@@ -42,8 +39,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0",
-            "properties": []
+            "id": "Apache-2.0"
           }
         }
       ],
@@ -52,13 +48,11 @@
       "externalReferences": [
         {
           "url": "https://github.com/CycloneDX/cyclonedx-dotnet-library",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/CycloneDX/cyclonedx-dotnet-library.git",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -79,8 +73,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "properties": []
+            "id": "MIT"
           }
         }
       ],
@@ -88,8 +81,7 @@
       "externalReferences": [
         {
           "url": "https://www.jetbrains.com/help/resharper/Code_Analysis__Code_Annotations.html",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         }
       ]
     },
@@ -118,13 +110,11 @@
       "externalReferences": [
         {
           "url": "https://github.com/gregsdennis/json-everything",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/gregsdennis/json-everything",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -146,8 +136,7 @@
         {
           "license": {
             "name": "Unknown - See URL",
-            "url": "https://aka.ms/deprecateLicenseUrl",
-            "properties": []
+            "url": "https://aka.ms/deprecateLicenseUrl"
           }
         }
       ],
@@ -155,13 +144,11 @@
       "externalReferences": [
         {
           "url": "https://github.com/gregsdennis/json-everything",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/gregsdennis/json-everything",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -182,8 +169,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "properties": []
+            "id": "MIT"
           }
         }
       ],
@@ -191,13 +177,11 @@
       "externalReferences": [
         {
           "url": "https://github.com/gregsdennis/json-everything",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/gregsdennis/json-everything",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -218,8 +202,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0",
-            "properties": []
+            "id": "Apache-2.0"
           }
         }
       ],
@@ -228,13 +211,11 @@
       "externalReferences": [
         {
           "url": "https://github.com/protobuf-net/protobuf-net",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/protobuf-net/protobuf-net",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -255,8 +236,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0",
-            "properties": []
+            "id": "Apache-2.0"
           }
         }
       ],
@@ -265,13 +245,11 @@
       "externalReferences": [
         {
           "url": "https://github.com/protobuf-net/protobuf-net",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/protobuf-net/protobuf-net",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -292,8 +270,7 @@
       "licenses": [
         {
           "license": {
-            "id": "LGPL-3.0-only",
-            "properties": []
+            "id": "LGPL-3.0-only"
           }
         }
       ],
@@ -302,13 +279,11 @@
       "externalReferences": [
         {
           "url": "https://redirect.sonarsource.com/doc/sonar-visualstudio.html",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/SonarSource/sonar-dotnet",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -329,8 +304,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "properties": []
+            "id": "MIT"
           }
         }
       ],
@@ -339,13 +313,11 @@
       "externalReferences": [
         {
           "url": "https://dot.net/",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/dotnet/runtime",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -366,8 +338,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "properties": []
+            "id": "MIT"
           }
         }
       ],
@@ -376,13 +347,11 @@
       "externalReferences": [
         {
           "url": "https://github.com/dotnet/command-line-api",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/dotnet/command-line-api",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -403,8 +372,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "properties": []
+            "id": "MIT"
           }
         }
       ],
@@ -413,13 +381,11 @@
       "externalReferences": [
         {
           "url": "https://dot.net/",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/dotnet/runtime",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -440,8 +406,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "properties": []
+            "id": "MIT"
           }
         }
       ],
@@ -450,13 +415,11 @@
       "externalReferences": [
         {
           "url": "https://dot.net/",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/dotnet/runtime",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     },
@@ -477,8 +440,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "properties": []
+            "id": "MIT"
           }
         }
       ],
@@ -486,13 +448,11 @@
       "externalReferences": [
         {
           "url": "https://github.com/aaubry/YamlDotNet/wiki",
-          "type": "website",
-          "hashes": []
+          "type": "website"
         },
         {
           "url": "https://github.com/aaubry/YamlDotNet.git",
-          "type": "vcs",
-          "hashes": []
+          "type": "vcs"
         }
       ]
     }
@@ -571,10 +531,6 @@
     {
       "ref": "pkg:nuget/YamlDotNet@15.1.4"
     }
-  ],
-  "vulnerabilities": [],
-  "annotations": [],
-  "properties": [],
-  "formulation": []
+  ]
 }
 }
