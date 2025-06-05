@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using CdxEnrich.ClearlyDefined;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.PackageUrl;
@@ -145,15 +146,17 @@ namespace CdxEnrich.Actions
         /// </summary>
         private static string CreateClearlyDefinedApiUrl(PackageUrl.PackageUrl packageUrl, string apiBase)
         {
+            var provider = ClearlyDefinedProvider.FromPackageType(packageUrl.Type);
+            
             // Fall 1: Namespace ist vorhanden
             if (packageUrl.Namespace != null)
             {
-                return $"{apiBase}/{packageUrl.Type}/{packageUrl.Provider.ApiString}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+                return $"{apiBase}/{packageUrl.Type}/{provider.ApiString}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
             }
             // Fall 2: Kein Namespace vorhanden, "-" als Platzhalter verwenden
             else
             {
-                return $"{apiBase}/{packageUrl.Type}/{packageUrl.Provider.ApiString}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+                return $"{apiBase}/{packageUrl.Type}/{provider.ApiString}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
             }
         }
 

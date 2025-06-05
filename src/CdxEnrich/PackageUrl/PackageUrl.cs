@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CdxEnrich.PackageUrl
 {
@@ -10,26 +8,10 @@ namespace CdxEnrich.PackageUrl
     /// </summary>
     public class PackageUrl
     {
-        // Mapping von Pakettypen zu Providern
-        private static readonly Dictionary<string, Provider> TypeToProviderMap = new (StringComparer.OrdinalIgnoreCase)
-        {
-            { "npm", Provider.Npmjs },
-            { "nuget", Provider.Nuget },
-            { "maven", Provider.MavenCentral },
-            { "pypi", Provider.Pypi },
-            { "gem", Provider.RubyGems },
-            { "golang", Provider.GitHub }
-        };
-        
         /// <summary>
         /// Der Pakettyp (npm, nuget, maven, pypi, etc.)
         /// </summary>
         public string Type { get; }
-        
-        /// <summary>
-        /// Der Provider für ClearlyDefined (npmjs, nuget, mavencentral, etc.)
-        /// </summary>
-        public Provider Provider { get; }
         
         /// <summary>
         /// Der Namespace des Pakets (kann null sein, wenn kein Namespace vorhanden ist)
@@ -51,10 +33,9 @@ namespace CdxEnrich.PackageUrl
         /// </summary>
         public string OriginalString { get; }
         
-        private PackageUrl(string type, Provider provider, string? namespace_, string name, string version, string originalString)
+        private PackageUrl(string type, string? namespace_, string name, string version, string originalString)
         {
             Type = type;
-            Provider = provider;
             Namespace = namespace_;
             Name = name;
             Version = version;
@@ -100,9 +81,6 @@ namespace CdxEnrich.PackageUrl
             
             var type = segments[0].ToLowerInvariant();
             
-            // Mappe den Typ auf den Provider für ClearlyDefined
-            var provider = GetProviderForType(type);
-            
             string? namespace_ = null;
             string name;
             string version;
@@ -137,20 +115,7 @@ namespace CdxEnrich.PackageUrl
                 version = versionSplit[1];
             }
             
-            return new PackageUrl(type, provider, namespace_, name, version, purlString);
-        }
-        
-        /// <summary>
-        /// Mappt einen Pakettyp auf den entsprechenden ClearlyDefined-Provider
-        /// </summary>
-        private static Provider GetProviderForType(string type)
-        {
-            if (TypeToProviderMap.TryGetValue(type, out var provider))
-            {
-                return provider;
-            }
-            
-            throw new ArgumentException($"Unbekannter Pakettyp: {type}");
+            return new PackageUrl(type, namespace_, name, version, purlString);
         }
         
         public override string ToString() => OriginalString;
