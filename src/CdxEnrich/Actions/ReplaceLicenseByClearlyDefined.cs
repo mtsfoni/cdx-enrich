@@ -1,25 +1,18 @@
-﻿using CdxEnrich;
+﻿using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
-using CdxEnrich.PackageUrl;
 using CycloneDX.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace CdxEnrich.Actions
 {
     public static class ReplaceLicenseByClearlyDefined
     {
-        static readonly string moduleName = nameof(ReplaceLicenseByClearlyDefined);
-        private static readonly HttpClient HttpClient = new() { Timeout = TimeSpan.FromSeconds(60) };
         private const string ClearlyDefinedApiBase = "https://api.clearlydefined.io/definitions";
+        private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
+        private static readonly HttpClient HttpClient = new() { Timeout = TimeSpan.FromSeconds(60) };
 
-        public static Component? GetComponentByBomRef(Bom bom, string bomRef)
+        private static Component? GetComponentByBomRef(Bom bom, string bomRef)
         {
             return bom.Components?.Find(comp => comp.BomRef == bomRef);
         }
@@ -28,24 +21,25 @@ namespace CdxEnrich.Actions
         {
             if (config.ReplaceLicenseByClearlyDefined?.Exists(rec => string.IsNullOrEmpty(rec.Ref)) == true)
             {
-                return InvalidConfigError.Create<ConfigRoot>(moduleName, "Ref must be set and cannot be an empty string.");
+                return InvalidConfigError.Create<ConfigRoot>(ModuleName,
+                    "Ref must be set and cannot be an empty string.");
             }
-            else
-            {
-                return new Ok<ConfigRoot>(config);
-            }
+
+            return new Ok<ConfigRoot>(config);
         }
 
         private static Result<ConfigRoot> RefMustBeValidPurl(ConfigRoot config)
         {
             if (config.ReplaceLicenseByClearlyDefined == null)
+            {
                 return new Ok<ConfigRoot>(config);
+            }
 
             foreach (var item in config.ReplaceLicenseByClearlyDefined)
             {
                 if (item.Ref != null && !PackageUrl.PackageUrl.TryParse(item.Ref, out _))
                 {
-                    return InvalidConfigError.Create<ConfigRoot>(moduleName, $"Invalid PURL format: {item.Ref}");
+                    return InvalidConfigError.Create<ConfigRoot>(ModuleName, $"Invalid PURL format: {item.Ref}");
                 }
             }
 
@@ -61,18 +55,18 @@ namespace CdxEnrich.Actions
         public static InputTuple Execute(InputTuple inputs)
         {
             var tasks = new List<Task>();
-            
+
             inputs.Config.ReplaceLicenseByClearlyDefined?
-                   .Where(item => item.Ref != null)
-                   .ToList()
-                   .ForEach(item =>
-                   {
-                       var component = GetComponentByBomRef(inputs.Bom, item.Ref!);
-                       if (component != null)
-                       {
-                           tasks.Add(ProcessComponentAsync(component, item.Ref!));
-                       }
-                   });
+                .Where(item => item.Ref != null)
+                .ToList()
+                .ForEach(item =>
+                {
+                    var component = GetComponentByBomRef(inputs.Bom, item.Ref!);
+                    if (component != null)
+                    {
+                        tasks.Add(ProcessComponentAsync(component, item.Ref!));
+                    }
+                });
 
             try
             {
@@ -91,7 +85,7 @@ namespace CdxEnrich.Actions
             try
             {
                 var cdLicenses = await GetClearlyDefinedLicensesAsync(purl);
-                
+
                 if (cdLicenses == null || !cdLicenses.Any())
                 {
                     Console.WriteLine($"No ClearlyDefined licenses found for {purl}");
@@ -105,43 +99,39 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing component {purl}: {ex.Message}");
+                await Console.Error.WriteLineAsync($"Error processing component {purl}: {ex.Message}");
             }
         }
 
-        private static async Task<List<string>> GetClearlyDefinedLicensesAsync(string purlString)
+        private static async Task<List<string>?> GetClearlyDefinedLicensesAsync(string purlString)
         {
             var packageUrl = PackageUrl.PackageUrl.Parse(purlString);
             var apiUrl = packageUrl.ToClearlyDefinedApiUrl(ClearlyDefinedApiBase);
 
             const int maxRetries = 3;
-            for (int retry = 0; retry < maxRetries; retry++)
+            for (var retry = 0; retry < maxRetries; retry++)
             {
                 try
                 {
                     var response = await HttpClient.GetFromJsonAsync<ClearlyDefinedResponse>(apiUrl);
-                    
-                    if (response?.Licensed?.Facets?.Core?.Discovered?.Expressions != null)
-                    {
-                        return response.Licensed.Facets.Core.Discovered.Expressions;
-                    }
-                    
-                    return null;
+
+                    return response?.Licensed.Facets.Core.Discovered.Expressions;
                 }
                 catch (HttpRequestException ex)
                 {
                     if (retry == maxRetries - 1)
                     {
-                        Console.Error.WriteLine($"Fehler bei API-Aufruf: {apiUrl}");
+                        await Console.Error.WriteLineAsync($"Fehler bei API-Aufruf: {apiUrl}");
                         throw;
                     }
-                    
-                    Console.Error.WriteLine($"HTTP error calling ClearlyDefined API (attempt {retry+1}/{maxRetries}): {ex.Message}");
+
+                    await Console.Error.WriteLineAsync(
+                        $"HTTP error calling ClearlyDefined API (attempt {retry + 1}/{maxRetries}): {ex.Message}");
                     await Task.Delay(1000 * (retry + 1)); // Exponential backoff
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"Error parsing ClearlyDefined response for URL {apiUrl}: {ex.Message}");
+                    await Console.Error.WriteLineAsync($"Error parsing ClearlyDefined response for URL {apiUrl}: {ex.Message}");
                     throw;
                 }
             }
@@ -149,34 +139,28 @@ namespace CdxEnrich.Actions
             return null;
         }
 
-
-        private class ClearlyDefinedResponse
+        private sealed class ClearlyDefinedResponse
         {
-            [JsonPropertyName("licensed")]
-            public LicensedData Licensed { get; set; }
+            [JsonPropertyName("licensed")] public required LicensedData Licensed { get; init; }
 
             public class LicensedData
             {
-                [JsonPropertyName("facets")]
-                public Facets Facets { get; set; }
+                [JsonPropertyName("facets")] public required Facets Facets { get; init; }
             }
 
             public class Facets
             {
-                [JsonPropertyName("core")]
-                public Core Core { get; set; }
+                [JsonPropertyName("core")] public required Core Core { get; init; }
             }
 
             public class Core
             {
-                [JsonPropertyName("discovered")]
-                public Discovered Discovered { get; set; }
+                [JsonPropertyName("discovered")] public required Discovered Discovered { get; init; }
             }
 
             public class Discovered
             {
-                [JsonPropertyName("expressions")]
-                public List<string> Expressions { get; set; }
+                [JsonPropertyName("expressions")] public List<string>? Expressions { get; init; }
             }
         }
     }
