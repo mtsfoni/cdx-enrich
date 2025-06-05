@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace CdxEnrich.ClearlyDefined
+﻿namespace CdxEnrich.ClearlyDefined
 {
     /// <summary>
-    /// Smart Enum für die unterstützten Pakettypen in ClearlyDefined
+    ///     Smart Enum für die unterstützten Pakettypen in ClearlyDefined
     /// </summary>
     public sealed record PackageType(string Name, string Value)
     {
@@ -25,38 +21,39 @@ namespace CdxEnrich.ClearlyDefined
         public static readonly PackageType Crate = new(nameof(Crate), "crate");
 
         // Dictionary für schnellen Zugriff nach Value
-        private static readonly Dictionary<string, PackageType> _lookupByValue = 
-            new List<PackageType> 
-            { 
-                Npm, Nuget, Maven, Pypi, Gem, Golang, Debian, 
+        private static readonly Dictionary<string, PackageType> _lookupByValue =
+            new List<PackageType>
+            {
+                Npm, Nuget, Maven, Pypi, Gem, Golang, Debian,
                 CocoaPods, Composer, Cargo, GitHubActions, Pod, Crate
             }.ToDictionary(p => p.Value, StringComparer.OrdinalIgnoreCase);
 
         // Mapping von PURL-Typen zu ClearlyDefined PackageTypes
-        private static readonly Dictionary<string, PackageType> _purlTypeToPackageType = new(StringComparer.OrdinalIgnoreCase)
-        {
-            { "npm", Npm },
-            { "nuget", Nuget },
-            { "maven", Maven },
-            { "pypi", Pypi },
-            { "gem", Gem },
-            { "golang", Golang },
-            { "debian", Debian },
-            { "cocoapods", CocoaPods },
-            { "composer", Composer },
-            { "cargo", Cargo },
-            { "githubactions", GitHubActions },
-            { "pod", Pod },
-            { "crate", Crate }
-        };
+        private static readonly Dictionary<string, PackageType> _purlTypeToPackageType =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                { "npm", Npm },
+                { "nuget", Nuget },
+                { "maven", Maven },
+                { "pypi", Pypi },
+                { "gem", Gem },
+                { "golang", Golang },
+                { "debian", Debian },
+                { "cocoapods", CocoaPods },
+                { "composer", Composer },
+                { "cargo", Cargo },
+                { "githubactions", GitHubActions },
+                { "pod", Pod },
+                { "crate", Crate }
+            };
 
         /// <summary>
-        /// Gibt alle verfügbaren Pakettypen zurück
+        ///     Gibt alle verfügbaren Pakettypen zurück
         /// </summary>
         public static IEnumerable<PackageType> All => _lookupByValue.Values;
 
         /// <summary>
-        /// Versucht, einen Pakettyp anhand seines Value-Strings zu finden
+        ///     Versucht, einen Pakettyp anhand seines Value-Strings zu finden
         /// </summary>
         public static bool TryFromValue(string value, out PackageType? packageType)
         {
@@ -70,7 +67,7 @@ namespace CdxEnrich.ClearlyDefined
         }
 
         /// <summary>
-        /// Findet einen Pakettyp anhand seines Value-Strings
+        ///     Findet einen Pakettyp anhand seines Value-Strings
         /// </summary>
         public static PackageType FromValue(string value)
         {
@@ -83,7 +80,7 @@ namespace CdxEnrich.ClearlyDefined
         }
 
         /// <summary>
-        /// Versucht, einen PackageType anhand eines PURL-Typs zu finden
+        ///     Versucht, einen PackageType anhand eines PURL-Typs zu finden
         /// </summary>
         public static bool TryFromPurlType(string purlType, out PackageType? packageType)
         {
@@ -97,7 +94,7 @@ namespace CdxEnrich.ClearlyDefined
         }
 
         /// <summary>
-        /// Findet einen PackageType anhand eines PURL-Typs
+        ///     Findet einen PackageType anhand eines PURL-Typs
         /// </summary>
         public static PackageType FromPurlType(string purlType)
         {
@@ -111,6 +108,9 @@ namespace CdxEnrich.ClearlyDefined
 
         // Bei Records wird ToString() automatisch überschrieben und gibt einen formatierten String mit allen Properties zurück
         // Wir überschreiben es hier, um nur den Namen zurückzugeben
-        public override string ToString() => Name;
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 }

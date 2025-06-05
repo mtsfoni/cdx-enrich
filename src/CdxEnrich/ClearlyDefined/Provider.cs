@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace CdxEnrich.ClearlyDefined
+﻿namespace CdxEnrich.ClearlyDefined
 {
     /// <summary>
-    /// Smart Enum für die unterstützten Provider in ClearlyDefined
+    ///     Smart Enum für die unterstützten Provider in ClearlyDefined
     /// </summary>
     public sealed record Provider(string Name, string ApiString)
     {
@@ -43,36 +39,37 @@ namespace CdxEnrich.ClearlyDefined
         };
 
         // Direktes Mapping von PURL-Typen zu Providern (für Kompatibilität)
-        private static readonly Dictionary<string, Provider> _purlTypeToProviderMap = new(StringComparer.OrdinalIgnoreCase)
-        {
-            { "npm", Npmjs },
-            { "nuget", Nuget },
-            { "maven", MavenCentral },
-            { "pypi", Pypi },
-            { "gem", RubyGems },
-            { "golang", GitHub },
-            { "cargo", Cratesio },
-            { "cocoapods", Cocoapods },
-            { "composer", Packagist },
-            { "debian", Debian }
-        };
+        private static readonly Dictionary<string, Provider> _purlTypeToProviderMap =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                { "npm", Npmjs },
+                { "nuget", Nuget },
+                { "maven", MavenCentral },
+                { "pypi", Pypi },
+                { "gem", RubyGems },
+                { "golang", GitHub },
+                { "cargo", Cratesio },
+                { "cocoapods", Cocoapods },
+                { "composer", Packagist },
+                { "debian", Debian }
+            };
 
         // Dictionary für schnellen Zugriff nach ApiString
-        private static readonly Dictionary<string, Provider> _lookupByApiString = 
-            new List<Provider> 
-            { 
+        private static readonly Dictionary<string, Provider> _lookupByApiString =
+            new List<Provider>
+            {
                 AnacondaMain, AnacondaR, Cocoapods, CondaForge, Cratesio,
                 Debian, GitHub, GitLab, MavenCentral, MavenGoogle,
                 GradlePlugin, Npmjs, Nuget, Packagist, Pypi, RubyGems
             }.ToDictionary(p => p.ApiString);
 
         /// <summary>
-        /// Gibt alle verfügbaren Provider zurück
+        ///     Gibt alle verfügbaren Provider zurück
         /// </summary>
         public static IEnumerable<Provider> All => _lookupByApiString.Values;
 
         /// <summary>
-        /// Versucht, einen Provider anhand seines API-Strings zu finden
+        ///     Versucht, einen Provider anhand seines API-Strings zu finden
         /// </summary>
         public static bool TryFromApiString(string apiString, out Provider? provider)
         {
@@ -86,7 +83,7 @@ namespace CdxEnrich.ClearlyDefined
         }
 
         /// <summary>
-        /// Findet einen Provider anhand seines API-Strings
+        ///     Findet einen Provider anhand seines API-Strings
         /// </summary>
         public static Provider FromApiString(string apiString)
         {
@@ -99,7 +96,7 @@ namespace CdxEnrich.ClearlyDefined
         }
 
         /// <summary>
-        /// Mappt einen Pakettyp auf den entsprechenden ClearlyDefined-Provider
+        ///     Mappt einen Pakettyp auf den entsprechenden ClearlyDefined-Provider
         /// </summary>
         public static Provider FromPackageType(PackageType packageType)
         {
@@ -107,12 +104,12 @@ namespace CdxEnrich.ClearlyDefined
             {
                 return provider;
             }
-            
+
             throw new ArgumentException($"Kein passender Provider für Pakettyp: {packageType.Name}");
         }
-        
+
         /// <summary>
-        /// Mappt einen PURL-Typ-String direkt auf den entsprechenden ClearlyDefined-Provider
+        ///     Mappt einen PURL-Typ-String direkt auf den entsprechenden ClearlyDefined-Provider
         /// </summary>
         public static Provider FromPurlType(string purlType)
         {
@@ -126,18 +123,21 @@ namespace CdxEnrich.ClearlyDefined
             {
                 return provider;
             }
-            
+
             // Wenn nicht gefunden, versuche über PackageType zu gehen
             if (PackageType.TryFromPurlType(purlType, out var packageType) && packageType != null)
             {
                 return FromPackageType(packageType);
             }
-            
+
             throw new ArgumentException($"Kein passender Provider für PURL-Typ: {purlType}");
         }
 
         // Bei Records wird ToString() automatisch überschrieben und gibt einen formatierten String mit allen Properties zurück
         // Wir überschreiben es hier, um nur den Namen zurückzugeben
-        public override string ToString() => Name;
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 }
