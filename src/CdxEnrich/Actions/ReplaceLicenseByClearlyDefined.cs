@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
+using CdxEnrich.PackageUrl;
 using CycloneDX.Models;
 
 namespace CdxEnrich.Actions
@@ -106,7 +107,7 @@ namespace CdxEnrich.Actions
         private static async Task<List<string>?> GetClearlyDefinedLicensesAsync(string purlString)
         {
             var packageUrl = PackageUrl.PackageUrl.Parse(purlString);
-            var apiUrl = packageUrl.ToClearlyDefinedApiUrl(ClearlyDefinedApiBase);
+            var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, ClearlyDefinedApiBase);
 
             const int maxRetries = 3;
             for (var retry = 0; retry < maxRetries; retry++)
@@ -137,6 +138,23 @@ namespace CdxEnrich.Actions
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Erzeugt die API-URL für ClearlyDefined
+        /// </summary>
+        private static string CreateClearlyDefinedApiUrl(PackageUrl.PackageUrl packageUrl, string apiBase)
+        {
+            // Fall 1: Namespace ist vorhanden
+            if (packageUrl.Namespace != null)
+            {
+                return $"{apiBase}/{packageUrl.Type}/{packageUrl.Provider.ApiString}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+            }
+            // Fall 2: Kein Namespace vorhanden, "-" als Platzhalter verwenden
+            else
+            {
+                return $"{apiBase}/{packageUrl.Type}/{packageUrl.Provider.ApiString}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+            }
         }
 
         private sealed class ClearlyDefinedResponse

@@ -62,23 +62,6 @@ namespace CdxEnrich.PackageUrl
         }
         
         /// <summary>
-        /// Erzeugt die API-URL für ClearlyDefined
-        /// </summary>
-        public string ToClearlyDefinedApiUrl(string apiBase)
-        {
-            // Fall 1: Namespace ist vorhanden
-            if (Namespace != null)
-            {
-                return $"{apiBase}/{Type}/{Provider.ApiString}/{Namespace}/{Name}/{Version}?expand=-files";
-            }
-            // Fall 2: Kein Namespace vorhanden, "-" als Platzhalter verwenden
-            else
-            {
-                return $"{apiBase}/{Type}/{Provider.ApiString}/-/{Name}/{Version}?expand=-files";
-            }
-        }
-        
-        /// <summary>
         /// Versucht, eine PURL zu parsen
         /// </summary>
         public static bool TryParse(string purlString, out PackageUrl? packageUrl)
