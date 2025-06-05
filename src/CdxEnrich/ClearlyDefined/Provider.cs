@@ -7,28 +7,28 @@ namespace CdxEnrich.ClearlyDefined
     /// <summary>
     /// Smart Enum für die unterstützten Provider in ClearlyDefined
     /// </summary>
-    public sealed record ClearlyDefinedProvider(string Name, string ApiString)
+    public sealed record Provider(string Name, string ApiString)
     {
         // Statische Instanzen aller Provider
-        public static readonly ClearlyDefinedProvider AnacondaMain = new(nameof(AnacondaMain), "anaconda-main");
-        public static readonly ClearlyDefinedProvider AnacondaR = new(nameof(AnacondaR), "anaconda-r");
-        public static readonly ClearlyDefinedProvider Cocoapods = new(nameof(Cocoapods), "cocoapods");
-        public static readonly ClearlyDefinedProvider CondaForge = new(nameof(CondaForge), "conda-forge");
-        public static readonly ClearlyDefinedProvider Cratesio = new(nameof(Cratesio), "cratesio");
-        public static readonly ClearlyDefinedProvider Debian = new(nameof(Debian), "debian");
-        public static readonly ClearlyDefinedProvider GitHub = new(nameof(GitHub), "github");
-        public static readonly ClearlyDefinedProvider GitLab = new(nameof(GitLab), "gitlab");
-        public static readonly ClearlyDefinedProvider MavenCentral = new(nameof(MavenCentral), "mavencentral");
-        public static readonly ClearlyDefinedProvider MavenGoogle = new(nameof(MavenGoogle), "mavengoogle");
-        public static readonly ClearlyDefinedProvider GradlePlugin = new(nameof(GradlePlugin), "gradleplugin");
-        public static readonly ClearlyDefinedProvider Npmjs = new(nameof(Npmjs), "npmjs");
-        public static readonly ClearlyDefinedProvider Nuget = new(nameof(Nuget), "nuget");
-        public static readonly ClearlyDefinedProvider Packagist = new(nameof(Packagist), "packagist");
-        public static readonly ClearlyDefinedProvider Pypi = new(nameof(Pypi), "pypi");
-        public static readonly ClearlyDefinedProvider RubyGems = new(nameof(RubyGems), "rubygems");
+        public static readonly Provider AnacondaMain = new(nameof(AnacondaMain), "anaconda-main");
+        public static readonly Provider AnacondaR = new(nameof(AnacondaR), "anaconda-r");
+        public static readonly Provider Cocoapods = new(nameof(Cocoapods), "cocoapods");
+        public static readonly Provider CondaForge = new(nameof(CondaForge), "conda-forge");
+        public static readonly Provider Cratesio = new(nameof(Cratesio), "cratesio");
+        public static readonly Provider Debian = new(nameof(Debian), "debian");
+        public static readonly Provider GitHub = new(nameof(GitHub), "github");
+        public static readonly Provider GitLab = new(nameof(GitLab), "gitlab");
+        public static readonly Provider MavenCentral = new(nameof(MavenCentral), "mavencentral");
+        public static readonly Provider MavenGoogle = new(nameof(MavenGoogle), "mavengoogle");
+        public static readonly Provider GradlePlugin = new(nameof(GradlePlugin), "gradleplugin");
+        public static readonly Provider Npmjs = new(nameof(Npmjs), "npmjs");
+        public static readonly Provider Nuget = new(nameof(Nuget), "nuget");
+        public static readonly Provider Packagist = new(nameof(Packagist), "packagist");
+        public static readonly Provider Pypi = new(nameof(Pypi), "pypi");
+        public static readonly Provider RubyGems = new(nameof(RubyGems), "rubygems");
 
         // Mapping von Pakettypen zu Providern
-        private static readonly Dictionary<PackageType, ClearlyDefinedProvider> _typeToProviderMap = new()
+        private static readonly Dictionary<PackageType, Provider> _typeToProviderMap = new()
         {
             { PackageType.Npm, Npmjs },
             { PackageType.Nuget, Nuget },
@@ -43,7 +43,7 @@ namespace CdxEnrich.ClearlyDefined
         };
 
         // Direktes Mapping von PURL-Typen zu Providern (für Kompatibilität)
-        private static readonly Dictionary<string, ClearlyDefinedProvider> _purlTypeToProviderMap = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, Provider> _purlTypeToProviderMap = new(StringComparer.OrdinalIgnoreCase)
         {
             { "npm", Npmjs },
             { "nuget", Nuget },
@@ -58,8 +58,8 @@ namespace CdxEnrich.ClearlyDefined
         };
 
         // Dictionary für schnellen Zugriff nach ApiString
-        private static readonly Dictionary<string, ClearlyDefinedProvider> _lookupByApiString = 
-            new List<ClearlyDefinedProvider> 
+        private static readonly Dictionary<string, Provider> _lookupByApiString = 
+            new List<Provider> 
             { 
                 AnacondaMain, AnacondaR, Cocoapods, CondaForge, Cratesio,
                 Debian, GitHub, GitLab, MavenCentral, MavenGoogle,
@@ -69,12 +69,12 @@ namespace CdxEnrich.ClearlyDefined
         /// <summary>
         /// Gibt alle verfügbaren Provider zurück
         /// </summary>
-        public static IEnumerable<ClearlyDefinedProvider> All => _lookupByApiString.Values;
+        public static IEnumerable<Provider> All => _lookupByApiString.Values;
 
         /// <summary>
         /// Versucht, einen Provider anhand seines API-Strings zu finden
         /// </summary>
-        public static bool TryFromApiString(string apiString, out ClearlyDefinedProvider? provider)
+        public static bool TryFromApiString(string apiString, out Provider? provider)
         {
             if (string.IsNullOrEmpty(apiString))
             {
@@ -88,7 +88,7 @@ namespace CdxEnrich.ClearlyDefined
         /// <summary>
         /// Findet einen Provider anhand seines API-Strings
         /// </summary>
-        public static ClearlyDefinedProvider FromApiString(string apiString)
+        public static Provider FromApiString(string apiString)
         {
             if (TryFromApiString(apiString, out var provider))
             {
@@ -101,7 +101,7 @@ namespace CdxEnrich.ClearlyDefined
         /// <summary>
         /// Mappt einen Pakettyp auf den entsprechenden ClearlyDefined-Provider
         /// </summary>
-        public static ClearlyDefinedProvider FromPackageType(PackageType packageType)
+        public static Provider FromPackageType(PackageType packageType)
         {
             if (_typeToProviderMap.TryGetValue(packageType, out var provider))
             {
@@ -114,7 +114,7 @@ namespace CdxEnrich.ClearlyDefined
         /// <summary>
         /// Mappt einen PURL-Typ-String direkt auf den entsprechenden ClearlyDefined-Provider
         /// </summary>
-        public static ClearlyDefinedProvider FromPurlType(string purlType)
+        public static Provider FromPurlType(string purlType)
         {
             if (string.IsNullOrEmpty(purlType))
             {

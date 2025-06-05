@@ -146,7 +146,7 @@ namespace CdxEnrich.Actions
         private static string CreateClearlyDefinedApiUrl(PackageUrl.PackageUrl packageUrl, string apiBase)
         {
             // Ermittle den passenden Provider für den PURL-Typ
-            var provider = ClearlyDefinedProvider.FromPurlType(packageUrl.Type);
+            var provider = Provider.FromPurlType(packageUrl.Type);
             
             // Fall 1: Namespace ist vorhanden
             if (packageUrl.Namespace != null)
