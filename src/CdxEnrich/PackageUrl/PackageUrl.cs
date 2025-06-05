@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CdxEnrich.PackageUrl
@@ -9,6 +10,17 @@ namespace CdxEnrich.PackageUrl
     /// </summary>
     public class PackageUrl
     {
+        // Mapping von Pakettypen zu Providern
+        private static readonly Dictionary<string, Provider> TypeToProviderMap = new (StringComparer.OrdinalIgnoreCase)
+        {
+            { "npm", Provider.Npmjs },
+            { "nuget", Provider.Nuget },
+            { "maven", Provider.MavenCentral },
+            { "pypi", Provider.Pypi },
+            { "gem", Provider.RubyGems },
+            { "golang", Provider.GitHub }
+        };
+        
         /// <summary>
         /// Der Pakettyp (npm, nuget, maven, pypi, etc.)
         /// </summary>
@@ -17,7 +29,7 @@ namespace CdxEnrich.PackageUrl
         /// <summary>
         /// Der Provider für ClearlyDefined (npmjs, nuget, mavencentral, etc.)
         /// </summary>
-        public string Provider { get; }
+        public Provider Provider { get; }
         
         /// <summary>
         /// Der Namespace des Pakets (kann null sein, wenn kein Namespace vorhanden ist)
@@ -39,7 +51,7 @@ namespace CdxEnrich.PackageUrl
         /// </summary>
         public string OriginalString { get; }
         
-        private PackageUrl(string type, string provider, string? namespace_, string name, string version, string originalString)
+        private PackageUrl(string type, Provider provider, string? namespace_, string name, string version, string originalString)
         {
             Type = type;
             Provider = provider;
@@ -57,12 +69,12 @@ namespace CdxEnrich.PackageUrl
             // Fall 1: Namespace ist vorhanden
             if (Namespace != null)
             {
-                return $"{apiBase}/{Type}/{Provider}/{Namespace}/{Name}/{Version}?expand=-files";
+                return $"{apiBase}/{Type}/{Provider.ApiString}/{Namespace}/{Name}/{Version}?expand=-files";
             }
             // Fall 2: Kein Namespace vorhanden, "-" als Platzhalter verwenden
             else
             {
-                return $"{apiBase}/{Type}/{Provider}/-/{Name}/{Version}?expand=-files";
+                return $"{apiBase}/{Type}/{Provider.ApiString}/-/{Name}/{Version}?expand=-files";
             }
         }
         
@@ -148,18 +160,14 @@ namespace CdxEnrich.PackageUrl
         /// <summary>
         /// Mappt einen Pakettyp auf den entsprechenden ClearlyDefined-Provider
         /// </summary>
-        private static string GetProviderForType(string type)
+        private static Provider GetProviderForType(string type)
         {
-            return type switch
+            if (TypeToProviderMap.TryGetValue(type, out var provider))
             {
-                "npm" => "npmjs",
-                "nuget" => "nuget",
-                "maven" => "mavencentral",
-                "pypi" => "pypi",
-                "gem" => "rubygems",
-                "golang" => "golang",
-                _ => type // Fallback: Verwende den Typ als Provider
-            };
+                return provider;
+            }
+            
+            throw new ArgumentException($"Unbekannter Pakettyp: {type}");
         }
         
         public override string ToString() => OriginalString;
