@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using CdxEnrich.ClearlyDefined;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
-using CdxEnrich.PackageUrl;
 using CycloneDX.Models;
 
 namespace CdxEnrich.Actions
@@ -146,7 +145,8 @@ namespace CdxEnrich.Actions
         /// </summary>
         private static string CreateClearlyDefinedApiUrl(PackageUrl.PackageUrl packageUrl, string apiBase)
         {
-            var provider = ClearlyDefinedProvider.FromPackageType(packageUrl.Type);
+            // Ermittle den passenden Provider für den PURL-Typ
+            var provider = ClearlyDefinedProvider.FromPurlType(packageUrl.Type);
             
             // Fall 1: Namespace ist vorhanden
             if (packageUrl.Namespace != null)

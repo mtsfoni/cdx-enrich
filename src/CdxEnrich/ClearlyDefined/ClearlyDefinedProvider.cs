@@ -28,14 +28,33 @@ namespace CdxEnrich.ClearlyDefined
         public static readonly ClearlyDefinedProvider RubyGems = new(nameof(RubyGems), "rubygems");
 
         // Mapping von Pakettypen zu Providern
-        private static readonly Dictionary<string, ClearlyDefinedProvider> TypeToProviderMap = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<PackageType, ClearlyDefinedProvider> _typeToProviderMap = new()
+        {
+            { PackageType.Npm, Npmjs },
+            { PackageType.Nuget, Nuget },
+            { PackageType.Maven, MavenCentral },
+            { PackageType.Pypi, Pypi },
+            { PackageType.Gem, RubyGems },
+            { PackageType.Golang, GitHub },
+            { PackageType.Cargo, Cratesio },
+            { PackageType.CocoaPods, Cocoapods },
+            { PackageType.Composer, Packagist },
+            { PackageType.Debian, Debian }
+        };
+
+        // Direktes Mapping von PURL-Typen zu Providern (für Kompatibilität)
+        private static readonly Dictionary<string, ClearlyDefinedProvider> _purlTypeToProviderMap = new(StringComparer.OrdinalIgnoreCase)
         {
             { "npm", Npmjs },
             { "nuget", Nuget },
             { "maven", MavenCentral },
             { "pypi", Pypi },
             { "gem", RubyGems },
-            { "golang", GitHub }
+            { "golang", GitHub },
+            { "cargo", Cratesio },
+            { "cocoapods", Cocoapods },
+            { "composer", Packagist },
+            { "debian", Debian }
         };
 
         // Dictionary für schnellen Zugriff nach ApiString
@@ -82,14 +101,39 @@ namespace CdxEnrich.ClearlyDefined
         /// <summary>
         /// Mappt einen Pakettyp auf den entsprechenden ClearlyDefined-Provider
         /// </summary>
-        public static ClearlyDefinedProvider FromPackageType(string type)
+        public static ClearlyDefinedProvider FromPackageType(PackageType packageType)
         {
-            if (TypeToProviderMap.TryGetValue(type, out var provider))
+            if (_typeToProviderMap.TryGetValue(packageType, out var provider))
             {
                 return provider;
             }
             
-            throw new ArgumentException($"Unbekannter Pakettyp: {type}");
+            throw new ArgumentException($"Kein passender Provider für Pakettyp: {packageType.Name}");
+        }
+        
+        /// <summary>
+        /// Mappt einen PURL-Typ-String direkt auf den entsprechenden ClearlyDefined-Provider
+        /// </summary>
+        public static ClearlyDefinedProvider FromPurlType(string purlType)
+        {
+            if (string.IsNullOrEmpty(purlType))
+            {
+                throw new ArgumentException("PURL-Typ darf nicht null oder leer sein.");
+            }
+
+            // Versuche direktes Mapping
+            if (_purlTypeToProviderMap.TryGetValue(purlType, out var provider))
+            {
+                return provider;
+            }
+            
+            // Wenn nicht gefunden, versuche über PackageType zu gehen
+            if (PackageType.TryFromPurlType(purlType, out var packageType) && packageType != null)
+            {
+                return FromPackageType(packageType);
+            }
+            
+            throw new ArgumentException($"Kein passender Provider für PURL-Typ: {purlType}");
         }
 
         // Bei Records wird ToString() automatisch überschrieben und gibt einen formatierten String mit allen Properties zurück
