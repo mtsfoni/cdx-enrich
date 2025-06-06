@@ -4,6 +4,7 @@ using CdxEnrich.ClearlyDefined;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CycloneDX.Models;
+using PackageUrl;
 
 namespace CdxEnrich.Actions
 {
@@ -106,7 +107,7 @@ namespace CdxEnrich.Actions
 
         private static async Task<List<string>?> GetClearlyDefinedLicensesAsync(string purlString)
         {
-            var packageUrl = new PackageUrl.PackageUrl(purlString);
+            var packageUrl = new PackageURL(purlString);
             var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, ClearlyDefinedApiBase);
 
             const int maxRetries = 3;
@@ -143,7 +144,7 @@ namespace CdxEnrich.Actions
         /// <summary>
         /// Erzeugt die API-URL für ClearlyDefined
         /// </summary>
-        private static string CreateClearlyDefinedApiUrl(PackageUrl.PackageUrl packageUrl, string apiBase)
+        private static string CreateClearlyDefinedApiUrl(PackageURL packageUrl, string apiBase)
         {
             // Ermittle den passenden Provider für den PURL-Typ
             var provider = Provider.FromPurlType(packageUrl.Type);
@@ -185,13 +186,13 @@ namespace CdxEnrich.Actions
             }
         }
 
-        private static bool TryParsePurl(string purlString, out PackageUrl.PackageUrl? packageUrl)
+        private static bool TryParsePurl(string purlString, out PackageURL? packageUrl)
         {
             packageUrl = null;
             
             try
             {
-                packageUrl = new PackageUrl.PackageUrl(purlString);
+                packageUrl = new PackageURL(purlString);
                 return true;
             }
             catch
