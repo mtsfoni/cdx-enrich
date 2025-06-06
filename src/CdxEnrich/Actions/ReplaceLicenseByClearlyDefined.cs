@@ -86,7 +86,8 @@ namespace CdxEnrich.Actions
         {
             try
             {
-                var cdLicenses = await GetClearlyDefinedLicensesAsync(purl);
+                var packageUrl = new PackageURL(purl);
+                var cdLicenses = await GetClearlyDefinedLicensesAsync(packageUrl);
 
                 if (cdLicenses == null || !cdLicenses.Any())
                 {
@@ -105,9 +106,8 @@ namespace CdxEnrich.Actions
             }
         }
 
-        private static async Task<List<string>?> GetClearlyDefinedLicensesAsync(string purlString)
+        private static async Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl)
         {
-            var packageUrl = new PackageURL(purlString);
             var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, ClearlyDefinedApiBase);
 
             const int maxRetries = 3;
