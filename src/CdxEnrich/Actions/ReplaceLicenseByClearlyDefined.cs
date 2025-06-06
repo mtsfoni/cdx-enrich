@@ -61,9 +61,11 @@ namespace CdxEnrich.Actions
                 .ForEach(item =>
                 {
                     var component = GetComponentByBomRef(inputs.Bom, item.Ref!);
+                    var packageUrl = new PackageURL(item.Ref!);
+                    var provider = Provider.FromPurlType(packageUrl.Type);
                     if (component != null)
                     {
-                        tasks.Add(ProcessComponentAsync(component, item.Ref!));
+                        tasks.Add(ProcessComponentAsync(component, packageUrl, provider));
                     }
                 });
 
@@ -79,16 +81,15 @@ namespace CdxEnrich.Actions
             return inputs;
         }
 
-        private static async Task ProcessComponentAsync(Component component, string purl)
+        private static async Task ProcessComponentAsync(Component component, PackageURL packageUrl, Provider provider)
         {
             try
             {
-                var packageUrl = new PackageURL(purl);
-                var cdLicenses = await ClearlyDefinedClient.GetClearlyDefinedLicensesAsync(packageUrl);
+                var cdLicenses = await ClearlyDefinedClient.GetClearlyDefinedLicensesAsync(packageUrl, provider);
 
                 if (cdLicenses == null || !cdLicenses.Any())
                 {
-                    Console.WriteLine($"No ClearlyDefined licenses found for {purl}");
+                    Console.WriteLine($"No ClearlyDefined licenses found for {packageUrl}");
                     return;
                 }
 
@@ -99,7 +100,7 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                await Console.Error.WriteLineAsync($"Error processing component {purl}: {ex.Message}");
+                await Console.Error.WriteLineAsync($"Error processing component {packageUrl}: {ex.Message}");
             }
         }
 

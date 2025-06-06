@@ -6,7 +6,7 @@ namespace CdxEnrich.ClearlyDefined
 {
     public interface IClearlyDefinedClient
     {
-        Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl);
+        Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider);
     }
 
     public class ClearlyDefinedClient : IClearlyDefinedClient
@@ -24,9 +24,9 @@ namespace CdxEnrich.ClearlyDefined
         /// </summary>
         /// <param name="packageUrl">Die PackageURL des Pakets</param>
         /// <returns>Eine Liste von Lizenzausdrücken oder null, wenn keine gefunden wurden</returns>
-        public async Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl)
+        public async Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider)
         {
-            var apiUrl = CreateClearlyDefinedApiUrl(packageUrl);
+            var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, provider);
 
             const int maxRetries = 3;
             for (var retry = 0; retry < maxRetries; retry++)
@@ -61,11 +61,8 @@ namespace CdxEnrich.ClearlyDefined
         /// <summary>
         /// Erzeugt die API-URL für ClearlyDefined
         /// </summary>
-        private string CreateClearlyDefinedApiUrl(PackageURL packageUrl)
+        private string CreateClearlyDefinedApiUrl(PackageURL packageUrl, Provider provider)
         {
-            // Ermittle den passenden Provider für den PURL-Typ
-            var provider = Provider.FromPurlType(packageUrl.Type);
-            
             // Fall 1: Namespace ist vorhanden
             if (packageUrl.Namespace != null)
             {
