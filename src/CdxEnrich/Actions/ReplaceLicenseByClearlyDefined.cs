@@ -106,7 +106,7 @@ namespace CdxEnrich.Actions
 
         private static async Task<List<string>?> GetClearlyDefinedLicensesAsync(string purlString)
         {
-            var packageUrl = PackageUrl.PackageUrl.Parse(purlString);
+            var packageUrl = new PackageUrl.PackageUrl(purlString);
             var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, ClearlyDefinedApiBase);
 
             const int maxRetries = 3;
