@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Json;
-using System.Text.Json.Serialization;
-using CdxEnrich.ClearlyDefined;
+﻿using CdxEnrich.ClearlyDefined;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CycloneDX.Models;
@@ -10,9 +8,8 @@ namespace CdxEnrich.Actions
 {
     public static class ReplaceLicenseByClearlyDefined
     {
-        private const string ClearlyDefinedApiBase = "https://api.clearlydefined.io/definitions";
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
-        private static readonly HttpClient HttpClient = new() { Timeout = TimeSpan.FromSeconds(60) };
+        private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient();
 
         private static Component? GetComponentByBomRef(Bom bom, string bomRef)
         {
@@ -87,7 +84,7 @@ namespace CdxEnrich.Actions
             try
             {
                 var packageUrl = new PackageURL(purl);
-                var cdLicenses = await GetClearlyDefinedLicensesAsync(packageUrl);
+                var cdLicenses = await ClearlyDefinedClient.GetClearlyDefinedLicensesAsync(packageUrl);
 
                 if (cdLicenses == null || !cdLicenses.Any())
                 {
@@ -103,86 +100,6 @@ namespace CdxEnrich.Actions
             catch (Exception ex)
             {
                 await Console.Error.WriteLineAsync($"Error processing component {purl}: {ex.Message}");
-            }
-        }
-
-        private static async Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl)
-        {
-            var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, ClearlyDefinedApiBase);
-
-            const int maxRetries = 3;
-            for (var retry = 0; retry < maxRetries; retry++)
-            {
-                try
-                {
-                    var response = await HttpClient.GetFromJsonAsync<ClearlyDefinedResponse>(apiUrl);
-
-                    return response?.Licensed.Facets.Core.Discovered.Expressions;
-                }
-                catch (HttpRequestException ex)
-                {
-                    if (retry == maxRetries - 1)
-                    {
-                        await Console.Error.WriteLineAsync($"Fehler bei API-Aufruf: {apiUrl}");
-                        throw;
-                    }
-
-                    await Console.Error.WriteLineAsync(
-                        $"HTTP error calling ClearlyDefined API (attempt {retry + 1}/{maxRetries}): {ex.Message}");
-                    await Task.Delay(1000 * (retry + 1)); // Exponential backoff
-                }
-                catch (Exception ex)
-                {
-                    await Console.Error.WriteLineAsync($"Error parsing ClearlyDefined response for URL {apiUrl}: {ex.Message}");
-                    throw;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Erzeugt die API-URL für ClearlyDefined
-        /// </summary>
-        private static string CreateClearlyDefinedApiUrl(PackageURL packageUrl, string apiBase)
-        {
-            // Ermittle den passenden Provider für den PURL-Typ
-            var provider = Provider.FromPurlType(packageUrl.Type);
-            
-            // Fall 1: Namespace ist vorhanden
-            if (packageUrl.Namespace != null)
-            {
-                return $"{apiBase}/{packageUrl.Type}/{provider.ApiString}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
-            }
-            // Fall 2: Kein Namespace vorhanden, "-" als Platzhalter verwenden
-            else
-            {
-                return $"{apiBase}/{packageUrl.Type}/{provider.ApiString}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
-            }
-        }
-
-        private sealed class ClearlyDefinedResponse
-        {
-            [JsonPropertyName("licensed")] public required LicensedData Licensed { get; init; }
-
-            public class LicensedData
-            {
-                [JsonPropertyName("facets")] public required Facets Facets { get; init; }
-            }
-
-            public class Facets
-            {
-                [JsonPropertyName("core")] public required Core Core { get; init; }
-            }
-
-            public class Core
-            {
-                [JsonPropertyName("discovered")] public required Discovered Discovered { get; init; }
-            }
-
-            public class Discovered
-            {
-                [JsonPropertyName("expressions")] public List<string>? Expressions { get; init; }
             }
         }
 
