@@ -62,7 +62,8 @@ namespace CdxEnrich.Actions
                 {
                     var component = GetComponentByBomRef(inputs.Bom, item.Ref!);
                     var packageUrl = new PackageURL(item.Ref!);
-                    var provider = Provider.FromPurlType(packageUrl.Type);
+                    var packageType = PackageType.FromPurlType(packageUrl.Type);
+                    var provider = packageType.DefaultProvider;
                     if (component != null)
                     {
                         tasks.Add(ProcessComponentAsync(component, packageUrl, provider));
