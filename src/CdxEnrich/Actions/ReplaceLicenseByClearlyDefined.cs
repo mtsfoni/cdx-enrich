@@ -1,7 +1,9 @@
 ﻿using CdxEnrich.ClearlyDefined;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
+using CdxEnrich.Logging;
 using CycloneDX.Models;
+using Microsoft.Extensions.Logging;
 using PackageUrl;
 
 namespace CdxEnrich.Actions
@@ -9,7 +11,8 @@ namespace CdxEnrich.Actions
     public static class ReplaceLicenseByClearlyDefined
     {
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
-        private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient();
+        private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
+            logger: new ConsoleLogger<ClearlyDefinedClient>());
 
         private static Component? GetComponentByBomRef(Bom bom, string bomRef)
         {

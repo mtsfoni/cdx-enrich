@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
-using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
 
 namespace CdxEnrich.ClearlyDefined
@@ -9,15 +10,12 @@ namespace CdxEnrich.ClearlyDefined
         Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider);
     }
 
-    public class ClearlyDefinedClient : IClearlyDefinedClient
+    public class ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
+        : IClearlyDefinedClient
     {
         private const string ClearlyDefinedApiBase = "https://api.clearlydefined.io/definitions";
-        private readonly HttpClient _httpClient;
-
-        public ClearlyDefinedClient(HttpClient? httpClient = null)
-        {
-            _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
-        }
+        private readonly HttpClient _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
+        private readonly ILogger<ClearlyDefinedClient> _logger = logger ?? NullLogger<ClearlyDefinedClient>.Instance;
 
         /// <summary>
         /// Ruft Lizenzinformationen für ein Paket von der ClearlyDefined API ab.
@@ -40,17 +38,18 @@ namespace CdxEnrich.ClearlyDefined
                 {
                     if (retry == maxRetries - 1)
                     {
-                        await Console.Error.WriteLineAsync($"Fehler bei API-Aufruf: {apiUrl}");
+                        _logger.LogError(ex, "Fehler bei API-Aufruf: {ApiUrl}", apiUrl);
                         throw;
                     }
 
-                    await Console.Error.WriteLineAsync(
-                        $"HTTP error calling ClearlyDefined API (attempt {retry + 1}/{maxRetries}): {ex.Message}");
+                    _logger.LogWarning(ex, "HTTP error calling ClearlyDefined API (attempt {Attempt}/{MaxRetries}): {Message}", 
+                        retry + 1, maxRetries, ex.Message);
                     await Task.Delay(1000 * (retry + 1)); // Exponential backoff
                 }
                 catch (Exception ex)
                 {
-                    await Console.Error.WriteLineAsync($"Error parsing ClearlyDefined response for URL {apiUrl}: {ex.Message}");
+                    _logger.LogError(ex, "Error parsing ClearlyDefined response for URL {ApiUrl}: {Message}", 
+                        apiUrl, ex.Message);
                     throw;
                 }
             }
