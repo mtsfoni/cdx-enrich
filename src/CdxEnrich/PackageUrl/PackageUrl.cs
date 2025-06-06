@@ -97,24 +97,6 @@ namespace CdxEnrich.PackageUrl
         }
 
         /// <summary>
-        /// Versucht, eine PURL zu parsen
-        /// </summary>
-        public static bool TryParse(string purlString, out PackageUrl packageUrl)
-        {
-            packageUrl = null;
-            
-            try
-            {
-                packageUrl = new PackageUrl(purlString);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
         /// Gibt eine kanonisierte Darstellung der PURL zurück.
         /// </summary>
         public override string ToString()

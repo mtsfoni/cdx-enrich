@@ -38,7 +38,7 @@ namespace CdxEnrich.Actions
 
             foreach (var item in config.ReplaceLicenseByClearlyDefined)
             {
-                if (item.Ref != null && !PackageUrl.PackageUrl.TryParse(item.Ref, out _))
+                if (item.Ref != null && !TryParsePurl(item.Ref, out _))
                 {
                     return InvalidConfigError.Create<ConfigRoot>(ModuleName, $"Invalid PURL format: {item.Ref}");
                 }
@@ -182,6 +182,21 @@ namespace CdxEnrich.Actions
             public class Discovered
             {
                 [JsonPropertyName("expressions")] public List<string>? Expressions { get; init; }
+            }
+        }
+
+        private static bool TryParsePurl(string purlString, out PackageUrl.PackageUrl? packageUrl)
+        {
+            packageUrl = null;
+            
+            try
+            {
+                packageUrl = new PackageUrl.PackageUrl(purlString);
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }
