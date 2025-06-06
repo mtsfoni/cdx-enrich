@@ -3,7 +3,7 @@
     /// <summary>
     ///     Smart Enum für die unterstützten Provider in ClearlyDefined
     /// </summary>
-    public sealed record Provider(string Name, string ApiString)
+    public sealed record Provider(string Name, string Value)
     {
         // Statische Instanzen aller Provider
         public static readonly Provider AnacondaMain = new(nameof(AnacondaMain), "anaconda-main");
@@ -30,7 +30,7 @@
                 AnacondaMain, AnacondaR, Cocoapods, CondaForge, Cratesio,
                 Debian, GitHub, GitLab, MavenCentral, MavenGoogle,
                 GradlePlugin, Npmjs, Nuget, Packagist, Pypi, RubyGems
-            }.ToDictionary(p => p.ApiString);
+            }.ToDictionary(p => p.Value);
 
         /// <summary>
         ///     Gibt alle verfügbaren Provider zurück

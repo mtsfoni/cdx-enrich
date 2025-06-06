@@ -66,12 +66,12 @@ namespace CdxEnrich.ClearlyDefined
             // Fall 1: Namespace ist vorhanden
             if (packageUrl.Namespace != null)
             {
-                return $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.ApiString}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+                return $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
             }
             // Fall 2: Kein Namespace vorhanden, "-" als Platzhalter verwenden
             else
             {
-                return $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.ApiString}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+                return $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
             }
         }
     }
