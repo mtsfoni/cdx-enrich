@@ -22,7 +22,7 @@ namespace CdxEnrich.ClearlyDefined
         private readonly ILogger<ClearlyDefinedClient> _logger;
         private readonly ResiliencePipeline _resiliencePipeline;
         
-        // Token Bucket Rate Limiter für max. 250 Anfragen pro Minute
+        // Token Bucket Rate Limiter for max. 250 requests per minute
         private static readonly TokenBucketRateLimiter RateLimiter = new (
             new TokenBucketRateLimiterOptions
             {

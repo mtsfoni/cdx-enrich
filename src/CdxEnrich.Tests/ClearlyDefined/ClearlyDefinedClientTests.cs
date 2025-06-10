@@ -118,7 +118,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
     }
 
     /// <summary>
-    ///     Fixture-Klasse für ClearlyDefinedClient-Tests
+    ///     Fixture class for ClearlyDefinedClient tests
     /// </summary>
     public class ClearlyDefinedClientFixture : IDisposable
     {
@@ -129,35 +129,35 @@ namespace CdxEnrich.Tests.ClearlyDefined
             this.HttpClient = new HttpClient(this.HttpHandler);
             this.Client = new ClearlyDefinedClient(this.HttpClient, this.Logger);
         }
-
+    
         public ILogger<ClearlyDefinedClient> Logger { get; }
         public TestHttpMessageHandler HttpHandler { get; }
         public HttpClient HttpClient { get; }
         public ClearlyDefinedClient Client { get; }
-
+    
         public void Dispose()
         {
             this.HttpClient.Dispose();
             this.HttpHandler.Dispose();
         }
-
+    
         /// <summary>
-        ///     Richtet eine erfolgreiche Antwort mit den angegebenen Lizenzausdrücken ein
+        ///     Sets up a successful response with the specified license expressions
         /// </summary>
         public void SetupSuccessResponse(List<string> licenseExpressions)
         {
             var responseContent = CreateResponseWithLicenses(licenseExpressions);
             var json = JsonSerializer.Serialize(responseContent);
-
+    
             this.HttpHandler.ResponseToReturn = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(json)
             };
         }
-
+    
         /// <summary>
-        ///     Richtet eine Fehlerantwort mit dem angegebenen Statuscode ein
+        ///     Sets up an error response with the specified status code
         /// </summary>
         public void SetupErrorResponse(HttpStatusCode statusCode)
         {
@@ -167,17 +167,17 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 Content = new StringContent("")
             };
         }
-
+    
         /// <summary>
-        ///     Richtet eine Ausnahme als Antwort ein
+        ///     Sets up an exception as a response
         /// </summary>
         public void SetupExceptionResponse(Exception exception)
         {
             this.HttpHandler.ExceptionToThrow = exception;
         }
-
+    
         /// <summary>
-        ///     Richtet eine Ratengrenze und dann eine erfolgreiche Antwort ein
+        ///     Sets up a rate limit response followed by a successful response
         /// </summary>
         public void SetupRateLimitThenSuccessResponse(List<string> licenseExpressions)
         {
@@ -188,20 +188,20 @@ namespace CdxEnrich.Tests.ClearlyDefined
             };
             rateLimitResponse.Headers.Add("x-ratelimit-remaining", "0");
             rateLimitResponse.Headers.Add("x-ratelimit-limit", "250");
-
+    
             var responseContent = CreateResponseWithLicenses(licenseExpressions);
             var successResponse = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(JsonSerializer.Serialize(responseContent))
             };
-
+    
             this.HttpHandler.ResponseSequence.Add(rateLimitResponse);
             this.HttpHandler.ResponseSequence.Add(successResponse);
         }
-
+    
         /// <summary>
-        ///     Überprüft, ob die Anfrage-URI den angegebenen String enthält
+        ///     Verifies that the request URI contains the specified string
         /// </summary>
         public void VerifyRequestUri(string contains)
         {
@@ -210,9 +210,9 @@ namespace CdxEnrich.Tests.ClearlyDefined
             Assert.That(this.HttpHandler.RequestsReceived[0].RequestUri, Is.Not.Null);
             Assert.That(this.HttpHandler.RequestsReceived[0].RequestUri.ToString(), Does.Contain(contains));
         }
-
+    
         /// <summary>
-        ///     Überprüft, ob der Logger eine Fehlermeldung mit dem angegebenen Text erhalten hat
+        ///     Verifies that the logger received an error message containing the specified text
         /// </summary>
         public void VerifyLoggerReceivedError(string messageContains)
         {
@@ -223,9 +223,9 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 Arg.Any<Exception>(),
                 Arg.Any<Func<object, Exception, string>>()!);
         }
-
+    
         /// <summary>
-        ///     Überprüft, ob der Logger eine Warnmeldung mit dem angegebenen Text erhalten hat
+        ///     Verifies that the logger received a warning message containing the specified text
         /// </summary>
         public void VerifyLoggerReceivedWarning(string messageContains)
         {
@@ -236,9 +236,9 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 Arg.Any<Exception>(),
                 Arg.Any<Func<object, Exception, string>>()!);
         }
-
+    
         /// <summary>
-        ///     Überprüft, ob der Logger eine Ausnahme vom angegebenen Typ erhalten hat
+        ///     Verifies that the logger received an exception of the specified type
         /// </summary>
         public void VerifyLoggerReceivedExceptionOfType<T>() where T : Exception
         {
@@ -249,9 +249,9 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 Arg.Is<Exception>(ex => ex is T),
                 Arg.Any<Func<object, Exception, string>>()!);
         }
-
+    
         /// <summary>
-        ///     Erstellt eine ClearlyDefinedResponse mit den angegebenen Lizenzausdrücken
+        ///     Creates a ClearlyDefinedResponse with the specified license expressions
         /// </summary>
         private static ClearlyDefinedResponse CreateResponseWithLicenses(List<string> expressions)
         {
@@ -273,8 +273,8 @@ namespace CdxEnrich.Tests.ClearlyDefined
             };
         }
     }
-
-    // Hilfsklasse für HTTP-Tests
+    
+    // Helper class for HTTP tests
     public class TestHttpMessageHandler : HttpMessageHandler, IDisposable
     {
         private int _sequenceIndex;
