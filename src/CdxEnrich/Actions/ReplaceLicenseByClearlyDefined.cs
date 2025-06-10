@@ -36,11 +36,11 @@ namespace CdxEnrich.Actions
                 return new Ok<ConfigRoot>(config);
             }
 
-            foreach (var item in config.ReplaceLicenseByClearlyDefined)
+            foreach (var itemRef in config.ReplaceLicenseByClearlyDefined.Select(item => item.Ref))
             {
-                if (item.Ref != null && !TryParsePurl(item.Ref, out _))
+                if (itemRef != null && !TryParsePurl(itemRef, out _))
                 {
-                    return InvalidConfigError.Create<ConfigRoot>(ModuleName, $"Invalid PURL format: {item.Ref}");
+                    return InvalidConfigError.Create<ConfigRoot>(ModuleName, $"Invalid PURL format: {itemRef}");
                 }
             }
 
