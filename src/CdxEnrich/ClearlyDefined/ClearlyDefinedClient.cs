@@ -1,7 +1,11 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
+using Polly;
+using Polly.Retry;
+using Polly.Timeout;
 
 namespace CdxEnrich.ClearlyDefined
 {
@@ -10,64 +14,135 @@ namespace CdxEnrich.ClearlyDefined
         Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider);
     }
 
-    public class ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
-        : IClearlyDefinedClient
+    public class ClearlyDefinedClient : IClearlyDefinedClient
     {
         private const string ClearlyDefinedApiBase = "https://api.clearlydefined.io/definitions";
-        private readonly HttpClient _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
-        private readonly ILogger<ClearlyDefinedClient> _logger = logger ?? NullLogger<ClearlyDefinedClient>.Instance;
+        private readonly HttpClient _httpClient;
+        private readonly ILogger<ClearlyDefinedClient> _logger;
+        private readonly ResiliencePipeline _resiliencePipeline;
+
+        public ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
+        {
+            _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
+            _logger = logger ?? NullLogger<ClearlyDefinedClient>.Instance;
+            _resiliencePipeline = this.CreateResiliencePipeline();
+        }
+
+        private ResiliencePipeline CreateResiliencePipeline()
+        {
+            // Configure resilience pipeline with Polly v8
+            var builder = new ResiliencePipelineBuilder();
+
+            // Add retry strategy
+            builder.AddRetry(new RetryStrategyOptions
+            {
+                MaxRetryAttempts = 3,
+                Delay = TimeSpan.FromSeconds(1),
+                BackoffType = DelayBackoffType.Exponential,
+                UseJitter = true, // Random variation of wait time
+                ShouldHandle = args =>
+                {
+                    // Handle HTTP errors
+                    if (args.Outcome.Exception is HttpRequestException)
+                        return ValueTask.FromResult(true);
+                    
+                    // Handle rate limit errors if the result is an HttpResponseMessage
+                    if (args.Outcome.Result is HttpResponseMessage response && 
+                        response.StatusCode == HttpStatusCode.TooManyRequests)
+                        return ValueTask.FromResult(true);
+                    
+                    return ValueTask.FromResult(false);
+                },
+                OnRetry = args =>
+                {
+                    if (args.Outcome.Result is HttpResponseMessage response && 
+                        response.StatusCode == HttpStatusCode.TooManyRequests)
+                    {
+                        this._logger.LogWarning(
+                            "Rate limit reached on ClearlyDefined API call. Retry attempt {Attempt} after {Delay}",
+                            args.AttemptNumber, args.RetryDelay);
+                        
+                        // Extract rate limit information from headers if available
+                        if (response.Headers.TryGetValues("x-ratelimit-remaining", out var remaining) &&
+                            response.Headers.TryGetValues("x-ratelimit-limit", out var limit))
+                        {
+                            this._logger.LogInformation("Rate Limit Info: {Remaining}/{Limit} remaining", 
+                                string.Join(",", remaining), string.Join(",", limit));
+                        }
+                    }
+                    else
+                    {
+                        this._logger.LogWarning(
+                            "HTTP error on ClearlyDefined API call. Retry attempt {Attempt} after {Delay}",
+                            args.AttemptNumber, args.RetryDelay);
+                    }
+                    
+                    return ValueTask.CompletedTask;
+                }
+            });
+            
+            // Add timeout strategy
+            builder.AddTimeout(new TimeoutStrategyOptions
+            {
+                Timeout = TimeSpan.FromSeconds(30),
+                OnTimeout = args =>
+                {
+                    this._logger.LogWarning("Timeout on ClearlyDefined API call after 30 seconds");
+                    return ValueTask.CompletedTask;
+                }
+            });
+            
+            return builder.Build();
+        }
 
         /// <summary>
-        /// Ruft Lizenzinformationen für ein Paket von der ClearlyDefined API ab.
+        /// Retrieves license information for a package from the ClearlyDefined API.
         /// </summary>
-        /// <param name="packageUrl">Die PackageURL des Pakets</param>
-        /// <returns>Eine Liste von Lizenzausdrücken oder null, wenn keine gefunden wurden</returns>
+        /// <param name="packageUrl">The PackageURL of the package</param>
+        /// <param name="provider">The provider to use</param>
+        /// <returns>A list of license expressions or null if none were found</returns>
         public async Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider)
         {
             var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, provider);
 
-            const int maxRetries = 3;
-            for (var retry = 0; retry < maxRetries; retry++)
+            try
             {
-                try
+                // Execute resilience pipeline
+                var response = await _resiliencePipeline.ExecuteAsync<HttpResponseMessage>(
+                    async cancellationToken => await _httpClient.GetAsync(apiUrl, cancellationToken),
+                    CancellationToken.None);
+                
+                if (response.IsSuccessStatusCode)
                 {
-                    var response = await _httpClient.GetFromJsonAsync<ClearlyDefinedResponse>(apiUrl);
-                    return response?.Licensed.Facets.Core.Discovered.Expressions;
+                    var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
+                    return data?.Licensed.Facets.Core.Discovered.Expressions;
                 }
-                catch (HttpRequestException ex)
+                else
                 {
-                    if (retry == maxRetries - 1)
-                    {
-                        _logger.LogError(ex, "Fehler bei API-Aufruf: {ApiUrl}", apiUrl);
-                        throw;
-                    }
-
-                    _logger.LogWarning(ex, "HTTP error calling ClearlyDefined API (attempt {Attempt}/{MaxRetries}): {Message}", 
-                        retry + 1, maxRetries, ex.Message);
-                    await Task.Delay(1000 * (retry + 1)); // Exponential backoff
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error parsing ClearlyDefined response for URL {ApiUrl}: {Message}", 
-                        apiUrl, ex.Message);
-                    throw;
+                    // Still not successful after retries
+                    _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}", 
+                        response.StatusCode, apiUrl);
+                    return null;
                 }
             }
-
-            return null;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during API call: {ApiUrl}", apiUrl);
+                return null;
+            }
         }
 
         /// <summary>
-        /// Erzeugt die API-URL für ClearlyDefined
+        /// Creates the API URL for ClearlyDefined
         /// </summary>
         private string CreateClearlyDefinedApiUrl(PackageURL packageUrl, Provider provider)
         {
-            // Fall 1: Namespace ist vorhanden
+            // Case 1: Namespace is present
             if (packageUrl.Namespace != null)
             {
                 return $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
             }
-            // Fall 2: Kein Namespace vorhanden, "-" als Platzhalter verwenden
+            // Case 2: No namespace present, use "-" as placeholder
             else
             {
                 return $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";

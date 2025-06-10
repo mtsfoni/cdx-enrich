@@ -3,7 +3,6 @@ using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.Logging;
 using CycloneDX.Models;
-using Microsoft.Extensions.Logging;
 using PackageUrl;
 
 namespace CdxEnrich.Actions
