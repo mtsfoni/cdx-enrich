@@ -23,7 +23,7 @@ namespace CdxEnrich.ClearlyDefined
         private readonly ResiliencePipeline _resiliencePipeline;
         
         // Token Bucket Rate Limiter für max. 250 Anfragen pro Minute
-        private static readonly TokenBucketRateLimiter _rateLimiter = new TokenBucketRateLimiter(
+        private static readonly TokenBucketRateLimiter RateLimiter = new (
             new TokenBucketRateLimiterOptions
             {
                 TokenLimit = 250,
@@ -43,7 +43,7 @@ namespace CdxEnrich.ClearlyDefined
 
         private ResiliencePipeline CreateResiliencePipeline()
         {
-            // Configure resilience pipeline with Polly v8
+            // Configure the resilience pipeline with Polly v8
             var builder = new ResiliencePipelineBuilder();
             
             // Add retry strategy
@@ -121,7 +121,7 @@ namespace CdxEnrich.ClearlyDefined
             try
             {
                 // Acquire permission from the rate limiter
-                using var lease = await _rateLimiter.AcquireAsync(1);
+                using var lease = await RateLimiter.AcquireAsync(1);
                 
                 if (lease.IsAcquired)
                 {
