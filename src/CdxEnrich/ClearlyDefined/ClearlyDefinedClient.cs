@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Threading.RateLimiting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
@@ -20,6 +21,18 @@ namespace CdxEnrich.ClearlyDefined
         private readonly HttpClient _httpClient;
         private readonly ILogger<ClearlyDefinedClient> _logger;
         private readonly ResiliencePipeline _resiliencePipeline;
+        
+        // Token Bucket Rate Limiter für max. 250 Anfragen pro Minute
+        private static readonly TokenBucketRateLimiter _rateLimiter = new TokenBucketRateLimiter(
+            new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = 250,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 100,
+                ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                TokensPerPeriod = 250,
+                AutoReplenishment = true
+            });
 
         public ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
         {
@@ -32,7 +45,7 @@ namespace CdxEnrich.ClearlyDefined
         {
             // Configure resilience pipeline with Polly v8
             var builder = new ResiliencePipelineBuilder();
-
+            
             // Add retry strategy
             builder.AddRetry(new RetryStrategyOptions
             {
@@ -107,21 +120,32 @@ namespace CdxEnrich.ClearlyDefined
 
             try
             {
-                // Execute resilience pipeline
-                var response = await _resiliencePipeline.ExecuteAsync<HttpResponseMessage>(
-                    async cancellationToken => await _httpClient.GetAsync(apiUrl, cancellationToken),
-                    CancellationToken.None);
+                // Acquire permission from the rate limiter
+                using var lease = await _rateLimiter.AcquireAsync(1);
                 
-                if (response.IsSuccessStatusCode)
+                if (lease.IsAcquired)
                 {
-                    var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
-                    return data?.Licensed.Facets.Core.Discovered.Expressions;
+                    // Execute resilience pipeline
+                    var response = await _resiliencePipeline.ExecuteAsync<HttpResponseMessage>(
+                        async cancellationToken => await _httpClient.GetAsync(apiUrl, cancellationToken),
+                        CancellationToken.None);
+                    
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
+                        return data?.Licensed.Facets.Core.Discovered.Expressions;
+                    }
+                    else
+                    {
+                        // Still not successful after retries
+                        _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}", 
+                            response.StatusCode, apiUrl);
+                        return null;
+                    }
                 }
                 else
                 {
-                    // Still not successful after retries
-                    _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}", 
-                        response.StatusCode, apiUrl);
+                    _logger.LogWarning("Rate limit exceeded, request for {ApiUrl} was rejected", apiUrl);
                     return null;
                 }
             }
