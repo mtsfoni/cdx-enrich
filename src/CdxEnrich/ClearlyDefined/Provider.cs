@@ -1,11 +1,11 @@
 ﻿namespace CdxEnrich.ClearlyDefined
 {
     /// <summary>
-    ///     Smart Enum für die unterstützten Provider in ClearlyDefined
+    ///     Smart Enum for supported providers in ClearlyDefined
     /// </summary>
     public sealed record Provider(string Name, string Value)
     {
-        // Statische Instanzen aller Provider
+        // Static instances of all providers
         public static readonly Provider AnacondaMain = new(nameof(AnacondaMain), "anaconda-main");
         public static readonly Provider AnacondaR = new(nameof(AnacondaR), "anaconda-r");
         public static readonly Provider Cocoapods = new(nameof(Cocoapods), "cocoapods");
@@ -23,7 +23,7 @@
         public static readonly Provider Pypi = new(nameof(Pypi), "pypi");
         public static readonly Provider RubyGems = new(nameof(RubyGems), "rubygems");
 
-        // Dictionary für schnellen Zugriff nach ApiString
+        // Dictionary for fast access by ApiString
         private static readonly Dictionary<string, Provider> _lookupByApiString =
             new List<Provider>
             {
@@ -33,13 +33,13 @@
             }.ToDictionary(p => p.Value);
 
         /// <summary>
-        ///     Gibt alle verfügbaren Provider zurück
+        ///     Returns all available providers
         /// </summary>
         public static IEnumerable<Provider> All => _lookupByApiString.Values;
         
 
-        // Bei Records wird ToString() automatisch überschrieben und gibt einen formatierten String mit allen Properties zurück
-        // Wir überschreiben es hier, um nur den Namen zurückzugeben
+        // For records, ToString() is automatically overridden and returns a formatted string with all properties
+        // We override it here to return only the name
         public override string ToString()
         {
             return this.Name;

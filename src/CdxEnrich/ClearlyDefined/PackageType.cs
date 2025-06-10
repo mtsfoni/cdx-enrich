@@ -1,11 +1,11 @@
 ﻿namespace CdxEnrich.ClearlyDefined
 {
     /// <summary>
-    ///     Smart Enum für die unterstützten Pakettypen in ClearlyDefined
+    ///     Smart Enum for supported package types in ClearlyDefined
     /// </summary>
     public sealed record PackageType(string Name, string Value, Provider DefaultProvider)
     {
-        // Statische Instanzen aller unterstützten Pakettypen mit direkter Zuweisung der DefaultProvider
+        // Static instances of all supported package types with direct assignment of DefaultProvider
         public static readonly PackageType Npm = new(nameof(Npm), "npm", Provider.Npmjs);
         public static readonly PackageType Nuget = new(nameof(Nuget), "nuget", Provider.Nuget);
         public static readonly PackageType Maven = new(nameof(Maven), "maven", Provider.MavenCentral);
@@ -20,7 +20,7 @@
         public static readonly PackageType Pod = new(nameof(Pod), "pod", Provider.Cocoapods);
         public static readonly PackageType Crate = new(nameof(Crate), "crate", Provider.Cratesio);
 
-        // Dictionary für schnellen Zugriff nach Value
+        // Dictionary for fast access by Value
         private static readonly Dictionary<string, PackageType> _lookupByValue =
             new List<PackageType>
             {
@@ -29,7 +29,7 @@
             }.ToDictionary(p => p.Value, StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        ///     Versucht, einen PackageType anhand eines PURL-Typs zu finden
+        ///     Tries to find a PackageType based on a PURL type
         /// </summary>
         private static bool TryFromPurlType(string purlType, out PackageType? packageType)
         {
@@ -43,7 +43,7 @@
         }
 
         /// <summary>
-        ///     Findet einen PackageType anhand eines PURL-Typs
+        ///     Finds a PackageType based on a PURL type
         /// </summary>
         public static PackageType FromPurlType(string purlType)
         {
@@ -52,11 +52,11 @@
                 return packageType!;
             }
 
-            throw new ArgumentException($"Kein passender ClearlyDefined-Pakettyp für PURL-Typ: {purlType}");
+            throw new ArgumentException($"No matching ClearlyDefined package type for PURL type: {purlType}");
         }
 
-        // Bei Records wird ToString() automatisch überschrieben und gibt einen formatierten String mit allen Properties zurück
-        // Wir überschreiben es hier, um nur den Namen zurückzugeben
+        // For records, ToString() is automatically overridden and returns a formatted string with all properties
+        // We override it here to return only the name
         public override string ToString()
         {
             return this.Name;
