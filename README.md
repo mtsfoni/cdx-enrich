@@ -79,7 +79,10 @@ ReplaceLicensesByURL:
 
 ReplaceLicenseByBomRef:
 - Ref: "pkg:nuget/Json.More.Net@1.9.0"
-  Id: "MIT"  
+  Id: "MIT"
+
+ReplaceLicenseByClearlyDefined:
+  - Ref: "pkg:nuget/System.Collections@4.0.11"
 ```
 
 ### Actions
@@ -101,6 +104,28 @@ This action replaces licenses in a specific component identified by its BOM refe
 - One of:
   - **Id:** The new SPDX License ID.
   - **Name:** The new license name.
+
+#### ReplaceLicenseByClearlyDefined
+
+This action replaces licenses in components by automatically retrieving license data from the ClearlyDefined service. Components are identified by their Package URL (PURL).
+
+- **Ref:** The Package URL (PURL) of the component whose license is to be replaced. This must follow the PURL format (e.g., "pkg:nuget/System.Text.Json@7.0.0" or "pkg:maven/org.apache.commons/commons-lang3@3.12.0").
+
+This action supports the following package types:
+- npm (Provider: npmjs)
+- NuGet (Provider: NuGet)
+- Maven (Provider: Maven Central)
+- PyPI (Provider: PyPI)
+- RubyGems (Provider: RubyGems)
+- Golang (Provider: GitHub)
+- Debian (Provider: Debian)
+- CocoaPods (Provider: Cocoapods)
+- Composer (Provider: Packagist)
+- Cargo/Crate (Provider: Crates.io)
+- GitHub Actions (Provider: GitHub)
+- Pod (Provider: Cocoapods)
+
+The license information is retrieved directly from the ClearlyDefined service and inserted into the SBOM file. The version part in the PURL is optional but recommended for precise license identification.
 
 ## Issues and Contributions
 
