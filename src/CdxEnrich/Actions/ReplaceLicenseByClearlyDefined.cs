@@ -3,12 +3,14 @@ using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.Logging;
 using CycloneDX.Models;
+using Microsoft.Extensions.Logging;
 using PackageUrl;
 
 namespace CdxEnrich.Actions
 {
     public static class ReplaceLicenseByClearlyDefined
     {
+        private static readonly ILogger Logger = new ConsoleLogger(nameof(ReplaceLicenseByClearlyDefined));
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
 
         private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
@@ -111,7 +113,7 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing components: {ex.Message}");
+                Logger.LogError(ex, "Error processing components {Message}", ex.Message);
             }
 
             return inputs;
@@ -125,7 +127,7 @@ namespace CdxEnrich.Actions
 
                 if (cdLicenses == null || !cdLicenses.Any())
                 {
-                    Console.WriteLine($"No ClearlyDefined licenses found for {packageUrl}");
+                    Logger.LogInformation("No ClearlyDefined licenses found for {PackageUrl}", packageUrl);
                     return;
                 }
 
@@ -136,7 +138,7 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                await Console.Error.WriteLineAsync($"Error processing component {packageUrl}: {ex.Message}");
+                Logger.LogError(ex, "Error processing component {PackageUrl}: {Message}", packageUrl, ex.Message);
             }
         }
 
