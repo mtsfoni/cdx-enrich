@@ -112,12 +112,17 @@ namespace CdxEnrich
 
         static public Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent, CycloneDXFormat outputFileFormat)
         {
-            return
+
+           return
                 CombineBomAndConfig(
                     BomSerialization.DeserializeBom(inputFileContent, inputFormat),
-                    ConfigLoader.ParseConfig(configFileContent))
+                    ConfigLoader.ParseConfig(configFileContent)
+                        .Map(ReplaceLicenseByBomRef.CheckConfig).Data
+                        .Map(ReplaceLicensesByUrl.CheckConfig).Data
+                        .Map(ReplaceLicenseByClearlyDefined.CheckConfig).Data)
                 .Map(ReplaceLicenseByBomRef.Execute)
                 .Map(ReplaceLicensesByUrl.Execute)
+                .Map(ReplaceLicenseByClearlyDefined.Execute)
                 .Bind(inputs => BomSerialization.SerializeBom(inputs, outputFileFormat));
 
         }
