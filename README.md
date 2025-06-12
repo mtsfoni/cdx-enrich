@@ -112,18 +112,23 @@ This action replaces licenses in components by automatically retrieving license 
 - **Ref:** The Package URL (PURL) of the component whose license is to be replaced. This must follow the PURL format (e.g., "pkg:nuget/System.Text.Json@7.0.0" or "pkg:maven/org.apache.commons/commons-lang3@3.12.0").
 
 This action supports the following package types:
+- Crate (Provider: Crates.io)
+- Gem (Provider: RubyGems)
+- Maven (Provider: Maven Central)
 - npm (Provider: npmjs)
 - NuGet (Provider: NuGet)
-- Maven (Provider: Maven Central)
-- PyPI (Provider: PyPI)
-- RubyGems (Provider: RubyGems)
-- Golang (Provider: GitHub)
-- Debian (Provider: Debian)
-- CocoaPods (Provider: Cocoapods)
-- Composer (Provider: Packagist)
-- Cargo/Crate (Provider: Crates.io)
-- GitHub Actions (Provider: GitHub)
 - Pod (Provider: Cocoapods)
+- PyPI (Provider: PyPI)
+
+The following package types are supported by ClearlyDefined, but are currently **not implemented** in CdxEnrich:
+- Composer (Provider: Packagist)
+- Conda (Provider: CondaForge)
+- Condasrc (Provider: CondaForge)
+- Deb (Provider: Debian)
+- Debsrc (Provider: Debian)
+- Git (Provider: GitHub)
+- Go (Provider: GitHub)
+- SourceArchive (Provider: GitHub)
 
 The license information is retrieved directly from the ClearlyDefined service and inserted into the SBOM file. The version part in the PURL is optional but recommended for precise license identification.
 
