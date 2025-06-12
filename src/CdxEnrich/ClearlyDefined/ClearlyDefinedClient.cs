@@ -133,6 +133,7 @@ namespace CdxEnrich.ClearlyDefined
                     if (response.IsSuccessStatusCode)
                     {
                         var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
+                        this._logger.LogInformation("Successfully retrieved data from ClearlyDefined API for package: {PackageUrl}", packageUrl);
                         return data?.Licensed.Facets.Core.Discovered.Expressions;
                     }
                     else
