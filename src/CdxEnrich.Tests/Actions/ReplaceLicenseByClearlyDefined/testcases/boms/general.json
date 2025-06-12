@@ -22,35 +22,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT"
-          }
-        }
-      ]
-    },
-    {
-      "type": "library",
-      "bom-ref": "pkg:nuget/System.Runtime@4.3.0",
-      "name": "System.Runtime",
-      "version": "4.3.0",
-      "purl": "pkg:nuget/System.Runtime@4.3.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "MS-PL"
-          }
-        }
-      ]
-    },
-    {
-      "type": "library",
-      "bom-ref": "pkg:nuget/Newtonsoft.Json@13.0.1",
-      "name": "Newtonsoft.Json",
-      "version": "13.0.1",
-      "purl": "pkg:nuget/Newtonsoft.Json@13.0.1",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
+            "name": "Unknown"
           }
         }
       ]
@@ -64,7 +36,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT"
+            "name": "Unknown"
           }
         }
       ]
@@ -78,7 +50,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Unknown"
           }
         }
       ]
@@ -92,21 +64,161 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Unknown"
           }
         }
       ]
     },
     {
       "type": "library",
-      "bom-ref": "pkg:nuget/System.Text.Json@7.0.0",
-      "name": "System.Text.Json",
-      "version": "7.0.0",
-      "purl": "pkg:nuget/System.Text.Json@7.0.0",
+      "bom-ref": "pkg:gem/rails@7.0.4",
+      "name": "rails",
+      "version": "7.0.4",
+      "purl": "pkg:gem/rails@7.0.4",
       "licenses": [
         {
           "license": {
-            "id": "MIT"
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:go/github.com/gorilla/mux@v1.8.0",
+      "name": "mux",
+      "version": "v1.8.0",
+      "purl": "pkg:go/github.com/gorilla/mux@v1.8.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7",
+      "name": "curl",
+      "version": "7.74.0-1.3+deb11u7",
+      "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pod/Alamofire@5.6.2",
+      "name": "Alamofire",
+      "version": "5.6.2",
+      "purl": "pkg:pod/Alamofire@5.6.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:composer/laravel/framework@10.0.0",
+      "name": "laravel/framework",
+      "version": "10.0.0",
+      "purl": "pkg:composer/laravel/framework@10.0.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:crate/serde@1.0.152",
+      "name": "serde",
+      "version": "1.0.152",
+      "purl": "pkg:crate/serde@1.0.152",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conda/pandas@1.5.3",
+      "name": "pandas",
+      "version": "1.5.3",
+      "purl": "pkg:conda/pandas@1.5.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:condasrc/numpy@1.24.3",
+      "name": "numpy",
+      "version": "1.24.3",
+      "purl": "pkg:condasrc/numpy@1.24.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:debsrc/debian/wget@1.21.3-1",
+      "name": "wget",
+      "version": "1.21.3-1",
+      "purl": "pkg:debsrc/debian/wget@1.21.3-1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:git/github.com/expressjs/express@4.18.2",
+      "name": "express",
+      "version": "4.18.2",
+      "purl": "pkg:git/github.com/expressjs/express@4.18.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:sourcearchive/apache/commons-text@1.10.0",
+      "name": "commons-text",
+      "version": "1.10.0",
+      "purl": "pkg:sourcearchive/apache/commons-text@1.10.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
           }
         }
       ]

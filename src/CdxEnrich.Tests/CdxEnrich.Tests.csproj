@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Actions\ReplaceLicenseByClearlyDefined\testcases\snapshots\" />
     <Folder Include="General\testcases\snapshots\" />
   </ItemGroup>
 

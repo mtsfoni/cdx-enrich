@@ -1,2 +1,0 @@
-﻿ReplaceLicenseByClearlyDefined:
-  - Ref: "pkg:nuget/Newtonsoft.Json@13.0.1"

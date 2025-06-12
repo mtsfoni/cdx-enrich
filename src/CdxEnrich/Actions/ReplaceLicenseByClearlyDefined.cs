@@ -10,8 +10,21 @@ namespace CdxEnrich.Actions
     public static class ReplaceLicenseByClearlyDefined
     {
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
+
         private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
             logger: new ConsoleLogger<ClearlyDefinedClient>());
+
+        private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
+        {
+            PackageType.Composer,
+            PackageType.Deb,
+            PackageType.Go,
+            PackageType.Conda,
+            PackageType.Condasrc,
+            PackageType.Debsrc,
+            PackageType.Git,
+            PackageType.SourceArchive,
+        };
 
         private static Component? GetComponentByBomRef(Bom bom, string bomRef)
         {
@@ -29,7 +42,7 @@ namespace CdxEnrich.Actions
             return new Ok<ConfigRoot>(config);
         }
 
-        private static Result<ConfigRoot> RefMustBeValidPurl(ConfigRoot config)
+        private static Result<ConfigRoot> RefMustBeSupportedPackageType(ConfigRoot config)
         {
             if (config.ReplaceLicenseByClearlyDefined == null)
             {
@@ -38,19 +51,39 @@ namespace CdxEnrich.Actions
 
             foreach (var itemRef in config.ReplaceLicenseByClearlyDefined.Select(item => item.Ref))
             {
-                if (itemRef != null && !TryParsePurl(itemRef, out _))
+                PackageURL? purl = null;
+                if (itemRef != null && !TryParsePurl(itemRef, out purl))
                 {
                     return InvalidConfigError.Create<ConfigRoot>(ModuleName, $"Invalid PURL format: {itemRef}");
+                }
+
+                PackageType? packageType = null;
+                if (purl != null && !PackageType.TryFromPurlType(purl.Type, out packageType))
+                {
+                    return InvalidConfigError.Create<ConfigRoot>(ModuleName,
+                        $"Package type '{purl.Type}' is not supported by ClearlyDefined. Supported types are: {string.Join(", ", PackageType.All.Select(pt => pt.Value))}");
+                }
+
+                if (packageType != null && !IsSupported(packageType))
+                {
+                    return InvalidConfigError.Create<ConfigRoot>(ModuleName,
+                        $"Package type '{packageType.Name}' is currently not supported by CdxEnrich. Supported types are: {string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value))}");
                 }
             }
 
             return new Ok<ConfigRoot>(config);
         }
 
+        private static bool IsSupported(PackageType packageType)
+        {
+            return !NotSupportedPackageTypes.Contains(packageType);
+        }
+
+
         public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
             return RefMustNotBeNullOrEmpty(config)
-                .Bind(RefMustBeValidPurl);
+                .Bind(RefMustBeSupportedPackageType);
         }
 
         public static InputTuple Execute(InputTuple inputs)
@@ -110,7 +143,7 @@ namespace CdxEnrich.Actions
         private static bool TryParsePurl(string purlString, out PackageURL? packageUrl)
         {
             packageUrl = null;
-            
+
             try
             {
                 packageUrl = new PackageURL(purlString);
