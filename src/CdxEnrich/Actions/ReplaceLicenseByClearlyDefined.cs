@@ -17,12 +17,12 @@ namespace CdxEnrich.Actions
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
         {
             PackageType.Composer,
-            PackageType.Deb,
-            PackageType.Go,
             PackageType.Conda,
             PackageType.Condasrc,
+            PackageType.Deb,
             PackageType.Debsrc,
             PackageType.Git,
+            PackageType.Go,
             PackageType.SourceArchive,
         };
 
