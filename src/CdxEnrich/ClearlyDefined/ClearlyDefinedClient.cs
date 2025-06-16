@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Threading.RateLimiting;
+using CycloneDX.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
@@ -12,7 +13,7 @@ namespace CdxEnrich.ClearlyDefined
 {
     public interface IClearlyDefinedClient
     {
-        Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider);
+        Task<List<LicenseChoice>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider);
     }
 
     public class ClearlyDefinedClient : IClearlyDefinedClient
@@ -21,9 +22,10 @@ namespace CdxEnrich.ClearlyDefined
         private readonly HttpClient _httpClient;
         private readonly ILogger<ClearlyDefinedClient> _logger;
         private readonly ResiliencePipeline _resiliencePipeline;
-        
+        private readonly LicenseChoicesFactory _licenseChoicesFactory;
+
         // Token Bucket Rate Limiter for max. 250 requests per minute
-        private static readonly TokenBucketRateLimiter RateLimiter = new (
+        private static readonly TokenBucketRateLimiter RateLimiter = new(
             new TokenBucketRateLimiterOptions
             {
                 TokenLimit = 250,
@@ -34,18 +36,19 @@ namespace CdxEnrich.ClearlyDefined
                 AutoReplenishment = true
             });
 
-        public ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
+        public ClearlyDefinedClient(LicenseChoicesFactory licenseChoicesFactory, HttpClient? httpClient = null,  ILogger<ClearlyDefinedClient>? logger = null)
         {
             _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
             _logger = logger ?? NullLogger<ClearlyDefinedClient>.Instance;
             _resiliencePipeline = this.CreateResiliencePipeline();
+            this._licenseChoicesFactory = licenseChoicesFactory;
         }
 
         private ResiliencePipeline CreateResiliencePipeline()
         {
             // Configure the resilience pipeline with Polly v8
             var builder = new ResiliencePipelineBuilder();
-            
+
             // Add retry strategy
             builder.AddRetry(new RetryStrategyOptions
             {
@@ -58,28 +61,28 @@ namespace CdxEnrich.ClearlyDefined
                     // Handle HTTP errors
                     if (args.Outcome.Exception is HttpRequestException)
                         return ValueTask.FromResult(true);
-                    
+
                     // Handle rate limit errors if the result is an HttpResponseMessage
-                    if (args.Outcome.Result is HttpResponseMessage response && 
+                    if (args.Outcome.Result is HttpResponseMessage response &&
                         response.StatusCode == HttpStatusCode.TooManyRequests)
                         return ValueTask.FromResult(true);
-                    
+
                     return ValueTask.FromResult(false);
                 },
                 OnRetry = args =>
                 {
-                    if (args.Outcome.Result is HttpResponseMessage response && 
+                    if (args.Outcome.Result is HttpResponseMessage response &&
                         response.StatusCode == HttpStatusCode.TooManyRequests)
                     {
                         this._logger.LogWarning(
                             "Rate limit reached on ClearlyDefined API call. Retry attempt {Attempt} after {Delay}",
                             args.AttemptNumber, args.RetryDelay);
-                        
+
                         // Extract rate limit information from headers if available
                         if (response.Headers.TryGetValues("x-ratelimit-remaining", out var remaining) &&
                             response.Headers.TryGetValues("x-ratelimit-limit", out var limit))
                         {
-                            this._logger.LogInformation("Rate Limit Info: {Remaining}/{Limit} remaining", 
+                            this._logger.LogInformation("Rate Limit Info: {Remaining}/{Limit} remaining",
                                 string.Join(",", remaining), string.Join(",", limit));
                         }
                     }
@@ -89,11 +92,11 @@ namespace CdxEnrich.ClearlyDefined
                             "HTTP error on ClearlyDefined API call. Retry attempt {Attempt} after {Delay}",
                             args.AttemptNumber, args.RetryDelay);
                     }
-                    
+
                     return ValueTask.CompletedTask;
                 }
             });
-            
+
             // Add timeout strategy
             builder.AddTimeout(new TimeoutStrategyOptions
             {
@@ -104,7 +107,7 @@ namespace CdxEnrich.ClearlyDefined
                     return ValueTask.CompletedTask;
                 }
             });
-            
+
             return builder.Build();
         }
 
@@ -114,7 +117,7 @@ namespace CdxEnrich.ClearlyDefined
         /// <param name="packageUrl">The PackageURL of the package</param>
         /// <param name="provider">The provider to use</param>
         /// <returns>A list of license expressions or null if none were found</returns>
-        public async Task<List<string>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider)
+        public async Task<List<LicenseChoice>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider)
         {
             var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, provider);
 
@@ -122,24 +125,31 @@ namespace CdxEnrich.ClearlyDefined
             {
                 // Acquire permission from the rate limiter
                 using var lease = await RateLimiter.AcquireAsync(1);
-                
+
                 if (lease.IsAcquired)
                 {
                     // Execute resilience pipeline
                     var response = await _resiliencePipeline.ExecuteAsync<HttpResponseMessage>(
                         async cancellationToken => await _httpClient.GetAsync(apiUrl, cancellationToken),
                         CancellationToken.None);
-                    
+
                     if (response.IsSuccessStatusCode)
                     {
                         var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
-                        this._logger.LogInformation("Successfully retrieved data from ClearlyDefined API for package: {PackageUrl}", packageUrl);
-                        return data?.Licensed.Facets.Core.Discovered.Expressions;
+                        this._logger.LogInformation(
+                            "Successfully retrieved data from ClearlyDefined API for package: {PackageUrl}",
+                            packageUrl);
+                        if (data?.Licensed == null)
+                        {
+                            return null;
+                        }
+
+                        return this._licenseChoicesFactory.Create(packageUrl, data.Licensed);
                     }
                     else
                     {
                         // Still not successful after retries
-                        _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}", 
+                        _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}",
                             response.StatusCode, apiUrl);
                         return null;
                     }
@@ -165,12 +175,14 @@ namespace CdxEnrich.ClearlyDefined
             // Case 1: Namespace is present
             if (packageUrl.Namespace != null)
             {
-                return $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+                return
+                    $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
             }
             // Case 2: No namespace present, use "-" as placeholder
             else
             {
-                return $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+                return
+                    $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
             }
         }
     }

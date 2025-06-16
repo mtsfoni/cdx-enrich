@@ -32,17 +32,7 @@
       Licenses: [
         {
           License: {
-            Id: LicenseRef-scancode-ms-net-library
-          }
-        },
-        {
-          License: {
-            Id: LicenseRef-scancode-ms-net-library-2018-11
-          }
-        },
-        {
-          License: {
-            Id: LicenseRef-scancode-unknown-license-reference AND MIT
+            Name: Unknown
           }
         }
       ],
@@ -55,14 +45,7 @@
       Version: 4.17.21,
       Licenses: [
         {
-          License: {
-            Id: MIT
-          }
-        },
-        {
-          License: {
-            Id: MIT AND CC0-1.0
-          }
+          Expression: CC0-1.0 AND MIT
         }
       ],
       Purl: pkg:npm/lodash@4.17.21
@@ -91,21 +74,6 @@
           License: {
             Id: Apache-2.0
           }
-        },
-        {
-          License: {
-            Id: Apache-2.0 AND MIT
-          }
-        },
-        {
-          License: {
-            Id: Apache-2.0 AND NOASSERTION
-          }
-        },
-        {
-          License: {
-            Id: NOASSERTION
-          }
         }
       ],
       Purl: pkg:pypi/requests@2.28.1
@@ -118,7 +86,7 @@
       Licenses: [
         {
           License: {
-            Id: MIT AND Ruby
+            Id: MIT
           }
         }
       ],
@@ -162,16 +130,6 @@
           License: {
             Id: MIT
           }
-        },
-        {
-          License: {
-            Id: MIT AND NOASSERTION
-          }
-        },
-        {
-          License: {
-            Id: NOASSERTION
-          }
         }
       ],
       Purl: pkg:pod/Alamofire@5.6.2
@@ -197,24 +155,7 @@
       Version: 1.0.152,
       Licenses: [
         {
-          License: {
-            Id: ((Apache-2.0 WITH LLVM-exception AND LicenseRef-scancode-generic-cla) AND Apache-2.0 AND MIT) AND LicenseRef-scancode-unknown-license-reference
-          }
-        },
-        {
-          License: {
-            Id: (Apache-2.0 OR MIT) AND (MIT OR Apache-2.0)
-          }
-        },
-        {
-          License: {
-            Id: Apache-2.0
-          }
-        },
-        {
-          License: {
-            Id: MIT
-          }
+          Expression: MIT OR Apache-2.0
         }
       ],
       Purl: pkg:crate/serde@1.0.152

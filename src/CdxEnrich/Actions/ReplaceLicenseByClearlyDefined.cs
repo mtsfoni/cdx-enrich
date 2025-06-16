@@ -14,6 +14,7 @@ namespace CdxEnrich.Actions
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
 
         private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
+            licenseChoicesFactory: new LicenseChoicesFactory(new ConsoleLogger<LicenseChoicesFactory>()),
             logger: new ConsoleLogger<ClearlyDefinedClient>());
 
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
@@ -131,10 +132,7 @@ namespace CdxEnrich.Actions
                     return;
                 }
 
-                component.Licenses = cdLicenses.Select(expression => new LicenseChoice
-                {
-                    License = new License { Id = expression }
-                }).ToList();
+                component.Licenses = cdLicenses;
             }
             catch (Exception ex)
             {
