@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Ref: "pkg:git/github.com/expressjs/express@4.18.2"
+  - Purl: "pkg:git/github.com/expressjs/express@4.18.2"

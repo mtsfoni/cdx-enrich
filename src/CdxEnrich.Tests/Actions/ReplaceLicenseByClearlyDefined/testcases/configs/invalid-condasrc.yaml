@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Ref: "pkg:condasrc/numpy@1.24.3"
+  - Purl: "pkg:condasrc/numpy@1.24.3"

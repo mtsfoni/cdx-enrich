@@ -31,6 +31,6 @@ namespace CdxEnrich.Config
     
     public class ReplaceLicenseByClearlyDefinedConfig
     {
-        public string? Ref { get; set; }
+        public string? Purl { get; set; }
     }
 }
