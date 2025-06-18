@@ -15,8 +15,8 @@ namespace CdxEnrich.Actions
 
         private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
             logger: new ConsoleLogger<ClearlyDefinedClient>());
-        
-        private static readonly LicenseResolver LicenseResolver = 
+
+        private static readonly LicenseResolver LicenseResolver =
             new LicenseResolver(new ConsoleLogger<LicenseResolver>());
 
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
@@ -95,20 +95,29 @@ namespace CdxEnrich.Actions
         {
             var tasks = new List<Task>();
 
-            inputs.Config.ReplaceLicenseByClearlyDefined?
+            var configEntries = inputs.Config.ReplaceLicenseByClearlyDefined?
                 .Where(item => item.Ref != null)
-                .ToList()
-                .ForEach(item =>
+                .ToList();
+            
+            if(configEntries == null)
+            {
+                Logger.LogInformation("No valid configuration entries found for ClearlyDefined replacement.");
+                return inputs;
+            }
+
+            foreach (var configEntry in configEntries)
+            {
+                var component = GetComponentByBomRef(inputs.Bom, configEntry.Ref!);
+                if (component == null)
                 {
-                    var component = GetComponentByBomRef(inputs.Bom, item.Ref!);
-                    var packageUrl = new PackageURL(item.Ref!);
-                    var packageType = PackageType.FromPurlType(packageUrl.Type);
-                    var provider = packageType.DefaultProvider;
-                    if (component != null)
-                    {
-                        tasks.Add(ProcessComponentAsync(component, packageUrl, provider));
-                    }
-                });
+                    continue;
+                }
+
+                var packageUrl = new PackageURL(configEntry.Ref!);
+                var packageType = PackageType.FromPurlType(packageUrl.Type);
+                var provider = packageType.DefaultProvider;
+                tasks.Add(ProcessComponentAsync(component, packageUrl, provider));
+            }
 
             try
             {
@@ -135,12 +144,13 @@ namespace CdxEnrich.Actions
                     return;
                 }
 
-                // Verwenden des Resolvers zum Ermitteln der LicenseChoices
+                // Verwenden des Resolvers zum Ermitteln der LicenseChoice
                 var licenseChoice = LicenseResolver.Resolve(packageUrl, licensedData);
 
                 if (licenseChoice == null)
                 {
-                    Logger.LogInformation("No applicable license choices created for package: {PackageUrl}", packageUrl);
+                    Logger.LogInformation("No applicable license choices resolved for package: {PackageUrl}",
+                        packageUrl);
                     return;
                 }
 
