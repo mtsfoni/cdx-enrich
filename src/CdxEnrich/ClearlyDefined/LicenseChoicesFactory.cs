@@ -7,7 +7,7 @@ namespace CdxEnrich.ClearlyDefined
 {
     public interface IAdoptionLicenseRule
     {
-        bool CanApply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
+        bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed);
         List<LicenseChoice>? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
     }
 
@@ -29,17 +29,17 @@ namespace CdxEnrich.ClearlyDefined
 
         public List<LicenseChoice>? Create(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
         {
-            var selectedRules =_rules.Where(x => x.CanApply(packageUrl, dataLicensed)).ToList();
+            var selectedRules =_rules.Where(x => x.CanApply(dataLicensed)).ToList();
             
             if(selectedRules.Count == 0)
             {
-                _logger.LogWarning("No applicable license rules found for package: {PackageUrl}", packageUrl);
+                _logger.LogInformation("No applicable license rules found for package: {PackageUrl}", packageUrl);
                 return null;
             }
             if (selectedRules.Count > 1)
             {
                 _logger.LogError(
-                    "Multiple license rules applied for package: {PackageUrl}. This is unexpected and may lead to incorrect results.",
+                    "Multiple license rules found for package: {PackageUrl}. Applying no rule to prevent unexpected or incorrect results.",
                     packageUrl);
                 return null;
             }
@@ -50,9 +50,9 @@ namespace CdxEnrich.ClearlyDefined
 
         #region License Rules
 
-        public class OtherAdoptionLicenseWithUnknownRefRule(ILogger logger) : IAdoptionLicenseRule
+        internal sealed class OtherAdoptionLicenseWithUnknownRefRule(ILogger logger) : IAdoptionLicenseRule
         {
-            public bool CanApply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
             {
                 var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
 
@@ -78,9 +78,9 @@ namespace CdxEnrich.ClearlyDefined
             }
         }
 
-        public class OtherAdoptionLicenseWithExpressionsRule(ILogger logger) : IAdoptionLicenseRule
+        internal sealed  class OtherAdoptionLicenseWithExpressionsRule(ILogger logger) : IAdoptionLicenseRule
         {
-            public bool CanApply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
             {
                 var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
 
@@ -90,7 +90,7 @@ namespace CdxEnrich.ClearlyDefined
                        !ContainsUnknownScancodeLicenseReference(licenseExpressions);
             }
 
-            public List<LicenseChoice>? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
             {
                 var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
                 var joinedLicenseExpression = string.Join(" OR ", licenseExpressions);
@@ -116,14 +116,14 @@ namespace CdxEnrich.ClearlyDefined
             }
         }
 
-        public class ExpressionAdoptionLicenseRule(ILogger logger) : IAdoptionLicenseRule
+        internal sealed  class ExpressionAdoptionLicenseRule(ILogger logger) : IAdoptionLicenseRule
         {
-            public bool CanApply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
             {
                 return IsExpression(dataLicensed.Declared);
             }
 
-            public List<LicenseChoice>? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
             {
                 logger.LogInformation(
                     "Using declared license expression: {DeclaredLicense} for package: {PackageUrl}",
@@ -146,16 +146,16 @@ namespace CdxEnrich.ClearlyDefined
             }
         }
 
-        public class SimpleAdoptionLicenseIdRule(ILogger logger) : IAdoptionLicenseRule
+        internal sealed  class SimpleAdoptionLicenseIdRule(ILogger logger) : IAdoptionLicenseRule
         {
-            public bool CanApply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
             {
                 // This rule applies to any simple license ID (not an expression and not "OTHER")
                 return !dataLicensed.Declared.Contains("OTHER") &&
                        !IsExpression(dataLicensed.Declared);
             }
 
-            public List<LicenseChoice>? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
             {
                 logger.LogInformation(
                     "Using declared license ID: {DeclaredLicenseId} for package: {PackageUrl}",
