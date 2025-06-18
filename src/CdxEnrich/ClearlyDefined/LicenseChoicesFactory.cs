@@ -16,7 +16,7 @@ namespace CdxEnrich.ClearlyDefined
             _logger = logger ?? NullLogger<LicenseChoicesFactory>.Instance;
 
             _rules.Add(new OtherLicenseAdoptionRule(_logger));
-            _rules.Add(new SPDXExpressionAdoptionRule(_logger));
+            _rules.Add(new SpdxExpressionAdoptionRule(_logger));
             _rules.Add(new LicenseIdAdoptionRule(_logger));
         }
 
