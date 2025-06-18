@@ -49,33 +49,80 @@ namespace CdxEnrich.ClearlyDefined
 
         #region License Rules
 
-        internal sealed class OtherLicenseAdoptionRule(ILogger logger) : IAdoptionLicenseRule
+        /// <summary>
+        /// Abstrakte Basisklasse für Lizenzregeln, die gemeinsame Funktionalität bereitstellt
+        /// </summary>
+        internal abstract class AdoptionLicenseRuleBase : IAdoptionLicenseRule
         {
-            public bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
+            protected readonly ILogger Logger;
+
+            protected AdoptionLicenseRuleBase(ILogger logger)
             {
-                // This rule applies to any license declaration containing "OTHER"
-                return dataLicensed.Declared.Contains("OTHER");
+                Logger = logger;
             }
 
-            public List<LicenseChoice>? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public abstract bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed);
+            
+            public abstract List<LicenseChoice>? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
+
+            /// <summary>
+            /// Prüft, ob ein Lizenzstring ein SPDX-Ausdruck ist (enthält Operatoren)
+            /// </summary>
+            protected bool IsExpression(string declared)
+            {
+                return declared.Contains(" OR ") ||
+                       declared.Contains(" AND ") ||
+                       declared.Contains(" WITH ");
+            }
+
+            /// <summary>
+            /// Prüft, ob ein Lizenzstring "OTHER" enthält
+            /// </summary>
+            protected bool ContainsOther(string declared)
+            {
+                return declared.Contains("OTHER");
+            }
+
+            /// <summary>
+            /// Prüft, ob eine Liste von Lizenzausdrücken unbekannte Scancode-Lizenzreferenzen enthält
+            /// </summary>
+            protected bool ContainsUnknownScancodeLicenseReference(List<string> licenseExpressions)
+            {
+                return licenseExpressions.Exists(expression =>
+                    expression.Contains("LicenseRef-scancode-unknown-license-reference",
+                        StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+        internal sealed class OtherLicenseAdoptionRule : AdoptionLicenseRuleBase
+        {
+            public OtherLicenseAdoptionRule(ILogger logger) : base(logger) { }
+
+            public override bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
+            {
+                // Diese Regel gilt für jede Lizenzdeklaration, die "OTHER" enthält
+                return ContainsOther(dataLicensed.Declared);
+            }
+
+            public override List<LicenseChoice>? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
             {
                 var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
 
-                // Case 1: No expressions, empty expressions, or expressions containing unknown license references
+                // Fall 1: Keine Ausdrücke, leere Ausdrücke oder Ausdrücke mit unbekannten Lizenzreferenzen
                 if (licenseExpressions == null || 
                     !licenseExpressions.Any() || 
                     ContainsUnknownScancodeLicenseReference(licenseExpressions))
                 {
-                    logger.LogWarning(
+                    Logger.LogWarning(
                         "No license adopted for package: {PackageUrl} due to 'OTHER' license with missing or invalid expressions",
                         packageUrl);
                     return null;
                 }
 
-                // Case 2: Valid expressions exist
+                // Fall 2: Gültige Ausdrücke vorhanden
                 var joinedLicenseExpression = string.Join(" OR ", licenseExpressions);
 
-                logger.LogInformation(
+                Logger.LogInformation(
                     "Using license expressions ({LicenseExpressions}) for package: {PackageUrl}",
                     joinedLicenseExpression, packageUrl);
 
@@ -87,26 +134,21 @@ namespace CdxEnrich.ClearlyDefined
                     }
                 ];
             }
-
-            private bool ContainsUnknownScancodeLicenseReference(List<string> licenseExpressions)
-            {
-                return licenseExpressions.Exists(expression =>
-                    expression.Contains("LicenseRef-scancode-unknown-license-reference",
-                        StringComparison.OrdinalIgnoreCase));
-            }
         }
 
-        internal sealed class SPDXExpressionAdoptionRule(ILogger logger) : IAdoptionLicenseRule
+        internal sealed class SPDXExpressionAdoptionRule : AdoptionLicenseRuleBase
         {
-            public bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
+            public SPDXExpressionAdoptionRule(ILogger logger) : base(logger) { }
+
+            public override bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
             {
-                return !dataLicensed.Declared.Contains("OTHER") && 
+                return !ContainsOther(dataLicensed.Declared) && 
                        IsExpression(dataLicensed.Declared);
             }
 
-            public List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public override List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
             {
-                logger.LogInformation(
+                Logger.LogInformation(
                     "Using declared license expression: {DeclaredLicense} for package: {PackageUrl}",
                     dataLicensed.Declared, packageUrl);
 
@@ -118,27 +160,22 @@ namespace CdxEnrich.ClearlyDefined
                     }
                 ];
             }
-
-            private bool IsExpression(string declared)
-            {
-                return declared.Contains(" OR ") ||
-                       declared.Contains(" AND ") ||
-                       declared.Contains(" WITH ");
-            }
         }
 
-        internal sealed class LicenseIdAdoptionRule(ILogger logger) : IAdoptionLicenseRule
+        internal sealed class LicenseIdAdoptionRule : AdoptionLicenseRuleBase
         {
-            public bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
+            public LicenseIdAdoptionRule(ILogger logger) : base(logger) { }
+
+            public override bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
             {
-                // This rule applies to any simple license ID (not an expression and not "OTHER")
-                return !dataLicensed.Declared.Contains("OTHER") &&
+                // Diese Regel gilt für einfache Lizenz-IDs (keine Ausdrücke und nicht "OTHER")
+                return !ContainsOther(dataLicensed.Declared) &&
                        !IsExpression(dataLicensed.Declared);
             }
 
-            public List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+            public override List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
             {
-                logger.LogInformation(
+                Logger.LogInformation(
                     "Using declared license ID: {DeclaredLicenseId} for package: {PackageUrl}",
                     dataLicensed.Declared, packageUrl);
 
@@ -152,13 +189,6 @@ namespace CdxEnrich.ClearlyDefined
                         }
                     }
                 ];
-            }
-
-            private bool IsExpression(string declared)
-            {
-                return declared.Contains(" OR ") ||
-                       declared.Contains(" AND ") ||
-                       declared.Contains(" WITH ");
             }
         }
 
