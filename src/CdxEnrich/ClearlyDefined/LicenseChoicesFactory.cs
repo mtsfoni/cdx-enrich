@@ -20,7 +20,7 @@ namespace CdxEnrich.ClearlyDefined
             _rules.Add(new LicenseIdAdoptionRule(_logger));
         }
 
-        public List<LicenseChoice>? Create(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+        public LicenseChoice? Create(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
         {
             var selectedRules =_rules.Where(x => x.CanApply(dataLicensed)).ToList();
             

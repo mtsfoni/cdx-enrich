@@ -136,15 +136,15 @@ namespace CdxEnrich.Actions
                 }
 
                 // Verwenden der Factory zur Erzeugung der LicenseChoices
-                var licenseChoices = LicenseChoicesFactory.Create(packageUrl, licensedData);
+                var licenseChoice = LicenseChoicesFactory.Create(packageUrl, licensedData);
 
-                if (licenseChoices == null || !licenseChoices.Any())
+                if (licenseChoice == null)
                 {
                     Logger.LogInformation("No applicable license choices created for package: {PackageUrl}", packageUrl);
                     return;
                 }
 
-                component.Licenses = licenseChoices;
+                component.Licenses = [licenseChoice];
             }
             catch (Exception ex)
             {

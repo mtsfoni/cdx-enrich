@@ -37,11 +37,10 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Has.Count.EqualTo(1));
             Assert.Multiple(() =>
             {
-                Assert.That(result[0].Expression, Is.EqualTo(expected));
-                Assert.That(result[0].License, Is.Null);
+                Assert.That(result.Expression, Is.EqualTo(expected));
+                Assert.That(result.License, Is.Null);
             });
         }
 
@@ -82,10 +81,9 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0].Expression, Is.Null);
-            Assert.That(result[0].License, Is.Not.Null);
-            Assert.That(result[0].License.Id, Is.EqualTo("MIT"));
+            Assert.That(result.Expression, Is.Null);
+            Assert.That(result.License, Is.Not.Null);
+            Assert.That(result.License.Id, Is.EqualTo("MIT"));
         }
 
         [Test]
@@ -99,11 +97,10 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Has.Count.EqualTo(1));
             Assert.Multiple(() =>
             {
-                Assert.That(result[0].Expression, Is.EqualTo("MIT OR Apache-2.0"));
-                Assert.That(result[0].License, Is.Null);
+                Assert.That(result.Expression, Is.EqualTo("MIT OR Apache-2.0"));
+                Assert.That(result.License, Is.Null);
             });
         }
 
@@ -124,11 +121,10 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Has.Count.EqualTo(1));
             Assert.Multiple(() =>
             {
-                Assert.That(result[0].Expression, Is.EqualTo(expected));
-                Assert.That(result[0].License, Is.Null);
+                Assert.That(result.Expression, Is.EqualTo(expected));
+                Assert.That(result.License, Is.Null);
             });
         }
 
@@ -143,11 +139,10 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Has.Count.EqualTo(1));
             Assert.Multiple(() =>
             {
-                Assert.That(result[0].Expression, Is.EqualTo("GPL-2.0-or-later WITH Classpath-exception-2.0"));
-                Assert.That(result[0].License, Is.Null);
+                Assert.That(result.Expression, Is.EqualTo("GPL-2.0-or-later WITH Classpath-exception-2.0"));
+                Assert.That(result.License, Is.Null);
             });
         }
 
@@ -164,13 +159,12 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Has.Count.EqualTo(1));
             Assert.Multiple(() =>
             {
-                Assert.That(result[0].Expression, Is.Null);
-                Assert.That(result[0].License, Is.Not.Null);
+                Assert.That(result.Expression, Is.Null);
+                Assert.That(result.License, Is.Not.Null);
             });
-            Assert.That(result[0].License.Id, Is.EqualTo("MIT"));
+            Assert.That(result.License.Id, Is.EqualTo("MIT"));
         }
 
         private class LicenseChoicesFactoryFixture

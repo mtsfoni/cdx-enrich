@@ -12,19 +12,16 @@ namespace CdxEnrich.ClearlyDefined.Rules
                    IsExpression(dataLicensed.Declared);
         }
 
-        public override List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+        public override LicenseChoice? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
         {
             Logger.LogInformation(
                 "Using declared license expression: {DeclaredLicense} for package: {PackageUrl}",
                 dataLicensed.Declared, packageUrl);
 
-            return
-            [
-                new LicenseChoice
-                {
-                    Expression = dataLicensed.Declared
-                }
-            ];
+            return new LicenseChoice
+            {
+                Expression = dataLicensed.Declared
+            };
         }
     }
 }

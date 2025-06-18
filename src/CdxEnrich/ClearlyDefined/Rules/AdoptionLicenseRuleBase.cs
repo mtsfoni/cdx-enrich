@@ -13,7 +13,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
 
         public abstract bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed);
         
-        public abstract List<LicenseChoice>? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
+        public abstract LicenseChoice? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
 
         /// <summary>
         /// Prüft, ob ein Lizenzstring ein SPDX-Ausdruck ist (enthält Operatoren)

@@ -12,13 +12,13 @@ namespace CdxEnrich.ClearlyDefined.Rules
             return ContainsOther(dataLicensed.Declared);
         }
 
-        public override List<LicenseChoice>? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+        public override LicenseChoice? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
         {
             var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
 
             // Fall 1: Keine Ausdrücke, leere Ausdrücke oder Ausdrücke mit unbekannten Lizenzreferenzen
-            if (licenseExpressions == null || 
-                !licenseExpressions.Any() || 
+            if (licenseExpressions == null ||
+                !licenseExpressions.Any() ||
                 ContainsUnknownScancodeLicenseReference(licenseExpressions))
             {
                 Logger.LogWarning(
@@ -34,13 +34,10 @@ namespace CdxEnrich.ClearlyDefined.Rules
                 "Using license expressions ({LicenseExpressions}) for package: {PackageUrl}",
                 joinedLicenseExpression, packageUrl);
 
-            return
-            [
-                new LicenseChoice
+            return new LicenseChoice
                 {
                     Expression = joinedLicenseExpression
-                }
-            ];
+                };
         }
     }
 }
