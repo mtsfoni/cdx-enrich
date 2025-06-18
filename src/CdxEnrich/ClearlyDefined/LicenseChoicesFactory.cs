@@ -20,7 +20,6 @@ namespace CdxEnrich.ClearlyDefined
         {
             _logger = logger ?? NullLogger<LicenseChoicesFactory>.Instance;
 
-            // Add default rules in priority order
             _rules.Add(new OtherAdoptionLicenseWithUnknownRefRule(_logger));
             _rules.Add(new OtherAdoptionLicenseWithExpressionsRule(_logger));
             _rules.Add(new ExpressionAdoptionLicenseRule(_logger));
@@ -39,7 +38,8 @@ namespace CdxEnrich.ClearlyDefined
             if (selectedRules.Count > 1)
             {
                 _logger.LogError(
-                    "Multiple license rules found for package: {PackageUrl}. Applying no rule to prevent unexpected or incorrect results.",
+                    "Multiple license rules found ({RuleNames}) for package: {PackageUrl}. Applying no rule to prevent unexpected or incorrect results.",
+                    string.Join(", ", selectedRules.Select(r => r.GetType().Name)),
                     packageUrl);
                 return null;
             }
@@ -93,7 +93,7 @@ namespace CdxEnrich.ClearlyDefined
             public List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
             {
                 var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
-                var joinedLicenseExpression = string.Join(" OR ", licenseExpressions);
+                var joinedLicenseExpression = string.Join(" OR ", licenseExpressions!);
 
                 logger.LogInformation(
                     "Using license expressions ({LicenseExpressions}) for package: {PackageUrl}",
@@ -120,7 +120,8 @@ namespace CdxEnrich.ClearlyDefined
         {
             public bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
             {
-                return IsExpression(dataLicensed.Declared);
+                return !dataLicensed.Declared.Contains("OTHER") && 
+                       IsExpression(dataLicensed.Declared);
             }
 
             public List<LicenseChoice> Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)

@@ -128,7 +128,6 @@ namespace CdxEnrich.Actions
 
                 if (cdLicenses == null || !cdLicenses.Any())
                 {
-                    Logger.LogInformation("No ClearlyDefined licenses found for {PackageUrl}", packageUrl);
                     return;
                 }
 
