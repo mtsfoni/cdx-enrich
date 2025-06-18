@@ -135,16 +135,16 @@ namespace CdxEnrich.Actions
         {
             try
             {
-                // Holen der Lizenzdaten von ClearlyDefined
+                // Fetching license data from ClearlyDefined
                 var licensedData = await ClearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
-
+            
                 if (licensedData == null)
                 {
                     Logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
                     return;
                 }
-
-                // Verwenden des Resolvers zum Ermitteln der LicenseChoice
+            
+                // Using the resolver to determine the LicenseChoice
                 var licenseChoice = LicenseResolver.Resolve(packageUrl, licensedData);
 
                 if (licenseChoice == null)

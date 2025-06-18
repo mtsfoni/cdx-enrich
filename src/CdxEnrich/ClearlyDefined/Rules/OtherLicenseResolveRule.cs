@@ -8,7 +8,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
     {
         public override bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed)
         {
-            // Diese Regel gilt für jede Lizenzdeklaration, die "OTHER" enthält
+            // This rule applies to any license declaration that contains "OTHER"
             return ContainsOther(dataLicensed.Declared);
         }
 
@@ -16,7 +16,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
         {
             var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
 
-            // Fall 1: Keine Ausdrücke, leere Ausdrücke oder Ausdrücke mit unbekannten Lizenzreferenzen
+            // Case 1: No expressions, empty expressions, or expressions with unknown license references
             if (licenseExpressions == null ||
                 !licenseExpressions.Any() ||
                 ContainsUnknownScancodeLicenseReference(licenseExpressions))
@@ -27,7 +27,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
                 return null;
             }
 
-            // Fall 2: Gültige Ausdrücke vorhanden
+            // Case 2: Valid expressions available
             var joinedLicenseExpression = string.Join(" OR ", licenseExpressions);
 
             Logger.LogInformation(

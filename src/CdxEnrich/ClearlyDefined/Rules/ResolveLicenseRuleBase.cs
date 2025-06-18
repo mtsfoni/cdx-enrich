@@ -5,7 +5,7 @@ using PackageUrl;
 namespace CdxEnrich.ClearlyDefined.Rules
 {
     /// <summary>
-    /// Abstrakte Basisklasse für Lizenzregeln, die gemeinsame Funktionalität bereitstellt
+    /// Abstract base class for license rules that provides common functionality
     /// </summary>
     internal abstract class ResolveLicenseRuleBase(ILogger logger) : IResolveLicenseRule
     {
@@ -16,7 +16,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
         public abstract LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
 
         /// <summary>
-        /// Prüft, ob ein Lizenzstring ein SPDX-Ausdruck ist (enthält Operatoren)
+        /// Checks if a license string is an SPDX expression (contains operators)
         /// </summary>
         protected bool IsExpression(string declared)
         {
@@ -26,7 +26,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
         }
 
         /// <summary>
-        /// Prüft, ob ein Lizenzstring "OTHER" enthält
+        /// Checks if a license string contains "OTHER"
         /// </summary>
         protected bool ContainsOther(string declared)
         {
@@ -34,7 +34,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
         }
 
         /// <summary>
-        /// Prüft, ob eine Liste von Lizenzausdrücken unbekannte Scancode-Lizenzreferenzen enthält
+        /// Checks if a list of license expressions contains unknown scancode license references
         /// </summary>
         protected bool ContainsUnknownScancodeLicenseReference(List<string> licenseExpressions)
         {
