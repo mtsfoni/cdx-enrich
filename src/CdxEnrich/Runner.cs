@@ -117,9 +117,9 @@ namespace CdxEnrich
                 CombineBomAndConfig(
                     BomSerialization.DeserializeBom(inputFileContent, inputFormat),
                     ConfigLoader.ParseConfig(configFileContent)
-                        .Map(ReplaceLicenseByBomRef.CheckConfig).Data
-                        .Map(ReplaceLicensesByUrl.CheckConfig).Data
-                        .Map(ReplaceLicenseByClearlyDefined.CheckConfig).Data)
+                        .Bind(ReplaceLicenseByBomRef.CheckConfig)
+                        .Bind(ReplaceLicensesByUrl.CheckConfig)
+                        .Bind(ReplaceLicenseByClearlyDefined.CheckConfig))
                 .Map(ReplaceLicenseByBomRef.Execute)
                 .Map(ReplaceLicensesByUrl.Execute)
                 .Map(ReplaceLicenseByClearlyDefined.Execute)
