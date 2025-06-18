@@ -16,7 +16,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
         public override LicenseChoice Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
         {
             Logger.LogInformation(
-                "Using declared license ID: {DeclaredLicenseId} for package: {PackageUrl}",
+                "Resolved license ID: {DeclaredLicenseId} for package: {PackageUrl}",
                 dataLicensed.Declared, packageUrl);
 
             return new LicenseChoice

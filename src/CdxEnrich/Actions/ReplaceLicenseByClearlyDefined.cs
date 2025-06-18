@@ -149,8 +149,6 @@ namespace CdxEnrich.Actions
 
                 if (licenseChoice == null)
                 {
-                    Logger.LogInformation("No applicable license choices resolved for package: {PackageUrl}",
-                        packageUrl);
                     return;
                 }
 

@@ -21,8 +21,8 @@ namespace CdxEnrich.ClearlyDefined.Rules
                 !licenseExpressions.Any() ||
                 ContainsUnknownScancodeLicenseReference(licenseExpressions))
             {
-                Logger.LogWarning(
-                    "No license adopted for package: {PackageUrl} due to 'OTHER' license with missing or invalid expressions",
+                Logger.LogInformation(
+                    "Resolved no licenses for package: {PackageUrl} due to 'OTHER' license with missing or invalid expressions",
                     packageUrl);
                 return null;
             }
@@ -31,7 +31,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
             var joinedLicenseExpression = string.Join(" OR ", licenseExpressions);
 
             Logger.LogInformation(
-                "Using license expressions ({LicenseExpressions}) for package: {PackageUrl}",
+                "Resolved license expressions ({LicenseExpressions}) for package: {PackageUrl}",
                 joinedLicenseExpression, packageUrl);
 
             return new LicenseChoice
