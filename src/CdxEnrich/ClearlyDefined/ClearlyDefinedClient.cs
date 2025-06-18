@@ -141,6 +141,8 @@ namespace CdxEnrich.ClearlyDefined
                             packageUrl);
                         if (data?.Licensed == null)
                         {
+                            this._logger.LogInformation(
+                                "No license information found for package: {PackageUrl}", packageUrl);
                             return null;
                         }
 
