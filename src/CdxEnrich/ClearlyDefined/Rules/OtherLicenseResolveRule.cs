@@ -4,15 +4,15 @@ using PackageUrl;
 
 namespace CdxEnrich.ClearlyDefined.Rules
 {
-    internal sealed class OtherLicenseAdoptionRule(ILogger logger) : AdoptionLicenseRuleBase(logger)
+    internal sealed class OtherLicenseResolveRule(ILogger logger) : ResolveLicenseRuleBase(logger)
     {
-        public override bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed)
+        public override bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed)
         {
             // Diese Regel gilt für jede Lizenzdeklaration, die "OTHER" enthält
             return ContainsOther(dataLicensed.Declared);
         }
 
-        public override LicenseChoice? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+        public override LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
         {
             var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
 

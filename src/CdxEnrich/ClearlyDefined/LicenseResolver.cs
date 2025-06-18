@@ -6,23 +6,23 @@ using PackageUrl;
 
 namespace CdxEnrich.ClearlyDefined
 {
-    public class LicenseChoicesFactory
+    public class LicenseResolver
     {
-        private readonly ILogger<LicenseChoicesFactory> _logger;
-        private readonly List<IAdoptionLicenseRule> _rules = new();
+        private readonly ILogger<LicenseResolver> _logger;
+        private readonly List<IResolveLicenseRule> _rules = new();
 
-        public LicenseChoicesFactory(ILogger<LicenseChoicesFactory>? logger = null)
+        public LicenseResolver(ILogger<LicenseResolver>? logger = null)
         {
-            _logger = logger ?? NullLogger<LicenseChoicesFactory>.Instance;
+            _logger = logger ?? NullLogger<LicenseResolver>.Instance;
 
-            _rules.Add(new OtherLicenseAdoptionRule(_logger));
-            _rules.Add(new SpdxExpressionAdoptionRule(_logger));
-            _rules.Add(new LicenseIdAdoptionRule(_logger));
+            _rules.Add(new OtherLicenseResolveRule(_logger));
+            _rules.Add(new SpdxExpressionResolveRule(_logger));
+            _rules.Add(new LicenseIdResolveRule(_logger));
         }
 
-        public LicenseChoice? Create(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+        public LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
         {
-            var selectedRules =_rules.Where(x => x.CanApply(dataLicensed)).ToList();
+            var selectedRules =_rules.Where(x => x.CanResolve(dataLicensed)).ToList();
             
             if(selectedRules.Count == 0)
             {
@@ -39,7 +39,7 @@ namespace CdxEnrich.ClearlyDefined
             }
 
             var selectedRule = selectedRules.Single();
-            return selectedRule.Apply(packageUrl, dataLicensed);
+            return selectedRule.Resolve(packageUrl, dataLicensed);
         }
     }
 }

@@ -16,8 +16,8 @@ namespace CdxEnrich.Actions
         private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
             logger: new ConsoleLogger<ClearlyDefinedClient>());
         
-        private static readonly LicenseChoicesFactory LicenseChoicesFactory = 
-            new LicenseChoicesFactory(new ConsoleLogger<LicenseChoicesFactory>());
+        private static readonly LicenseResolver LicenseResolver = 
+            new LicenseResolver(new ConsoleLogger<LicenseResolver>());
 
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
         {
@@ -135,8 +135,8 @@ namespace CdxEnrich.Actions
                     return;
                 }
 
-                // Verwenden der Factory zur Erzeugung der LicenseChoices
-                var licenseChoice = LicenseChoicesFactory.Create(packageUrl, licensedData);
+                // Verwenden des Resolvers zum Ermitteln der LicenseChoices
+                var licenseChoice = LicenseResolver.Resolve(packageUrl, licensedData);
 
                 if (licenseChoice == null)
                 {

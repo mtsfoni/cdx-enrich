@@ -7,13 +7,13 @@ namespace CdxEnrich.ClearlyDefined.Rules
     /// <summary>
     /// Abstrakte Basisklasse für Lizenzregeln, die gemeinsame Funktionalität bereitstellt
     /// </summary>
-    internal abstract class AdoptionLicenseRuleBase(ILogger logger) : IAdoptionLicenseRule
+    internal abstract class ResolveLicenseRuleBase(ILogger logger) : IResolveLicenseRule
     {
         protected readonly ILogger Logger = logger;
 
-        public abstract bool CanApply(ClearlyDefinedResponse.LicensedData dataLicensed);
+        public abstract bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed);
         
-        public abstract LicenseChoice? Apply(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
+        public abstract LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
 
         /// <summary>
         /// Prüft, ob ein Lizenzstring ein SPDX-Ausdruck ist (enthält Operatoren)

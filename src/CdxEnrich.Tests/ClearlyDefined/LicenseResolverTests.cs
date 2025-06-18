@@ -4,14 +4,14 @@ using PackageUrl;
 namespace CdxEnrich.Tests.ClearlyDefined
 {
     [TestFixture]
-    public class LicenseChoicesFactoryTests
+    public class LicenseResolverTests
     {
-        private LicenseChoicesFactoryFixture _fixture;
+        private LicenseResolverFixture _fixture;
 
         [SetUp]
         public void Setup()
         {
-            this._fixture = new LicenseChoicesFactoryFixture();
+            this._fixture = new LicenseResolverFixture();
         }
 
         [TestCase("MIT OR Apache-2.0", "MIT", "Apache-2.0",
@@ -25,7 +25,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
         [TestCase("MIT AND Apache-2.0", "MIT AND Apache-2.0",
             Description = "One expressions, with AND operator")]
         public void
-            Create_WhenDeclaredContainsOTHER_AndTryGetLicenseFromExpressionsSucceeds_ReturnsLicenseChoiceWithExpression(
+            Resolve_WhenDeclaredContainsOTHER_AndTryGetLicenseFromExpressionsSucceeds_ReturnsLicenseChoiceWithExpression(
                 string expected, params string[] expressions)
         {
             // Arrange
@@ -33,7 +33,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 expressions.ToList());
 
             // Act
-            var result = this._fixture.Factory.Create(this._fixture.PackageUrl, dataLicensed);
+            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -56,7 +56,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
         [TestCase("LicenseRef-scancode-unknown-license-reference", "MIT",
             Description =
                 "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it")]
-        public void Create_WhenDeclaredContainsOTHER_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
+        public void Resolve_WhenDeclaredContainsOTHER_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
             params string[] expressions)
         {
             // Arrange
@@ -64,20 +64,20 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 expressions.ToList());
 
             // Act
-            var result = this._fixture.Factory.Create(this._fixture.PackageUrl, dataLicensed);
+            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Null);
         }
 
         [Test]
-        public void Create_WhenDeclaredIsNotExpression_ReturnsLicenseChoiceWithLicenseId()
+        public void Resolve_WhenDeclaredIsNotExpression_ReturnsLicenseChoiceWithLicenseId()
         {
             // Arrange
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith("MIT");
 
             // Act
-            var result = this._fixture.Factory.Create(this._fixture.PackageUrl, dataLicensed);
+            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -87,13 +87,13 @@ namespace CdxEnrich.Tests.ClearlyDefined
         }
 
         [Test]
-        public void Create_WhenDeclaredIsExpression_ReturnsLicenseChoiceWithExpression()
+        public void Resolve_WhenDeclaredIsExpression_ReturnsLicenseChoiceWithExpression()
         {
             // Arrange
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith("MIT OR Apache-2.0");
 
             // Act
-            var result = this._fixture.Factory.Create(this._fixture.PackageUrl, dataLicensed);
+            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -110,14 +110,14 @@ namespace CdxEnrich.Tests.ClearlyDefined
             Description = "OR operator in the declared license")]
         [TestCase("MIT WITH Apache-2.0", "MIT WITH Apache-2.0",
             Description = "WITH operator in the declared license")]
-        public void Create_WhenDeclaredContainsOperator_ReturnsLicenseChoiceWithExpression(string declared,
+        public void Resolve_WhenDeclaredContainsOperator_ReturnsLicenseChoiceWithExpression(string declared,
             string expected)
         {
             // Arrange
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith(declared);
 
             // Act
-            var result = this._fixture.Factory.Create(this._fixture.PackageUrl, dataLicensed);
+            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -129,13 +129,13 @@ namespace CdxEnrich.Tests.ClearlyDefined
         }
 
         [Test]
-        public void Create_WhenDeclaredContainsWITH_ReturnsLicenseChoiceWithExpression()
+        public void Resolve_WhenDeclaredContainsWITH_ReturnsLicenseChoiceWithExpression()
         {
             // Arrange
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith("GPL-2.0-or-later WITH Classpath-exception-2.0");
 
             // Act
-            var result = this._fixture.Factory.Create(this._fixture.PackageUrl, dataLicensed);
+            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -147,7 +147,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
         }
 
         [Test]
-        public void Create_WhenDeclaredIsDefinedLicense_AndExpressionsExist_UsesDeclaredAndIgnoresExpressions()
+        public void Resolve_WhenDeclaredIsDefinedLicense_AndExpressionsExist_UsesDeclaredAndIgnoresExpressions()
         {
             // Arrange
             var dataLicensed = this._fixture.CreateLicenseDeclaredAndExpressions(
@@ -155,7 +155,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 ["Apache-2.0", "GPL-3.0"]);
 
             // Act
-            var result = this._fixture.Factory.Create(this._fixture.PackageUrl, dataLicensed);
+            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -167,9 +167,9 @@ namespace CdxEnrich.Tests.ClearlyDefined
             Assert.That(result.License.Id, Is.EqualTo("MIT"));
         }
 
-        private class LicenseChoicesFactoryFixture
+        private class LicenseResolverFixture
         {
-            public LicenseChoicesFactory Factory { get; } = new();
+            public LicenseResolver Resolver { get; } = new();
             public PackageURL PackageUrl { get; } = new("nuget", null, "Test.Package", "1.0.0", null, null);
 
             public ClearlyDefinedResponse.LicensedData CreateLicenseDeclaredWith(string declared)
