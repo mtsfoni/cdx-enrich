@@ -33,12 +33,11 @@ namespace CdxEnrich.Tests.ClearlyDefined
             this._fixture.SetupSuccessResponse("MIT", []);
 
             // Act
-            var result = await this._fixture.Client.GetClearlyDefinedLicensesAsync(packageUrl, provider);
+            var result = await this._fixture.Client.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0].License.Id, Is.EqualTo("MIT"));
+            Assert.That(result.Declared, Is.EqualTo("MIT"));
 
             this._fixture.VerifyRequestUri("npm/npmjs/-/lodash/4.17.21");
         }
@@ -52,11 +51,10 @@ namespace CdxEnrich.Tests.ClearlyDefined
             this._fixture.SetupSuccessResponse("Apache-2.0", []);
 
             // Act
-            var result = await this._fixture.Client.GetClearlyDefinedLicensesAsync(packageUrl, provider);
+            var result = await this._fixture.Client.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(1));
 
             this._fixture.VerifyRequestUri("maven/mavencentral/org.apache.commons/commons-lang3/3.12.0");
         }
@@ -70,7 +68,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
             this._fixture.SetupErrorResponse(HttpStatusCode.NotFound);
 
             // Act
-            var result = await this._fixture.Client.GetClearlyDefinedLicensesAsync(packageUrl, provider);
+            var result = await this._fixture.Client.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
 
             // Assert
             Assert.That(result, Is.Null);
@@ -87,7 +85,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
             this._fixture.SetupExceptionResponse(new HttpRequestException("Netzwerkfehler"));
 
             // Act
-            var result = await this._fixture.Client.GetClearlyDefinedLicensesAsync(packageUrl, provider);
+            var result = await this._fixture.Client.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
 
             // Assert
             Assert.That(result, Is.Null);
@@ -104,12 +102,11 @@ namespace CdxEnrich.Tests.ClearlyDefined
             this._fixture.SetupRateLimitThenSuccessResponse("MIT", []);
 
             // Act
-            var result = await this._fixture.Client.GetClearlyDefinedLicensesAsync(packageUrl, provider);
+            var result = await this._fixture.Client.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0].License.Id, Is.EqualTo("MIT"));
+            Assert.That(result.Declared, Is.EqualTo("MIT"));
 
             Assert.That(this._fixture.HttpHandler.RequestsReceived.Count, Is.EqualTo(2));
 
@@ -123,8 +120,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 this.Logger = Substitute.For<ILogger<ClearlyDefinedClient>>();
                 this.HttpHandler = new TestHttpMessageHandler();
                 this.HttpClient = new HttpClient(this.HttpHandler);
-                var factory = new LicenseChoicesFactory();
-                this.Client = new ClearlyDefinedClient(factory, this.HttpClient, this.Logger);
+                this.Client = new ClearlyDefinedClient(this.HttpClient, this.Logger);
             }
 
             public ILogger<ClearlyDefinedClient> Logger { get; }

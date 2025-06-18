@@ -14,8 +14,10 @@ namespace CdxEnrich.Actions
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
 
         private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
-            licenseChoicesFactory: new LicenseChoicesFactory(new ConsoleLogger<LicenseChoicesFactory>()),
             logger: new ConsoleLogger<ClearlyDefinedClient>());
+        
+        private static readonly LicenseChoicesFactory LicenseChoicesFactory = 
+            new LicenseChoicesFactory(new ConsoleLogger<LicenseChoicesFactory>());
 
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
         {
@@ -124,14 +126,25 @@ namespace CdxEnrich.Actions
         {
             try
             {
-                var cdLicenses = await ClearlyDefinedClient.GetClearlyDefinedLicensesAsync(packageUrl, provider);
+                // Holen der Lizenzdaten von ClearlyDefined
+                var licensedData = await ClearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
 
-                if (cdLicenses == null || !cdLicenses.Any())
+                if (licensedData == null)
                 {
+                    Logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
                     return;
                 }
 
-                component.Licenses = cdLicenses;
+                // Verwenden der Factory zur Erzeugung der LicenseChoices
+                var licenseChoices = LicenseChoicesFactory.Create(packageUrl, licensedData);
+
+                if (licenseChoices == null || !licenseChoices.Any())
+                {
+                    Logger.LogInformation("No applicable license choices created for package: {PackageUrl}", packageUrl);
+                    return;
+                }
+
+                component.Licenses = licenseChoices;
             }
             catch (Exception ex)
             {

@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Threading.RateLimiting;
-using CycloneDX.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
@@ -13,7 +12,7 @@ namespace CdxEnrich.ClearlyDefined
 {
     public interface IClearlyDefinedClient
     {
-        Task<List<LicenseChoice>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider);
+        Task<ClearlyDefinedResponse.LicensedData?> GetClearlyDefinedLicensedDataAsync(PackageURL packageUrl, Provider provider);
     }
 
     public class ClearlyDefinedClient : IClearlyDefinedClient
@@ -22,7 +21,6 @@ namespace CdxEnrich.ClearlyDefined
         private readonly HttpClient _httpClient;
         private readonly ILogger<ClearlyDefinedClient> _logger;
         private readonly ResiliencePipeline _resiliencePipeline;
-        private readonly LicenseChoicesFactory _licenseChoicesFactory;
 
         // Token Bucket Rate Limiter for max. 250 requests per minute
         private static readonly TokenBucketRateLimiter RateLimiter = new(
@@ -36,12 +34,11 @@ namespace CdxEnrich.ClearlyDefined
                 AutoReplenishment = true
             });
 
-        public ClearlyDefinedClient(LicenseChoicesFactory licenseChoicesFactory, HttpClient? httpClient = null,  ILogger<ClearlyDefinedClient>? logger = null)
+        public ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
         {
             _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
             _logger = logger ?? NullLogger<ClearlyDefinedClient>.Instance;
             _resiliencePipeline = this.CreateResiliencePipeline();
-            this._licenseChoicesFactory = licenseChoicesFactory;
         }
 
         private ResiliencePipeline CreateResiliencePipeline()
@@ -112,12 +109,12 @@ namespace CdxEnrich.ClearlyDefined
         }
 
         /// <summary>
-        /// Retrieves license information for a package from the ClearlyDefined API.
+        /// Retrieves license data for a package from the ClearlyDefined API.
         /// </summary>
         /// <param name="packageUrl">The PackageURL of the package</param>
         /// <param name="provider">The provider to use</param>
-        /// <returns>A list of license expressions or null if none were found</returns>
-        public async Task<List<LicenseChoice>?> GetClearlyDefinedLicensesAsync(PackageURL packageUrl, Provider provider)
+        /// <returns>Licensed data or null if not found</returns>
+        public async Task<ClearlyDefinedResponse.LicensedData?> GetClearlyDefinedLicensedDataAsync(PackageURL packageUrl, Provider provider)
         {
             var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, provider);
 
@@ -139,14 +136,7 @@ namespace CdxEnrich.ClearlyDefined
                         this._logger.LogInformation(
                             "Successfully retrieved data from ClearlyDefined API for package: {PackageUrl}",
                             packageUrl);
-                        if (data?.Licensed == null)
-                        {
-                            this._logger.LogInformation(
-                                "No license information found for package: {PackageUrl}", packageUrl);
-                            return null;
-                        }
-
-                        return this._licenseChoicesFactory.Create(packageUrl, data.Licensed);
+                        return data?.Licensed;
                     }
                     else
                     {
