@@ -189,7 +189,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
         }
 
         [Test]
-        public void Resolve_WhenDeclaredIsNotExpression_ReturnsLicenseChoiceWithLicenseId()
+        public void Resolve_WhenDeclaredIsNotExpressionAndIsNotLicenseRef_ReturnsLicenseChoiceWithLicenseId()
         {
             // Arrange
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith("MIT");
@@ -218,6 +218,24 @@ namespace CdxEnrich.Tests.ClearlyDefined
             Assert.Multiple(() =>
             {
                 Assert.That(result.Expression, Is.EqualTo("MIT OR Apache-2.0"));
+                Assert.That(result.License, Is.Null);
+            });
+        }
+        
+        [Test]
+        public void Resolve_WhenDeclaredIsLicenseRef_ReturnsLicenseChoiceWithExpression()
+        {
+            // Arrange
+            var dataLicensed = this._fixture.CreateLicenseDeclaredWith("LicenseRef-scancode-ms-net-library-2018-11");
+
+            // Act
+            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Expression, Is.EqualTo("LicenseRef-scancode-ms-net-library-2018-11"));
                 Assert.That(result.License, Is.Null);
             });
         }

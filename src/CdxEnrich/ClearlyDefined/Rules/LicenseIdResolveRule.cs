@@ -12,7 +12,8 @@ namespace CdxEnrich.ClearlyDefined.Rules
             return !ContainsOther(dataLicensed.Declared) &&
                    !ContainsNone(dataLicensed.Declared) &&
                    !ContainsNoAssertion(dataLicensed.Declared) && 
-                   !IsExpression(dataLicensed.Declared);
+                   !IsExpression(dataLicensed.Declared) &&
+                   !IsLicenseRef(dataLicensed.Declared);
         }
 
         public override LicenseChoice Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)

@@ -24,6 +24,12 @@ namespace CdxEnrich.ClearlyDefined.Rules
                    declared.Contains(" AND ") ||
                    declared.Contains(" WITH ");
         }
+        
+        protected bool IsLicenseRef(string declared)
+        {
+            // Check if the declared license is a valid license reference
+            return declared.StartsWith("LicenseRef-");
+        }
 
         /// <summary>
         /// Checks if a license string contains "OTHER"
