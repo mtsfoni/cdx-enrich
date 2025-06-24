@@ -24,6 +24,14 @@ namespace CdxEnrich.ClearlyDefined.Rules
                 return null;
             }
 
+            if (joinedLicenseExpression == dataLicensed.Declared)
+            {
+                this.Logger.LogInformation(
+                    "Resolved no licenses for package: {PackageUrl} due to 'NOASSERTION' license with same expression as declared",
+                    packageUrl);
+                return null;
+            }
+
             Logger.LogInformation(
                 "Resolved license expressions ({LicenseExpressions}) for package: {PackageUrl}",
                 joinedLicenseExpression, packageUrl);

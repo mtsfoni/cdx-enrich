@@ -56,6 +56,8 @@ namespace CdxEnrich.Tests.ClearlyDefined
         [TestCase("LicenseRef-scancode-unknown-license-reference", "MIT",
             Description =
                 "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it")]
+        [TestCase("OTHER",
+            Description = "Single expression 'OTHER' without operator")]
         public void Resolve_WhenDeclaredContainsOTHER_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
             params string[] expressions)
         {
@@ -112,6 +114,8 @@ namespace CdxEnrich.Tests.ClearlyDefined
         [TestCase("LicenseRef-scancode-unknown-license-reference", "MIT",
             Description =
                 "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it")]
+        [TestCase("NONE",
+            Description = "Single expression 'NONE' without operator")]
         public void Resolve_WhenDeclaredContainsNONE_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
             params string[] expressions)
         {
@@ -168,6 +172,8 @@ namespace CdxEnrich.Tests.ClearlyDefined
         [TestCase("LicenseRef-scancode-unknown-license-reference", "MIT",
             Description =
                 "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it")]
+        [TestCase("NOASSERTION",
+            Description = "Single expression 'NOASSERTION' without operator")]
         public void Resolve_WhenDeclaredContainsNOASSERTION_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
             params string[] expressions)
         {

@@ -23,6 +23,14 @@ namespace CdxEnrich.ClearlyDefined.Rules
                     packageUrl);
                 return null;
             }
+            
+            if (joinedLicenseExpression == dataLicensed.Declared)
+            {
+                this.Logger.LogInformation(
+                    "Resolved no licenses for package: {PackageUrl} due to 'NONE' license with same expression as declared",
+                    packageUrl);
+                return null;
+            }
 
             Logger.LogInformation(
                 "Resolved license expressions ({LicenseExpressions}) for package: {PackageUrl}",
