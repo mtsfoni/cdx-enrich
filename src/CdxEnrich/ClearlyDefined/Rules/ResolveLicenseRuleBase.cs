@@ -32,6 +32,15 @@ namespace CdxEnrich.ClearlyDefined.Rules
         {
             return declared.Contains("OTHER");
         }
+        
+        /// <summary>
+        /// Checks if a license string contains "NONE"
+        /// </summary>
+        protected bool ContainsNone(string declared)
+        {
+            return declared.Contains("NONE");
+        }
+
 
         /// <summary>
         /// Checks if a list of license expressions contains unknown scancode license references

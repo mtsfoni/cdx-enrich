@@ -10,6 +10,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
         {
             // This rule applies to simple license IDs (no expressions and not "OTHER")
             return !ContainsOther(dataLicensed.Declared) &&
+                   !ContainsNone(dataLicensed.Declared) &&
                    !IsExpression(dataLicensed.Declared);
         }
 
