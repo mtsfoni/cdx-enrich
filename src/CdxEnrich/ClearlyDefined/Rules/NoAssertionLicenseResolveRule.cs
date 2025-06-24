@@ -4,12 +4,12 @@ using PackageUrl;
 
 namespace CdxEnrich.ClearlyDefined.Rules
 {
-    internal sealed class OtherLicenseResolveRule(ILogger logger) : ResolveLicenseRuleBase(logger)
+    internal sealed class NoAssertionResolveRule(ILogger logger) : ResolveLicenseRuleBase(logger)
     {
         public override bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed)
         {
             // This rule applies to any license declaration that contains "OTHER"
-            return ContainsOther(dataLicensed.Declared);
+            return ContainsNoAssertion(dataLicensed.Declared);
         }
 
         public override LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
@@ -19,7 +19,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
             if (licenseExpressions == null || !this.TryGetJoinedLicenseExpression(licenseExpressions, out var joinedLicenseExpression))
             {
                 this.Logger.LogInformation(
-                    "Resolved no licenses for package: {PackageUrl} due to 'OTHER' license with missing or invalid expressions",
+                    "Resolved no licenses for package: {PackageUrl} due to 'NOASSERTION' license with missing or invalid expressions",
                     packageUrl);
                 return null;
             }
@@ -29,9 +29,9 @@ namespace CdxEnrich.ClearlyDefined.Rules
                 joinedLicenseExpression, packageUrl);
 
             return new LicenseChoice
-            {
-                Expression = joinedLicenseExpression
-            };
+                {
+                    Expression = joinedLicenseExpression
+                };
         }
     }
 }

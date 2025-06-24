@@ -17,6 +17,7 @@ namespace CdxEnrich.ClearlyDefined
 
             _rules.Add(new OtherLicenseResolveRule(_logger));
             _rules.Add(new NoneLicenseResolveRule(_logger));
+            _rules.Add(new NoAssertionResolveRule(_logger));
             _rules.Add(new SpdxExpressionResolveRule(_logger));
             _rules.Add(new LicenseIdResolveRule(_logger));
         }

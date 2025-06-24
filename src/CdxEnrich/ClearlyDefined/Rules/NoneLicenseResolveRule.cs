@@ -16,28 +16,22 @@ namespace CdxEnrich.ClearlyDefined.Rules
         {
             var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
 
-            // Case 1: No expressions, empty expressions, or expressions with unknown license references
-            if (licenseExpressions == null ||
-                !licenseExpressions.Any() ||
-                ContainsUnknownScancodeLicenseReference(licenseExpressions))
+            if (licenseExpressions == null || !this.TryGetJoinedLicenseExpression(licenseExpressions, out var joinedLicenseExpression))
             {
-                Logger.LogInformation(
+                this.Logger.LogInformation(
                     "Resolved no licenses for package: {PackageUrl} due to 'NONE' license with missing or invalid expressions",
                     packageUrl);
                 return null;
             }
-            
-            // Case 2: Valid expressions available
-            var joinedLicenseExpression = string.Join(" OR ", licenseExpressions);
 
             Logger.LogInformation(
                 "Resolved license expressions ({LicenseExpressions}) for package: {PackageUrl}",
                 joinedLicenseExpression, packageUrl);
 
             return new LicenseChoice
-                {
-                    Expression = joinedLicenseExpression
-                };
+            {
+                Expression = joinedLicenseExpression
+            };
         }
     }
 }

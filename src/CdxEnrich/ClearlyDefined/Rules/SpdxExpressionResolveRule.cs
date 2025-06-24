@@ -10,6 +10,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
         {
             return !ContainsOther(dataLicensed.Declared) && 
                    !ContainsNone(dataLicensed.Declared) && 
+                   !ContainsNoAssertion(dataLicensed.Declared) && 
                    IsExpression(dataLicensed.Declared);
         }
 

@@ -40,7 +40,15 @@ namespace CdxEnrich.ClearlyDefined.Rules
         {
             return declared.Contains("NONE");
         }
-
+        
+        /// <summary>
+        /// Checks if a license string contains "NOASSERTION"
+        /// </summary>
+        protected bool ContainsNoAssertion(string declared)
+        {
+            return declared.Contains("NOASSERTION");
+        }
+        
 
         /// <summary>
         /// Checks if a list of license expressions contains unknown scancode license references
@@ -50,6 +58,27 @@ namespace CdxEnrich.ClearlyDefined.Rules
             return licenseExpressions.Exists(expression =>
                 expression.Contains("LicenseRef-scancode-unknown-license-reference",
                     StringComparison.OrdinalIgnoreCase));
+        }
+        
+        /// <summary>
+        /// Tries to join a list of license expressions into a single expression
+        /// </summary>
+        /// <param name="licenseExpressions"></param>
+        /// <param name="joinedLicenseExpression"></param>
+        /// <returns></returns>
+        protected bool TryGetJoinedLicenseExpression(List<string> licenseExpressions,
+            out string? joinedLicenseExpression)
+        {
+            if (!licenseExpressions.Any() ||
+                this.ContainsUnknownScancodeLicenseReference(licenseExpressions))
+            {
+                
+                joinedLicenseExpression = null;
+                return false;
+            }
+            
+            joinedLicenseExpression = string.Join(" OR ", licenseExpressions);
+            return true;
         }
     }
 }
