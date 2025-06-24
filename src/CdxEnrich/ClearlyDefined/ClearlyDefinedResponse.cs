@@ -10,15 +10,8 @@ namespace CdxEnrich.ClearlyDefined
         {
             [JsonPropertyName("facets")] public Facets? Facets { get; init; }
             [JsonPropertyName("declared")] public string? Declared { get; init; }
-            
-            [JsonPropertyName("toolScore")] public ToolScore ToolScore { get; init; }
         }
 
-        public class ToolScore
-        {
-            [JsonPropertyName("total")] public required int Total { get; init; }
-        }
-        
         public class Facets
         {
             [JsonPropertyName("core")] public required Core Core { get; init; }
