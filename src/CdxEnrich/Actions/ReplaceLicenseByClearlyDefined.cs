@@ -139,7 +139,7 @@ namespace CdxEnrich.Actions
                 // Fetching license data from ClearlyDefined
                 var licensedData = await ClearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
             
-                if (licensedData == null)
+                if (licensedData == null || licensedData.Declared == null || licensedData.Facets == null)
                 {
                     Logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
                     return;

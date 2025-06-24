@@ -8,8 +8,8 @@ namespace CdxEnrich.ClearlyDefined
 
         public class LicensedData
         {
-            [JsonPropertyName("facets")] public required Facets Facets { get; init; }
-            [JsonPropertyName("declared")] public required string Declared { get; init; }
+            [JsonPropertyName("facets")] public Facets? Facets { get; init; }
+            [JsonPropertyName("declared")] public string? Declared { get; init; }
         }
 
         public class Facets
