@@ -15,10 +15,10 @@ namespace CdxEnrich.ClearlyDefined
         {
             _logger = logger ?? NullLogger<LicenseResolver>.Instance;
             
-            var specialLicenseResolveRules = SpecialLicense.All.Select(x => new FallbackLicenseResolveRule(_logger, x));
-            _rules.AddRange(specialLicenseResolveRules);
             _rules.Add(new SpdxExpressionResolveRule(_logger));
             _rules.Add(new LicenseIdResolveRule(_logger));
+            var specialLicenseResolveRules = SpecialLicense.All.Select(x => new FallbackLicenseResolveRule(_logger, x));
+            _rules.AddRange(specialLicenseResolveRules);
         }
 
         public LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
