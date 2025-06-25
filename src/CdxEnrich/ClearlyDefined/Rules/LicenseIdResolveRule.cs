@@ -8,10 +8,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
     {
         public override bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed)
         {
-            // This rule applies to simple license IDs (no expressions and not "OTHER")
-            return !ContainsOther(dataLicensed.Declared!) &&
-                   !ContainsNone(dataLicensed.Declared!) &&
-                   !ContainsNoAssertion(dataLicensed.Declared!) && 
+            return !IsSpecialLicense(dataLicensed.Declared!) &&
                    !IsExpression(dataLicensed.Declared!) &&
                    !IsLicenseRef(dataLicensed.Declared!);
         }

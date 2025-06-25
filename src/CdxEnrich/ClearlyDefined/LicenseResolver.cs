@@ -14,10 +14,9 @@ namespace CdxEnrich.ClearlyDefined
         public LicenseResolver(ILogger<LicenseResolver>? logger = null)
         {
             _logger = logger ?? NullLogger<LicenseResolver>.Instance;
-
-            _rules.Add(new OtherLicenseResolveRule(_logger));
-            _rules.Add(new NoneLicenseResolveRule(_logger));
-            _rules.Add(new NoAssertionResolveRule(_logger));
+            
+            var specialLicenseResolveRules = SpecialLicense.All.Select(x => new FallbackLicenseResolveRule(_logger, x));
+            _rules.AddRange(specialLicenseResolveRules);
             _rules.Add(new SpdxExpressionResolveRule(_logger));
             _rules.Add(new LicenseIdResolveRule(_logger));
         }

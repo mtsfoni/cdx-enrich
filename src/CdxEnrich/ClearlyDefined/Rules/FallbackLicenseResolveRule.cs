@@ -4,11 +4,16 @@ using PackageUrl;
 
 namespace CdxEnrich.ClearlyDefined.Rules
 {
-    internal sealed class NoAssertionResolveRule(ILogger logger) : ResolveLicenseRuleBase(logger)
+    /// <summary>
+    /// This rule handles special license types such as NONE, NOASSERTION and OTHER,
+    /// which require an alternative resolution approach.
+    /// </summary>
+    internal sealed class FallbackLicenseResolveRule(ILogger logger, SpecialLicense specialLicense)
+        : ResolveLicenseRuleBase(logger)
     {
         public override bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed)
         {
-            return ContainsNoAssertion(dataLicensed.Declared!);
+            return specialLicense.IsInDeclaredLicense(dataLicensed.Declared!);
         }
 
         public override LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
@@ -18,16 +23,16 @@ namespace CdxEnrich.ClearlyDefined.Rules
             if (licenseExpressions == null || !this.TryGetJoinedLicenseExpression(licenseExpressions, out var joinedLicenseExpression))
             {
                 this.Logger.LogInformation(
-                    "Resolved no licenses for package: {PackageUrl} due to 'NOASSERTION' license with missing or invalid expressions",
-                    packageUrl);
+                    "Resolved no licenses for package: {PackageUrl} due to '{SpecialLicense}' license with missing or invalid expressions",
+                    packageUrl, specialLicense.LicenseIdentifier);
                 return null;
             }
-
+            
             if (joinedLicenseExpression == dataLicensed.Declared)
             {
                 this.Logger.LogInformation(
-                    "Resolved no licenses for package: {PackageUrl} due to 'NOASSERTION' license with same expression as declared",
-                    packageUrl);
+                    "Resolved no licenses for package: {PackageUrl} due to '{SpecialLicense}' license with same expression as declared",
+                    packageUrl, specialLicense.LicenseIdentifier);
                 return null;
             }
 
@@ -36,9 +41,9 @@ namespace CdxEnrich.ClearlyDefined.Rules
                 joinedLicenseExpression, packageUrl);
 
             return new LicenseChoice
-                {
-                    Expression = joinedLicenseExpression
-                };
+            {
+                Expression = joinedLicenseExpression
+            };
         }
     }
 }

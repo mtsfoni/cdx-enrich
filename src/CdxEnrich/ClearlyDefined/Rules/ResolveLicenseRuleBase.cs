@@ -25,41 +25,31 @@ namespace CdxEnrich.ClearlyDefined.Rules
                    declared.Contains(" WITH ");
         }
         
+        /// <summary>
+        /// Checks if a license string is a LicenseRef (starts with "LicenseRef-")
+        /// </summary>
+        /// <param name="declared"></param>
+        /// <returns></returns>
         protected bool IsLicenseRef(string declared)
         {
             // Check if the declared license is a valid license reference
             return declared.StartsWith("LicenseRef-");
         }
-
-        /// <summary>
-        /// Checks if a license string contains "OTHER"
-        /// </summary>
-        protected bool ContainsOther(string declared)
-        {
-            return declared.Contains("OTHER");
-        }
         
         /// <summary>
-        /// Checks if a license string contains "NONE"
+        /// Checks if a license string is a special license type (e.g NONE, NOASSERTION, OTHER)
         /// </summary>
-        protected bool ContainsNone(string declared)
+        /// <param name="declared"></param>
+        /// <returns></returns>
+        protected bool IsSpecialLicense(string declared)
         {
-            return declared.Contains("NONE");
+            return SpecialLicense.All.Any(x => x.IsInDeclaredLicense(declared));
         }
-        
-        /// <summary>
-        /// Checks if a license string contains "NOASSERTION"
-        /// </summary>
-        protected bool ContainsNoAssertion(string declared)
-        {
-            return declared.Contains("NOASSERTION");
-        }
-        
 
         /// <summary>
         /// Checks if a list of license expressions contains unknown scancode license references
         /// </summary>
-        protected bool ContainsUnknownScancodeLicenseReference(List<string> licenseExpressions)
+        private bool ContainsUnknownScancodeLicenseReference(List<string> licenseExpressions)
         {
             return licenseExpressions.Exists(expression =>
                 expression.Contains("LicenseRef-scancode-unknown-license-reference",
