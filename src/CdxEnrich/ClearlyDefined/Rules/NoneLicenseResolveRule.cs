@@ -9,12 +9,12 @@ namespace CdxEnrich.ClearlyDefined.Rules
         public override bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed)
         {
             // This rule applies to any license declaration that contains "OTHER"
-            return ContainsNone(dataLicensed.Declared);
+            return ContainsNone(dataLicensed.Declared!);
         }
         
         public override LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
         {
-            var licenseExpressions = dataLicensed.Facets.Core.Discovered.Expressions;
+            var licenseExpressions = dataLicensed.Facets!.Core.Discovered.Expressions;
 
             if (licenseExpressions == null || !this.TryGetJoinedLicenseExpression(licenseExpressions, out var joinedLicenseExpression))
             {
