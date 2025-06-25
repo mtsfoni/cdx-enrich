@@ -1,4 +1,4 @@
-﻿namespace CdxEnrich.ClearlyDefined.Rules
+﻿namespace CdxEnrich.ClearlyDefined
 {
     /// <summary>
     /// SmartEnum for special license types that require special handling.
