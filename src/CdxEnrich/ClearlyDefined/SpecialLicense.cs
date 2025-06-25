@@ -31,10 +31,10 @@
         }
 
         // For records, ToString() is automatically overridden and returns a formatted string with all properties
-        // We override it here to return only the name
+        // We override it here to return only the license identifier
         public override string ToString()
         {
-            return this.Name;
+            return this.LicenseIdentifier;
         }
     }
 }
