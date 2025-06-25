@@ -8,7 +8,6 @@ namespace CdxEnrich.ClearlyDefined.Rules
     {
         public override bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed)
         {
-            // This rule applies to any license declaration that contains "OTHER"
             return ContainsOther(dataLicensed.Declared!);
         }
 
