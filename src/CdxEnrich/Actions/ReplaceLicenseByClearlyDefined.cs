@@ -110,7 +110,7 @@ namespace CdxEnrich.Actions
                 var component = GetComponentByBomPurl(inputs.Bom, configEntry.Purl!);
                 if (component == null)
                 {
-                    Logger.LogInformation("Component with BOM ref '{BomRef}' not found in the BOM.", configEntry.Purl);
+                    Logger.LogInformation("Component with package url '{PackageUrl}' not found in the BOM.", configEntry.Purl);
                     continue;
                 }
 
