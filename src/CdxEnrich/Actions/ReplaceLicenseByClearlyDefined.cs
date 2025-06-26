@@ -17,7 +17,7 @@ namespace CdxEnrich.Actions
             logger: new ConsoleLogger<ClearlyDefinedClient>());
 
         private static readonly LicenseResolver LicenseResolver =
-            new LicenseResolver(new ConsoleLogger<LicenseResolver>());
+            new (new ConsoleLogger<LicenseResolver>());
 
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
         {
@@ -47,38 +47,6 @@ namespace CdxEnrich.Actions
             return new Ok<ConfigRoot>(config);
         }
 
-        private static Result<ConfigRoot> RefMustBeSupportedPackageType(ConfigRoot config)
-        {
-            if (config.ReplaceLicenseByClearlyDefined == null)
-            {
-                return new Ok<ConfigRoot>(config);
-            }
-
-            foreach (var itemRef in config.ReplaceLicenseByClearlyDefined.Select(item => item.Ref))
-            {
-                PackageURL? purl = null;
-                if (itemRef != null && !TryParsePurl(itemRef, out purl))
-                {
-                    return InvalidConfigError.Create<ConfigRoot>(ModuleName, $"Invalid PURL format: {itemRef}");
-                }
-
-                PackageType? packageType = null;
-                if (purl != null && !PackageType.TryFromPurlType(purl.Type, out packageType))
-                {
-                    return InvalidConfigError.Create<ConfigRoot>(ModuleName,
-                        $"Package type '{purl.Type}' is not supported by ClearlyDefined. Supported types are: {string.Join(", ", PackageType.All.Select(pt => pt.Value))}");
-                }
-
-                if (packageType != null && !IsSupported(packageType))
-                {
-                    return InvalidConfigError.Create<ConfigRoot>(ModuleName,
-                        $"Package type '{packageType.Name}' is currently not supported by CdxEnrich. Supported types are: {string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value))}");
-                }
-            }
-
-            return new Ok<ConfigRoot>(config);
-        }
-
         private static bool IsSupported(PackageType packageType)
         {
             return !NotSupportedPackageTypes.Contains(packageType);
@@ -87,8 +55,7 @@ namespace CdxEnrich.Actions
 
         public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
-            return RefMustNotBeNullOrEmpty(config)
-                .Bind(RefMustBeSupportedPackageType);
+            return RefMustNotBeNullOrEmpty(config);
         }
 
         public static InputTuple Execute(InputTuple inputs)
@@ -101,29 +68,45 @@ namespace CdxEnrich.Actions
             
             if(configEntries == null)
             {
-                Logger.LogInformation("No valid configuration entries found for ClearlyDefined replacement.");
                 return inputs;
             }
 
-            foreach (var configEntry in configEntries)
+            foreach (var configEntryRef in configEntries.Select(x => x.Ref))
             {
-                var component = GetComponentByBomRef(inputs.Bom, configEntry.Ref!);
+                var component = GetComponentByBomRef(inputs.Bom, configEntryRef!);
                 if (component == null)
                 {
-                    Logger.LogInformation("Component with bom ref '{BomRef}' not found in the BOM.", configEntry.Ref);
+                    Logger.LogInformation("Component with bom ref '{BomRef}' not found in the BOM.", configEntryRef);
                     continue;
                 }
                 
                 if(string.IsNullOrEmpty(component.Purl))
                 {
-                    Logger.LogInformation("Component with bom ref '{BomRef}' does not have a PURL set.", configEntry.Ref);
+                    Logger.LogInformation("Component with bom ref '{BomRef}' does not have a PURL set.", configEntryRef);
+                    continue;
+                }
+
+                if (!TryParsePurl(component.Purl, out var packageUrl))
+                {
+                    Logger.LogError("Invalid PURL format: '{PackageUrl}'", component.Purl);
+                    continue;
+                }
+
+                PackageType? packageType = null;
+                if (packageUrl != null && !PackageType.TryFromPurlType(packageUrl.Type, out packageType))
+                {
+                    Logger.LogError("Package type '{PackageUrlType}' is not supported by ClearlyDefined. Supported types are: {SupportedPackageTypes}", packageUrl.Type, string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value)));
+                    continue;
+                }
+
+                if (packageType != null && !IsSupported(packageType))
+                {
+                    Logger.LogError("Package type '{PackageTypeName}' is currently not supported by CdxEnrich. Supported types are: {SupportedPackageTypes}", packageType.Name, string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value)));
                     continue;
                 }
                 
-                var packageUrl = new PackageURL(component.Purl);
-                var packageType = PackageType.FromPurlType(packageUrl.Type);
-                var provider = packageType.DefaultProvider;
-                tasks.Add(ProcessComponentAsync(component, packageUrl, provider));
+                var provider = packageType!.DefaultProvider;
+                tasks.Add(ProcessComponentAsync(component, packageUrl!, provider));
             }
 
             try
