@@ -13,23 +13,40 @@ namespace CdxEnrich.Tests.ClearlyDefined
         {
             this._fixture = new LicenseResolverFixture();
         }
-
-        [TestCase("MIT OR Apache-2.0", "MIT", "Apache-2.0",
-            Description = "Multiple expressions")]
-        [TestCase("MIT", "MIT",
-            Description = "One expressions, no operator")]
-        [TestCase("MIT OR Apache-2.0", "MIT OR Apache-2.0",
-            Description = "One expressions, with OR operator")]
-        [TestCase("MIT WITH Apache-2.0", "MIT WITH Apache-2.0",
-            Description = "One expressions, with WITH operator")]
-        [TestCase("MIT AND Apache-2.0", "MIT AND Apache-2.0",
-            Description = "One expressions, with AND operator")]
-        public void
-            Resolve_WhenDeclaredContainsOTHER_AndTryGetLicenseFromExpressionsSucceeds_ReturnsLicenseChoiceWithExpression(
-                string expected, params string[] expressions)
+        
+        public static IEnumerable<object[]> SuccessSpecialLicenseWithExpression()
+        {
+            foreach (var specialLicense in SpecialLicense.All)
+            {
+                yield return ["MIT OR Apache-2.0", specialLicense, new [] {"MIT", "Apache-2.0"}]; //Multiple expressions
+                yield return ["MIT OR Apache-2.0", specialLicense,  new [] {"MIT OR Apache-2.0"}]; //One expressions, with OR operator
+                yield return ["MIT WITH Apache-2.0", specialLicense,  new [] {"MIT WITH Apache-2.0"}]; //One expressions, with WITH operator
+                yield return ["MIT AND Apache-2.0", specialLicense,  new [] {"MIT AND Apache-2.0"}]; //One expressions, with AND operator
+                yield return ["MIT", specialLicense, new []{"MIT"}]; //One expressions, no operator
+            }
+        }
+        
+        public static IEnumerable<object[]> FailingSpecialLicenseWithExpression()
+        {
+            foreach (var specialLicense in SpecialLicense.All)
+            {
+                yield return [specialLicense, new [] {"LicenseRef-scancode-unknown-license-reference"}]; //One expression 'LicenseRef-scancode-unknown-license-reference' without operator
+                yield return [specialLicense,  new [] {"MIT OR LicenseRef-scancode-unknown-license-reference"}]; //One expression 'LicenseRef-scancode-unknown-license-reference' with operator before it
+                yield return [specialLicense,  new [] {"LicenseRef-scancode-unknown-license-reference OR MIT"}]; //One expression 'LicenseRef-scancode-unknown-license-reference' with operator after it
+                yield return [specialLicense,  new [] {"MIT", "LicenseRef-scancode-unknown-license-reference"}]; // Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator before it
+                yield return [specialLicense,  new [] {"LicenseRef-scancode-unknown-license-reference", "MIT"}]; //Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it
+                yield return [specialLicense, Array.Empty<string>()]; //Without any expressions
+            }
+        }
+        
+        [Test]
+        [TestCaseSource(nameof(SuccessSpecialLicenseWithExpression))]
+        public void Resolve_WhenDeclaredContainsSpecialLicense_AndTryGetLicenseFromExpressionsSucceeds_ReturnsLicenseChoiceWithExpression(
+            string expected, SpecialLicense specialLicense, string[] expressions)
         {
             // Arrange
-            var dataLicensed = this._fixture.CreateLicenseDeclaredWithOtherAndExpressions(
+            var dataLicensed = this._fixture.CreateLicenseDeclaredForSpecialLicenseAndExpressions(
+                specialLicense,
                 expressions.ToList());
 
             // Act
@@ -44,25 +61,14 @@ namespace CdxEnrich.Tests.ClearlyDefined
             });
         }
 
-        [TestCase("LicenseRef-scancode-unknown-license-reference",
-            Description = "One expression 'LicenseRef-scancode-unknown-license-reference' without operator")]
-        [TestCase("MIT OR LicenseRef-scancode-unknown-license-reference",
-            Description = "One expression  'LicenseRef-scancode-unknown-license-reference' with operator before it")]
-        [TestCase("LicenseRef-scancode-unknown-license-reference OR MIT",
-            Description = "One expression  'LicenseRef-scancode-unknown-license-reference' with operator after it")]
-        [TestCase("MIT", "LicenseRef-scancode-unknown-license-reference",
-            Description =
-                "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator before it")]
-        [TestCase("LicenseRef-scancode-unknown-license-reference", "MIT",
-            Description =
-                "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it")]
-        [TestCase("OTHER",
-            Description = "Single expression 'OTHER' without operator")]
-        public void Resolve_WhenDeclaredContainsOTHER_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
-            params string[] expressions)
+        [Test]
+        [TestCaseSource(nameof(FailingSpecialLicenseWithExpression))]
+        public void Resolve_WhenDeclaredContainsSpecialLicense_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
+            SpecialLicense specialLicense, string[] expressions)
         {
             // Arrange
-            var dataLicensed = this._fixture.CreateLicenseDeclaredWithOtherAndExpressions(
+            var dataLicensed = this._fixture.CreateLicenseDeclaredForSpecialLicenseAndExpressions(
+                specialLicense,
                 expressions.ToList());
 
             // Act
@@ -72,122 +78,6 @@ namespace CdxEnrich.Tests.ClearlyDefined
             Assert.That(result, Is.Null);
         }
         
-        [TestCase("MIT OR Apache-2.0", "MIT", "Apache-2.0",
-            Description = "Multiple expressions")]
-        [TestCase("MIT", "MIT",
-            Description = "One expressions, no operator")]
-        [TestCase("MIT OR Apache-2.0", "MIT OR Apache-2.0",
-            Description = "One expressions, with OR operator")]
-        [TestCase("MIT WITH Apache-2.0", "MIT WITH Apache-2.0",
-            Description = "One expressions, with WITH operator")]
-        [TestCase("MIT AND Apache-2.0", "MIT AND Apache-2.0",
-            Description = "One expressions, with AND operator")]
-        public void
-            Resolve_WhenDeclaredContainsNONE_AndTryGetLicenseFromExpressionsSucceeds_ReturnsLicenseChoiceWithExpression(
-                string expected, params string[] expressions)
-        {   
-            // Arrange
-            var dataLicensed = this._fixture.CreateLicenseDeclaredWithNoneAndExpressions(
-                expressions.ToList());
-
-            // Act
-            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
-
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.Expression, Is.EqualTo(expected));
-                Assert.That(result.License, Is.Null);
-            });
-        }
-
-        [TestCase("LicenseRef-scancode-unknown-license-reference",
-            Description = "One expression 'LicenseRef-scancode-unknown-license-reference' without operator")]
-        [TestCase("MIT OR LicenseRef-scancode-unknown-license-reference",
-            Description = "One expression  'LicenseRef-scancode-unknown-license-reference' with operator before it")]
-        [TestCase("LicenseRef-scancode-unknown-license-reference OR MIT",
-            Description = "One expression  'LicenseRef-scancode-unknown-license-reference' with operator after it")]
-        [TestCase("MIT", "LicenseRef-scancode-unknown-license-reference",
-            Description =
-                "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator before it")]
-        [TestCase("LicenseRef-scancode-unknown-license-reference", "MIT",
-            Description =
-                "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it")]
-        [TestCase("NONE",
-            Description = "Single expression 'NONE' without operator")]
-        public void Resolve_WhenDeclaredContainsNONE_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
-            params string[] expressions)
-        {
-            // Arrange
-            var dataLicensed = this._fixture.CreateLicenseDeclaredWithNoneAndExpressions(
-                expressions.ToList());
-
-            // Act
-            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
-
-            // Assert
-            Assert.That(result, Is.Null);
-        }
-        
-        [TestCase("MIT OR Apache-2.0", "MIT", "Apache-2.0",
-            Description = "Multiple expressions")]
-        [TestCase("MIT", "MIT",
-            Description = "One expressions, no operator")]
-        [TestCase("MIT OR Apache-2.0", "MIT OR Apache-2.0",
-            Description = "One expressions, with OR operator")]
-        [TestCase("MIT WITH Apache-2.0", "MIT WITH Apache-2.0",
-            Description = "One expressions, with WITH operator")]
-        [TestCase("MIT AND Apache-2.0", "MIT AND Apache-2.0",
-            Description = "One expressions, with AND operator")]
-        public void
-            Resolve_WhenDeclaredContainsNOASSERTION_AndTryGetLicenseFromExpressionsSucceeds_ReturnsLicenseChoiceWithExpression(
-                string expected, params string[] expressions)
-        {   
-            // Arrange
-            var dataLicensed = this._fixture.CreateLicenseDeclaredWithNoAssertionAndExpressions(
-                expressions.ToList());
-
-            // Act
-            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
-
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.Expression, Is.EqualTo(expected));
-                Assert.That(result.License, Is.Null);
-            });
-        }
-
-        [TestCase("LicenseRef-scancode-unknown-license-reference",
-            Description = "One expression 'LicenseRef-scancode-unknown-license-reference' without operator")]
-        [TestCase("MIT OR LicenseRef-scancode-unknown-license-reference",
-            Description = "One expression  'LicenseRef-scancode-unknown-license-reference' with operator before it")]
-        [TestCase("LicenseRef-scancode-unknown-license-reference OR MIT",
-            Description = "One expression  'LicenseRef-scancode-unknown-license-reference' with operator after it")]
-        [TestCase("MIT", "LicenseRef-scancode-unknown-license-reference",
-            Description =
-                "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator before it")]
-        [TestCase("LicenseRef-scancode-unknown-license-reference", "MIT",
-            Description =
-                "Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it")]
-        [TestCase("NOASSERTION",
-            Description = "Single expression 'NOASSERTION' without operator")]
-        public void Resolve_WhenDeclaredContainsNOASSERTION_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
-            params string[] expressions)
-        {
-            // Arrange
-            var dataLicensed = this._fixture.CreateLicenseDeclaredWithNoAssertionAndExpressions(
-                expressions.ToList());
-
-            // Act
-            var result = this._fixture.Resolver.Resolve(this._fixture.PackageUrl, dataLicensed);
-
-            // Assert
-            Assert.That(result, Is.Null);
-        }
-
         [Test]
         public void Resolve_WhenDeclaredIsNotExpressionAndIsNotLicenseRef_ReturnsLicenseChoiceWithLicenseId()
         {
@@ -221,7 +111,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 Assert.That(result.License, Is.Null);
             });
         }
-        
+
         [Test]
         public void Resolve_WhenDeclaredIsLicenseRef_ReturnsLicenseChoiceWithExpression()
         {
@@ -345,22 +235,10 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 };
             }
 
-            public ClearlyDefinedResponse.LicensedData CreateLicenseDeclaredWithOtherAndExpressions(
-                List<string> expressions)
+            public ClearlyDefinedResponse.LicensedData CreateLicenseDeclaredForSpecialLicenseAndExpressions(
+                SpecialLicense specialLicense, List<string> expressions)
             {
-                return this.CreateLicenseDeclaredAndExpressions("OTHER", expressions);
-            }
-            
-            public ClearlyDefinedResponse.LicensedData CreateLicenseDeclaredWithNoneAndExpressions(
-                List<string> expressions)
-            {
-                return this.CreateLicenseDeclaredAndExpressions("NONE", expressions);
-            }
-            
-            public ClearlyDefinedResponse.LicensedData CreateLicenseDeclaredWithNoAssertionAndExpressions(
-                List<string> expressions)
-            {
-                return this.CreateLicenseDeclaredAndExpressions("NOASSERTION", expressions);
+                return this.CreateLicenseDeclaredAndExpressions(specialLicense.LicenseIdentifier, expressions);
             }
         }
     }
