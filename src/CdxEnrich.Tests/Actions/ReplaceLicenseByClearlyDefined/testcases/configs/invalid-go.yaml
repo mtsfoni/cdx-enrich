@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Purl: "pkg:go/github.com/gorilla/mux@v1.8.0"
+  - Ref: "pkg:go/github.com/gorilla/mux@v1.8.0"

@@ -1,17 +1,8 @@
-﻿using CdxEnrich;
-using CdxEnrich.Config;
+﻿using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.Serialization;
-using CdxEnrich.Actions;
-using VerifyNUnit;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using NUnit.Framework;
 
-namespace CdxEnrich.Tests.Actions
+namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
 {
     internal class ReplaceLicenseByClearlyDefinedTest
     {
@@ -42,7 +33,7 @@ namespace CdxEnrich.Tests.Actions
         {
             var configContent = File.ReadAllText(configPath);
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(ReplaceLicenseByClearlyDefined.CheckConfig);
+                .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig);
 
             Assert.That(checkConfigResult is Failure);
         }
@@ -53,7 +44,7 @@ namespace CdxEnrich.Tests.Actions
         {
             var configContent = File.ReadAllText(configPath);
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(ReplaceLicenseByClearlyDefined.CheckConfig);
+                .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig);
 
             Assert.That(checkConfigResult is Success);
         }
@@ -90,8 +81,8 @@ namespace CdxEnrich.Tests.Actions
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                    .Bind(ReplaceLicenseByClearlyDefined.CheckConfig))
-                .Map(ReplaceLicenseByClearlyDefined.Execute);
+                    .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig))
+                .Map(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.Execute);
 
             Assert.That(executionResult is Success);
 

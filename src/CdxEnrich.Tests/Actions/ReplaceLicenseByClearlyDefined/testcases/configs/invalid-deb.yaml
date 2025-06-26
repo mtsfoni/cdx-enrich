@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Purl: "pkg:deb/debian/curl@7.74.0-1.3+deb11u7"
+  - Ref: "pkg:deb/debian/curl@7.74.0-1.3+deb11u7"

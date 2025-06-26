@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Purl: "pkg:debsrc/debian/wget@1.21.3-1"
+  - Ref: "pkg:debsrc/debian/wget@1.21.3-1"

@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Purl: "pkg:conda/pandas@1.5.3"
+  - Ref: "pkg:conda/pandas@1.5.3"

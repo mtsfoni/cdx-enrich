@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Purl: "pkg:sourcearchive/apache/commons-text@1.10.0"
+  - Ref: "pkg:sourcearchive/apache/commons-text@1.10.0"

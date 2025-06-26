@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Purl: "not-a-valid-purl"
+  - Ref: "not-a-valid-purl"

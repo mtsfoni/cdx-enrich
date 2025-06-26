@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Purl: "pkg:nuget/System.Collections"
+  - Ref: "pkg:nuget/System.Collections"

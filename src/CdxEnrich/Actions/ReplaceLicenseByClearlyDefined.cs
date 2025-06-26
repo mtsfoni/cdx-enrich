@@ -31,14 +31,14 @@ namespace CdxEnrich.Actions
             PackageType.SourceArchive,
         };
 
-        private static Component? GetComponentByBomPurl(Bom bom, string bomRef)
+        private static Component? GetComponentByBomRef(Bom bom, string bomRef)
         {
-            return bom.Components?.Find(comp => comp.Purl == bomRef);
+            return bom.Components?.Find(comp => comp.BomRef == bomRef);
         }
 
         private static Result<ConfigRoot> RefMustNotBeNullOrEmpty(ConfigRoot config)
         {
-            if (config.ReplaceLicenseByClearlyDefined?.Exists(rec => string.IsNullOrEmpty(rec.Purl)) == true)
+            if (config.ReplaceLicenseByClearlyDefined?.Exists(rec => string.IsNullOrEmpty(rec.Ref)) == true)
             {
                 return InvalidConfigError.Create<ConfigRoot>(ModuleName,
                     "Ref must be set and cannot be an empty string.");
@@ -54,7 +54,7 @@ namespace CdxEnrich.Actions
                 return new Ok<ConfigRoot>(config);
             }
 
-            foreach (var itemRef in config.ReplaceLicenseByClearlyDefined.Select(item => item.Purl))
+            foreach (var itemRef in config.ReplaceLicenseByClearlyDefined.Select(item => item.Ref))
             {
                 PackageURL? purl = null;
                 if (itemRef != null && !TryParsePurl(itemRef, out purl))
@@ -96,7 +96,7 @@ namespace CdxEnrich.Actions
             var tasks = new List<Task>();
 
             var configEntries = inputs.Config.ReplaceLicenseByClearlyDefined?
-                .Where(item => item.Purl != null)
+                .Where(item => item.Ref != null)
                 .ToList();
             
             if(configEntries == null)
@@ -107,14 +107,20 @@ namespace CdxEnrich.Actions
 
             foreach (var configEntry in configEntries)
             {
-                var component = GetComponentByBomPurl(inputs.Bom, configEntry.Purl!);
+                var component = GetComponentByBomRef(inputs.Bom, configEntry.Ref!);
                 if (component == null)
                 {
-                    Logger.LogInformation("Component with package url '{PackageUrl}' not found in the BOM.", configEntry.Purl);
+                    Logger.LogInformation("Component with bom ref '{BomRef}' not found in the BOM.", configEntry.Ref);
                     continue;
                 }
-
-                var packageUrl = new PackageURL(configEntry.Purl!);
+                
+                if(string.IsNullOrEmpty(component.Purl))
+                {
+                    Logger.LogInformation("Component with bom ref '{BomRef}' does not have a PURL set.", configEntry.Ref);
+                    continue;
+                }
+                
+                var packageUrl = new PackageURL(component.Purl);
                 var packageType = PackageType.FromPurlType(packageUrl.Type);
                 var provider = packageType.DefaultProvider;
                 tasks.Add(ProcessComponentAsync(component, packageUrl, provider));

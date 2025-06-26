@@ -1,2 +1,2 @@
 ﻿ReplaceLicenseByClearlyDefined:
-  - Purl: "pkg:composer/laravel/framework@10.0.0"
+  - Ref: "pkg:composer/laravel/framework@10.0.0"
