@@ -39,11 +39,11 @@ namespace CdxEnrich.Actions
             }
         }
 
-        private static Result<ConfigRoot> PurlMustNotBeNullOrEmpty(ConfigRoot config)
+        private static Result<ConfigRoot> RefMustNotBeNullOrEmpty(ConfigRoot config)
         {
             if (config.ReplaceLicenseByBomRef?.Exists(rec => string.IsNullOrEmpty(rec.Ref)) == true)
             {
-                return InvalidConfigError.Create<ConfigRoot>(moduleName, "Purl must be set and cannot be an emtpy string.");
+                return InvalidConfigError.Create<ConfigRoot>(moduleName, "Ref must be set and cannot be an emtpy string.");
             }
             else
             {
@@ -56,7 +56,7 @@ namespace CdxEnrich.Actions
             return
                 MustHaveEitherIdOrName(config)
                 .Bind(MustNotHaveIdAndNameSet)
-                .Bind(PurlMustNotBeNullOrEmpty);
+                .Bind(RefMustNotBeNullOrEmpty);
         }
 
         public static InputTuple Execute(InputTuple inputs)
