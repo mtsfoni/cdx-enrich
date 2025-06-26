@@ -109,7 +109,7 @@ This action replaces licenses in a specific component identified by its BOM refe
 
 This action replaces licenses in components by automatically retrieving license data from the ClearlyDefined service. Components are identified by their Package URL (PURL).
 
-- **Ref:** The Package URL (PURL) of the component whose license is to be replaced. This must follow the PURL format (e.g., "pkg:nuget/System.Text.Json@7.0.0" or "pkg:maven/org.apache.commons/commons-lang3@3.12.0").
+- **Ref:** The BOM reference of the component whose license is to be replaced.
 
 This action supports the following package types:
 - Crate (Provider: Crates.io)
@@ -130,7 +130,66 @@ The following package types are supported by ClearlyDefined, but are currently *
 - Go (Provider: GitHub)
 - SourceArchive (Provider: GitHub)
 
-The license information is retrieved directly from the ClearlyDefined service and inserted into the SBOM file. The version part in the PURL is optional but recommended for precise license identification.
+##### License Resolution Rules
+
+The action 'ReplaceLicenseByClearlyDefined' uses a rule-based system to convert license data from ClearlyDefined into a CycloneDX-compatible format. The rules are prioritized, and only one rule is applied per case to avoid inconsistencies.
+
+###### Basic Principle
+
+License resolution follows a clear priority sequence. Only one rule is applied per case. If multiple rules are applicable, none is applied to avoid inconsistent results.
+
+###### Rule Types
+
+The system defines three main rule types:
+
+1. **LicenseIdResolveRule**
+
+  * Handles simple license identifiers such as `MIT`, `Apache-2.0`
+  * Conditions:
+
+    * Must not be a special license type (`NONE`, `NOASSERTION`, `OTHER`)
+    * Must not be an SPDX expression
+    * Must not be a license reference (e.g., starts with `LicenseRef-`)
+  * Returns the license ID as a direct CycloneDX ID
+
+2. **SpdxExpressionResolveRule**
+
+  * Handles SPDX expressions and license references:
+
+    * Expressions include operators like `OR`, `AND`, `WITH`
+    * References begin with `LicenseRef-`
+  * Conditions:
+
+    * Must not be a special license type
+  * Returns the full SPDX expression as-is
+
+3. **FallbackLicenseResolveRule**
+
+  * Handles special license types:
+
+    * `NONE` means no license declared
+    * `NOASSERTION` means the license could not be determined
+    * `OTHER` represents a non-standard license
+  * Tries the following:
+
+    1. Checks for discovered expressions from ClearlyDefined
+    2. Combines them using `OR` if multiple are found
+    3. Validates that the result differs from the original declared license
+  * Only if all conditions are met, the combined expression is returned
+
+###### Decision Process
+
+1. All applicable rules are identified
+2. If no rule is applicable, the original license remains unchanged
+3. If more than one rule is applicable, an error is logged and the license remains unchanged
+4. If exactly one rule is applicable, it is applied and its result returned
+
+###### Examples
+
+* A simple license `MIT` uses **LicenseIdResolveRule**
+* A compound expression `MIT OR Apache-2.0` uses **SpdxExpressionResolveRule**
+* A special license `NOASSERTION` with alternative expressions uses **FallbackLicenseResolveRule**, if conditions are met; otherwise, the license remains unchanged
+
 
 ## Issues and Contributions
 
