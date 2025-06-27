@@ -46,6 +46,22 @@ namespace CdxEnrich.Actions
 
             return new Ok<ConfigRoot>(config);
         }
+        
+        private static Result<ConfigRoot> RefMustBeUnique(ConfigRoot config)
+        {
+            var duplicateRefs = config.ReplaceLicenseByClearlyDefined?.GroupBy(x => x.Ref)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+            
+            if (duplicateRefs?.Count > 0)
+            {
+                return InvalidConfigError.Create<ConfigRoot>(ModuleName,
+                    "The Refs must be unique. Found duplicates: " + string.Join(", ", duplicateRefs));
+            }
+
+            return new Ok<ConfigRoot>(config);
+        }
 
         private static bool IsSupported(PackageType packageType)
         {
@@ -55,7 +71,8 @@ namespace CdxEnrich.Actions
 
         public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
-            return RefMustNotBeNullOrEmpty(config);
+            return RefMustNotBeNullOrEmpty(config)
+                .Bind(RefMustBeUnique);
         }
 
         public static InputTuple Execute(InputTuple inputs)
