@@ -23,7 +23,7 @@ namespace CdxEnrich.ClearlyDefined
         private readonly ResiliencePipeline _resiliencePipeline;
 
         // Token Bucket Rate Limiter for max. 2k requests per minute
-        private static readonly TokenBucketRateLimiter UnlimitedLeakyBucketRateLimiter = new(
+        private static readonly TokenBucketRateLimiter UnlimitedLeakyBucketTrafficSmoother = new(
             new TokenBucketRateLimiterOptions
             {
                 TokenLimit = int.MaxValue,
@@ -33,10 +33,7 @@ namespace CdxEnrich.ClearlyDefined
                 TokensPerPeriod = 33,  // 33 per second = 1980 per minute
                 AutoReplenishment = true
             });
-
-
-
-
+        
         public ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
         {
             _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
@@ -123,8 +120,8 @@ namespace CdxEnrich.ClearlyDefined
 
             try
             {
-                // Acquire permission from the rate limiter
-                using var lease = await UnlimitedLeakyBucketRateLimiter.AcquireAsync(1);
+                // Acquire permission from the traffic smoother
+                using var lease = await UnlimitedLeakyBucketTrafficSmoother.AcquireAsync(1);
 
                 if (lease.IsAcquired)
                 {
