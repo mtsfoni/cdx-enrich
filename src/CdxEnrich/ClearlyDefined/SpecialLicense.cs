@@ -29,6 +29,19 @@
         {
             return declared.Contains(LicenseIdentifier);
         }
+        
+        /// <summary>
+        /// Tries to get a SpecialLicense by its license identifier.
+        /// </summary>
+        /// <param name="licenseIdentifier"></param>
+        /// <param name="specialLicense"></param>
+        /// <returns></returns>
+        public static bool TryGetByLicenseIdentifier(string licenseIdentifier, out SpecialLicense? specialLicense)
+        {
+            specialLicense = All.FirstOrDefault(x =>
+                x.LicenseIdentifier.Equals(licenseIdentifier, StringComparison.OrdinalIgnoreCase));
+            return specialLicense != null;
+        }
 
         // For records, ToString() is automatically overridden and returns a formatted string with all properties
         // We override it here to return only the license identifier

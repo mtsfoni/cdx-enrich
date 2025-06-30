@@ -27,16 +27,18 @@ namespace CdxEnrich.ClearlyDefined.Rules
                     packageUrl, specialLicense.LicenseIdentifier);
                 return null;
             }
-            
-            if (joinedLicenseExpression == dataLicensed.Declared)
+
+            if (joinedLicenseExpression != null &&
+                SpecialLicense.TryGetByLicenseIdentifier(joinedLicenseExpression,
+                    out var specialLicenseFromExpression))
             {
                 this.Logger.LogInformation(
-                    "Resolved no licenses for package: {PackageUrl} due to '{SpecialLicense}' license with same expression as declared",
-                    packageUrl, specialLicense.LicenseIdentifier);
+                    "Resolved no licenses for package: {PackageUrl} due to '{SpecialLicense}' declared license and expression with special license '{SpecialLicenseFromExpression}'",
+                    packageUrl, specialLicense.LicenseIdentifier, specialLicenseFromExpression!.LicenseIdentifier);
                 return null;
             }
 
-            Logger.LogInformation(
+            this.Logger.LogInformation(
                 "Resolved license expressions ({LicenseExpressions}) for package: {PackageUrl}",
                 joinedLicenseExpression, packageUrl);
 

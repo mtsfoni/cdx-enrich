@@ -174,7 +174,7 @@ The system defines three main rule types:
 
     1. Checks for discovered expressions from ClearlyDefined
     2. Combines them using `OR` if multiple are found
-    3. Validates that the result differs from the original declared license
+    3. Validates that the result is not one of the special license types
   * Only if all conditions are met, the combined expression is returned
 
 ###### Decision Process
