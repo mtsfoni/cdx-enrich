@@ -36,6 +36,10 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 yield return [specialLicense,  new [] {"MIT", "LicenseRef-scancode-unknown-license-reference"}]; // Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator before it
                 yield return [specialLicense,  new [] {"LicenseRef-scancode-unknown-license-reference", "MIT"}]; //Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it
                 yield return [specialLicense, Array.Empty<string>()]; //Without any expressions
+                foreach (var specialLicenseFromExpression in SpecialLicense.All)
+                {
+                    yield return [specialLicense, new[] { specialLicenseFromExpression.LicenseIdentifier }]; //One expression that is a special license
+                }
             }
         }
         
