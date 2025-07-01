@@ -16,44 +16,19 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
             }
             return files;
         }
-
-        [Test]
-        [TestCaseSource(nameof(GetConfigs), new object[] { "" })]
-        public void CanParseConfig(string configPath)
+        
+        private static CycloneDXFormat GetCycloneDxFormat(string bomPath)
         {
-            var configContent = File.ReadAllText(configPath);
-            var parseConfigResult = ConfigLoader.ParseConfig(configContent);
-
-            Assert.That(parseConfigResult is not Failure);
+            var extension = Path.GetExtension(bomPath);
+            CycloneDXFormat inputFormat = extension.Equals(".json", StringComparison.CurrentCultureIgnoreCase) ? CycloneDXFormat.JSON : CycloneDXFormat.XML;
+            return inputFormat;
         }
-
-        [Test]
-        [TestCaseSource(nameof(GetConfigs), new object[] { "invalid" })]
-        public void InvalidConfigsReturnError(string configPath)
-        {
-            var configContent = File.ReadAllText(configPath);
-            var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig);
-
-            Assert.That(checkConfigResult is Failure);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(GetConfigs), new object[] { "valid" })]
-        public void ValidConfigsReturnSuccess(string configPath)
-        {
-            var configContent = File.ReadAllText(configPath);
-            var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig);
-
-            Assert.That(checkConfigResult is Success);
-        }
-
-        private static IEnumerable<object[]> GetInputPairs()
+        
+        private static IEnumerable<object[]> GetInputPairs(string startingWith)
         {
             bool returnedAtLeastOneSet = false;
 
-            foreach (string filePath in GetConfigs("valid"))
+            foreach (string filePath in GetConfigs(startingWith))
             {
                 string testFilesPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../../..", "Actions/ReplaceLicenseByClearlyDefined/testcases/boms"));
 
@@ -71,17 +46,54 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         }
 
         [Test]
-        [TestCaseSource(nameof(GetInputPairs))]
+        [TestCaseSource(nameof(GetConfigs), new object[] { "" })]
+        public void CanParseConfig(string configPath)
+        {
+            var configContent = File.ReadAllText(configPath);
+            var parseConfigResult = ConfigLoader.ParseConfig(configContent);
+
+            Assert.That(parseConfigResult is not Failure);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(GetInputPairs), new object[] { "invalid" })]
+        public void InvalidBomAndConfigCombinationsReturnError(string configPath, string bomPath)
+        {
+            var inputFormat = GetCycloneDxFormat(bomPath);
+            string bomContent = File.ReadAllText(bomPath);
+
+            var checkConfigResult =
+                Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
+                        ConfigLoader.ParseConfig(File.ReadAllText(configPath))
+                            .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig))
+                    .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckBomAndConfigCombination);
+
+            Assert.That(checkConfigResult is Failure);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(GetConfigs), new object[] { "valid" })]
+        public void ValidConfigsReturnSuccess(string configPath)
+        {
+            var configContent = File.ReadAllText(configPath);
+            var checkConfigResult = ConfigLoader.ParseConfig(configContent)
+                .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig);
+
+            Assert.That(checkConfigResult is Success);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(GetInputPairs), new object[] { "valid" })]
         public Task ExecuteActionCreateCorrectResults(string configPath, string bomPath)
         {
-            var extension = Path.GetExtension(bomPath);
-            CycloneDXFormat inputFormat = extension.Equals(".json", StringComparison.CurrentCultureIgnoreCase) ? CycloneDXFormat.JSON : CycloneDXFormat.XML;
+            var inputFormat = GetCycloneDxFormat(bomPath);
             string bomContent = File.ReadAllText(bomPath);
 
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
                     .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig))
+                    .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckBomAndConfigCombination)
                 .Map(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.Execute);
 
             Assert.That(executionResult is Success);

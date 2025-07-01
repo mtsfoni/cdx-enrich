@@ -74,6 +74,52 @@ namespace CdxEnrich.Actions
             return RefMustNotBeNullOrEmpty(config)
                 .Bind(RefMustBeUnique);
         }
+        
+        public static Result<InputTuple> CheckBomAndConfigCombination(InputTuple inputs)
+        {
+            var configEntries = inputs.Config.ReplaceLicenseByClearlyDefined?
+                .Where(item => item.Ref != null)
+                .ToList();
+            
+            if(configEntries == null)
+            {
+                return new Ok<InputTuple>(inputs);
+            }
+
+            foreach (var configEntryRef in configEntries.Select(x => x.Ref))
+            {
+                var component = GetComponentByBomRef(inputs.Bom, configEntryRef!);
+                if (component == null)
+                {
+                    return InvalidBomAndConfigCombinationError.Create<InputTuple>(
+                        $"Component with bom ref '{configEntryRef}' not found in the BOM.");
+                }
+
+                if (string.IsNullOrEmpty(component.Purl))
+                {
+                    return InvalidBomAndConfigCombinationError.Create<InputTuple>($"Component with bom ref '{configEntryRef}' does not have a PURL set.");
+                }
+
+                if (!TryParsePurl(component.Purl, out var packageUrl))
+                {
+                    return InvalidBomAndConfigCombinationError.Create<InputTuple>($"Invalid PURL format: '{component.Purl}'");
+                }
+
+                PackageType? packageType = null;
+                if (packageUrl != null && !PackageType.TryFromPurlType(packageUrl.Type, out packageType))
+                {
+                    return InvalidBomAndConfigCombinationError.Create<InputTuple>(
+                        $"Package type '{packageUrl.Type}' is not supported by ClearlyDefined. Supported types are: {string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value))}");
+                }
+
+                if (packageType != null && !IsSupported(packageType))
+                {
+                    return InvalidBomAndConfigCombinationError.Create<InputTuple>(
+                        $"Package type '{packageType.Name}' is currently not supported by CdxEnrich. Supported types are: {string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value))}");
+                }
+            }
+            return new Ok<InputTuple>(inputs);
+        }
 
         public static InputTuple Execute(InputTuple inputs)
         {
@@ -91,39 +137,10 @@ namespace CdxEnrich.Actions
             foreach (var configEntryRef in configEntries.Select(x => x.Ref))
             {
                 var component = GetComponentByBomRef(inputs.Bom, configEntryRef!);
-                if (component == null)
-                {
-                    Logger.LogInformation("Component with bom ref '{BomRef}' not found in the BOM.", configEntryRef);
-                    continue;
-                }
-                
-                if(string.IsNullOrEmpty(component.Purl))
-                {
-                    Logger.LogInformation("Component with bom ref '{BomRef}' does not have a PURL set.", configEntryRef);
-                    continue;
-                }
-
-                if (!TryParsePurl(component.Purl, out var packageUrl))
-                {
-                    Logger.LogError("Invalid PURL format: '{PackageUrl}'", component.Purl);
-                    continue;
-                }
-
-                PackageType? packageType = null;
-                if (packageUrl != null && !PackageType.TryFromPurlType(packageUrl.Type, out packageType))
-                {
-                    Logger.LogError("Package type '{PackageUrlType}' is not supported by ClearlyDefined. Supported types are: {SupportedPackageTypes}", packageUrl.Type, string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value)));
-                    continue;
-                }
-
-                if (packageType != null && !IsSupported(packageType))
-                {
-                    Logger.LogError("Package type '{PackageTypeName}' is currently not supported by CdxEnrich. Supported types are: {SupportedPackageTypes}", packageType.Name, string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value)));
-                    continue;
-                }
-                
-                var provider = packageType!.DefaultProvider;
-                tasks.Add(ProcessComponentAsync(component, packageUrl!, provider));
+                var packageUrl = new PackageURL(component!.Purl);
+                var packageType = PackageType.FromPurlType(packageUrl.Type);
+                var provider = packageType.DefaultProvider;
+                tasks.Add(ProcessComponentAsync(component, packageUrl, provider));
             }
 
             try

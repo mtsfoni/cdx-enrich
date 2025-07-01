@@ -120,6 +120,7 @@ namespace CdxEnrich
                         .Bind(ReplaceLicenseByBomRef.CheckConfig)
                         .Bind(ReplaceLicensesByUrl.CheckConfig)
                         .Bind(ReplaceLicenseByClearlyDefined.CheckConfig))
+                    .Bind(ReplaceLicenseByClearlyDefined.CheckBomAndConfigCombination)
                 .Map(ReplaceLicenseByBomRef.Execute)
                 .Map(ReplaceLicensesByUrl.Execute)
                 .Map(ReplaceLicenseByClearlyDefined.Execute)
