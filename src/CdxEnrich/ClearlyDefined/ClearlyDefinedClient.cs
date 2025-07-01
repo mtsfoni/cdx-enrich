@@ -26,7 +26,7 @@ namespace CdxEnrich.ClearlyDefined
         private static readonly TokenBucketRateLimiter UnlimitedLeakyBucketTrafficSmoother = new(
             new TokenBucketRateLimiterOptions
             {
-                TokenLimit = int.MaxValue,
+                TokenLimit = 33,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = int.MaxValue,
                 ReplenishmentPeriod = TimeSpan.FromSeconds(1),
