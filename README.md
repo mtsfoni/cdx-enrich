@@ -160,7 +160,7 @@ The system defines three main rule types:
     * References begin with `LicenseRef-`
   * Conditions:
 
-    * Must not be a special license type
+    * Must not be a license placeholder
   * Returns the full SPDX expression as-is
 
 3. **PlaceholderLicenseResolveRule**
