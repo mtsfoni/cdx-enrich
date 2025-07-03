@@ -5,9 +5,19 @@
     /// </summary>
     public sealed record SpecialLicense(string Name, string LicenseIdentifier)
     {
-        // Static instances of all special license types
+        /// <summary>
+        /// This indicates that a human confirmed that there is no license information in the file.
+        /// </summary>
         public static readonly SpecialLicense None = new(nameof(None), "NONE");
+        
+        /// <summary>
+        /// This indicates that license-like data is found, but that ClearlyDefined cannot identify an SPDX-identified license.
+        /// </summary>
         public static readonly SpecialLicense NoAssertion = new(nameof(NoAssertion), "NOASSERTION");
+        
+        /// <summary>
+        /// This indicates that a human confirmed that there is license information in the file but that the license is not an SPDX-identified license.
+        /// </summary>
         public static readonly SpecialLicense Other = new(nameof(Other), "OTHER");
 
         // Dictionary for fast access by LicenseIdentifier
