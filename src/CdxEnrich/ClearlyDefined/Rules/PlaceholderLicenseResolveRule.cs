@@ -8,7 +8,7 @@ namespace CdxEnrich.ClearlyDefined.Rules
     /// This rule handles license placeholders such as NONE, NOASSERTION and OTHER,
     /// which require an alternative resolution approach.
     /// </summary>
-    internal sealed class FallbackLicenseResolveRule(ILogger logger, LicensePlaceholder licensePlaceholder)
+    internal sealed class PlaceholderLicenseResolveRule(ILogger logger, LicensePlaceholder licensePlaceholder)
         : ResolveLicenseRuleBase(logger)
     {
         public override bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed)

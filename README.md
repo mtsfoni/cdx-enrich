@@ -163,7 +163,7 @@ The system defines three main rule types:
     * Must not be a special license type
   * Returns the full SPDX expression as-is
 
-3. **FallbackLicenseResolveRule**
+3. **PlaceholderLicenseResolveRule**
 
   * Handles license placeholder:
 
@@ -188,7 +188,7 @@ The system defines three main rule types:
 
 * A simple license `MIT` uses **LicenseIdResolveRule**
 * A compound expression `MIT OR Apache-2.0` uses **SpdxExpressionResolveRule**
-* A license placeholder `NOASSERTION` with alternative expressions uses **FallbackLicenseResolveRule**, if conditions are met; otherwise, the license remains unchanged
+* A license placeholder `NOASSERTION` with alternative expressions uses **PlaceholderLicenseResolveRule**, if conditions are met; otherwise, the license remains unchanged
 
 
 ## Issues and Contributions

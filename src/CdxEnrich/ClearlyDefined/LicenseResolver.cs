@@ -17,7 +17,7 @@ namespace CdxEnrich.ClearlyDefined
             
             _rules.Add(new LicenseIdResolveRule(_logger));
             _rules.Add(new SpdxExpressionResolveRule(_logger));
-            var licensePlaceholderResolveRules = LicensePlaceholder.All.Select(x => new FallbackLicenseResolveRule(_logger, x));
+            var licensePlaceholderResolveRules = LicensePlaceholder.All.Select(x => new PlaceholderLicenseResolveRule(_logger, x));
             _rules.AddRange(licensePlaceholderResolveRules);
         }
 
