@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using System.Threading.RateLimiting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
@@ -22,29 +21,16 @@ namespace CdxEnrich.ClearlyDefined
         private readonly HttpClient _httpClient;
         private readonly ILogger<ClearlyDefinedClient> _logger;
         private readonly ResiliencePipeline _resiliencePipeline;
-
-        // Max. 10 concurrent requests to the ClearlyDefined API
-        private static readonly SemaphoreSlim ConcurrencyLimiter = new(10);
-
-        // Token Bucket Rate Limiter for max. 2k requests per minute
-        private const int RequestsPerSecond = 33; // 33 per second = 1980 per minute
-
-        private static readonly TokenBucketRateLimiter UnlimitedLeakyBucketTrafficSmoother = new(
-            new TokenBucketRateLimiterOptions
-            {
-                TokenLimit = RequestsPerSecond,
-                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = int.MaxValue,
-                ReplenishmentPeriod = TimeSpan.FromSeconds(1),
-                TokensPerPeriod = RequestsPerSecond,
-                AutoReplenishment = true
-            });
+        private readonly RequestLimiter _requestLimiter;
 
         public ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
         {
             _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
             _logger = logger ?? NullLogger<ClearlyDefinedClient>.Instance;
             _resiliencePipeline = this.CreateResiliencePipeline();
+            _requestLimiter =
+                new RequestLimiter(maxConcurrentRequests: 10, requestsPerSecond: 33,
+                    _logger); // 33 per second = 1980 per minute
         }
 
         private ResiliencePipeline CreateResiliencePipeline()
@@ -136,53 +122,26 @@ namespace CdxEnrich.ClearlyDefined
         {
             var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, provider);
 
-            try
-            {
-                // Acquire permission from the traffic smoother
-                using var lease = await UnlimitedLeakyBucketTrafficSmoother.AcquireAsync(1);
-
-                if (lease.IsAcquired)
+            return await _requestLimiter.ExecuteWithLimitsAsync(
+                apiUrl, async () =>
                 {
-                    // Limit concurrent requests to the ClearlyDefined API
-                    await ConcurrencyLimiter.WaitAsync();
-                    try
-                    {
-                        // Execute resilience pipeline
-                        var response = await _resiliencePipeline.ExecuteAsync<HttpResponseMessage>(
-                            async cancellationToken => await _httpClient.GetAsync(apiUrl, cancellationToken),
-                            CancellationToken.None);
+                    var response = await _resiliencePipeline.ExecuteAsync<HttpResponseMessage>(
+                        async cancellationToken => await _httpClient.GetAsync(apiUrl, cancellationToken),
+                        CancellationToken.None);
 
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
-                            this._logger.LogInformation(
-                                "Successfully retrieved data from ClearlyDefined API for package: {PackageUrl}",
-                                packageUrl);
-                            return data?.Licensed;
-                        }
-                        else
-                        {
-                            // Still not successful after retries
-                            _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}",
-                                response.StatusCode, apiUrl);
-                            return null;
-                        }
-                    }
-                    finally
+                    if (!response.IsSuccessStatusCode)
                     {
-                        // Release the concurrency limiter
-                        ConcurrencyLimiter.Release();
+                        _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}",
+                            response.StatusCode, apiUrl);
+                        return null;
                     }
-                }
 
-                this._logger.LogWarning("Rate limit exceeded, request for {ApiUrl} was rejected", apiUrl);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during API call: {ApiUrl}", apiUrl);
-                return null;
-            }
+                    var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
+                    _logger.LogInformation(
+                        "Successfully retrieved data from ClearlyDefined API for package: {PackageUrl}",
+                        packageUrl);
+                    return data?.Licensed;
+                });
         }
 
         /// <summary>
