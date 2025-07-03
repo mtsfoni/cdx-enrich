@@ -22,6 +22,7 @@ namespace CdxEnrich.ClearlyDefined
         private readonly ILogger<ClearlyDefinedClient> _logger;
         private readonly ResiliencePipeline _resiliencePipeline;
         private readonly RequestLimiter _requestLimiter;
+        private const int MaxRetryAttempts = 3;
 
         public ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
         {
@@ -42,7 +43,7 @@ namespace CdxEnrich.ClearlyDefined
             var retryDelay = TimeSpan.FromSeconds(1);
             builder.AddRetry(new RetryStrategyOptions
             {
-                MaxRetryAttempts = 3,
+                MaxRetryAttempts = MaxRetryAttempts,
                 Delay = retryDelay,
                 BackoffType = DelayBackoffType.Exponential,
                 UseJitter = true, // Random variation of wait time
@@ -56,7 +57,6 @@ namespace CdxEnrich.ClearlyDefined
                             retryDelay);
                         return ValueTask.FromResult(true);
                     }
-
 
                     // Handle rate limit errors if the result is an HttpResponseMessage
                     if (args.Outcome.Result is HttpResponseMessage { StatusCode: HttpStatusCode.TooManyRequests })
@@ -75,8 +75,8 @@ namespace CdxEnrich.ClearlyDefined
                         response.StatusCode == HttpStatusCode.TooManyRequests)
                     {
                         this._logger.LogWarning(
-                            "Rate limit reached on ClearlyDefined API call. Retry attempt {Attempt} after {Delay}",
-                            args.AttemptNumber, args.RetryDelay);
+                            "Rate limit reached on ClearlyDefined API call. Retry attempt {Attempt}/{MaxAttempts} after {Delay}",
+                            args.AttemptNumber, MaxRetryAttempts, args.RetryDelay);
 
                         // Extract rate limit information from headers if available
                         if (response.Headers.TryGetValues("x-ratelimit-remaining", out var remaining) &&
@@ -89,8 +89,8 @@ namespace CdxEnrich.ClearlyDefined
                     else
                     {
                         this._logger.LogWarning(
-                            "HTTP error on ClearlyDefined API call. Retry attempt {Attempt} after {Delay}",
-                            args.AttemptNumber, args.RetryDelay);
+                            "HTTP error on ClearlyDefined API call. Retry attempt {Attempt}/{MaxAttempts} after {Delay}",
+                            args.AttemptNumber, MaxRetryAttempts, args.RetryDelay);
                     }
 
                     return ValueTask.CompletedTask;
@@ -103,7 +103,8 @@ namespace CdxEnrich.ClearlyDefined
                 Timeout = TimeSpan.FromSeconds(60),
                 OnTimeout = args =>
                 {
-                    this._logger.LogWarning("Timeout on ClearlyDefined API call after 60 seconds");
+                    var seconds = args.Timeout.ToString("ss");
+                    this._logger.LogWarning("Timeout on ClearlyDefined API call after {Seconds} seconds", seconds);
                     return ValueTask.CompletedTask;
                 }
             });
@@ -131,8 +132,8 @@ namespace CdxEnrich.ClearlyDefined
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}",
-                            response.StatusCode, apiUrl);
+                        _logger.LogError("API call unsuccessful after retry {RetryAttempts} attempts: {StatusCode} for {ApiUrl}",
+                            MaxRetryAttempts, response.StatusCode, apiUrl);
                         return null;
                     }
 
