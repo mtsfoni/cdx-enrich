@@ -12,7 +12,8 @@ namespace CdxEnrich.ClearlyDefined
 {
     public interface IClearlyDefinedClient
     {
-        Task<ClearlyDefinedResponse.LicensedData?> GetClearlyDefinedLicensedDataAsync(PackageURL packageUrl, Provider provider);
+        Task<ClearlyDefinedResponse.LicensedData?> GetClearlyDefinedLicensedDataAsync(PackageURL packageUrl,
+            Provider provider);
     }
 
     public class ClearlyDefinedClient : IClearlyDefinedClient
@@ -22,8 +23,12 @@ namespace CdxEnrich.ClearlyDefined
         private readonly ILogger<ClearlyDefinedClient> _logger;
         private readonly ResiliencePipeline _resiliencePipeline;
 
+        // Max. 10 concurrent requests to the ClearlyDefined API
+        private static readonly SemaphoreSlim ConcurrencyLimiter = new(10);
+
         // Token Bucket Rate Limiter for max. 2k requests per minute
         private const int RequestsPerSecond = 33; // 33 per second = 1980 per minute
+
         private static readonly TokenBucketRateLimiter UnlimitedLeakyBucketTrafficSmoother = new(
             new TokenBucketRateLimiterOptions
             {
@@ -34,7 +39,7 @@ namespace CdxEnrich.ClearlyDefined
                 TokensPerPeriod = RequestsPerSecond,
                 AutoReplenishment = true
             });
-        
+
         public ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
         {
             _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
@@ -65,7 +70,7 @@ namespace CdxEnrich.ClearlyDefined
                             retryDelay);
                         return ValueTask.FromResult(true);
                     }
-                        
+
 
                     // Handle rate limit errors if the result is an HttpResponseMessage
                     if (args.Outcome.Result is HttpResponseMessage { StatusCode: HttpStatusCode.TooManyRequests })
@@ -126,7 +131,8 @@ namespace CdxEnrich.ClearlyDefined
         /// <param name="packageUrl">The PackageURL of the package</param>
         /// <param name="provider">The provider to use</param>
         /// <returns>Licensed data or null if not found</returns>
-        public async Task<ClearlyDefinedResponse.LicensedData?> GetClearlyDefinedLicensedDataAsync(PackageURL packageUrl, Provider provider)
+        public async Task<ClearlyDefinedResponse.LicensedData?> GetClearlyDefinedLicensedDataAsync(
+            PackageURL packageUrl, Provider provider)
         {
             var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, provider);
 
@@ -137,32 +143,40 @@ namespace CdxEnrich.ClearlyDefined
 
                 if (lease.IsAcquired)
                 {
-                    // Execute resilience pipeline
-                    var response = await _resiliencePipeline.ExecuteAsync<HttpResponseMessage>(
-                        async cancellationToken => await _httpClient.GetAsync(apiUrl, cancellationToken),
-                        CancellationToken.None);
+                    // Limit concurrent requests to the ClearlyDefined API
+                    await ConcurrencyLimiter.WaitAsync();
+                    try
+                    {
+                        // Execute resilience pipeline
+                        var response = await _resiliencePipeline.ExecuteAsync<HttpResponseMessage>(
+                            async cancellationToken => await _httpClient.GetAsync(apiUrl, cancellationToken),
+                            CancellationToken.None);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
-                        this._logger.LogInformation(
-                            "Successfully retrieved data from ClearlyDefined API for package: {PackageUrl}",
-                            packageUrl);
-                        return data?.Licensed;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
+                            this._logger.LogInformation(
+                                "Successfully retrieved data from ClearlyDefined API for package: {PackageUrl}",
+                                packageUrl);
+                            return data?.Licensed;
+                        }
+                        else
+                        {
+                            // Still not successful after retries
+                            _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}",
+                                response.StatusCode, apiUrl);
+                            return null;
+                        }
                     }
-                    else
+                    finally
                     {
-                        // Still not successful after retries
-                        _logger.LogError("API call unsuccessful after retry attempts: {StatusCode} for {ApiUrl}",
-                            response.StatusCode, apiUrl);
-                        return null;
+                        // Release the concurrency limiter
+                        ConcurrencyLimiter.Release();
                     }
                 }
-                else
-                {
-                    _logger.LogWarning("Rate limit exceeded, request for {ApiUrl} was rejected", apiUrl);
-                    return null;
-                }
+
+                this._logger.LogWarning("Rate limit exceeded, request for {ApiUrl} was rejected", apiUrl);
+                return null;
             }
             catch (Exception ex)
             {
