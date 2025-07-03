@@ -17,8 +17,8 @@ namespace CdxEnrich.ClearlyDefined
             
             _rules.Add(new LicenseIdResolveRule(_logger));
             _rules.Add(new SpdxExpressionResolveRule(_logger));
-            var specialLicenseResolveRules = SpecialLicense.All.Select(x => new FallbackLicenseResolveRule(_logger, x));
-            _rules.AddRange(specialLicenseResolveRules);
+            var licensePlaceholderResolveRules = LicensePlaceholder.All.Select(x => new FallbackLicenseResolveRule(_logger, x));
+            _rules.AddRange(licensePlaceholderResolveRules);
         }
 
         public LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)

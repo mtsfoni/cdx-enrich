@@ -5,15 +5,15 @@ using PackageUrl;
 namespace CdxEnrich.ClearlyDefined.Rules
 {
     /// <summary>
-    /// This rule handles special license types such as NONE, NOASSERTION and OTHER,
+    /// This rule handles license placeholders such as NONE, NOASSERTION and OTHER,
     /// which require an alternative resolution approach.
     /// </summary>
-    internal sealed class FallbackLicenseResolveRule(ILogger logger, SpecialLicense specialLicense)
+    internal sealed class FallbackLicenseResolveRule(ILogger logger, LicensePlaceholder licensePlaceholder)
         : ResolveLicenseRuleBase(logger)
     {
         public override bool CanResolve(ClearlyDefinedResponse.LicensedData dataLicensed)
         {
-            return specialLicense.IsInDeclaredLicense(dataLicensed.Declared!);
+            return licensePlaceholder.IsInDeclaredLicense(dataLicensed.Declared!);
         }
 
         public override LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
@@ -23,18 +23,18 @@ namespace CdxEnrich.ClearlyDefined.Rules
             if (licenseExpressions == null || !this.TryGetJoinedLicenseExpression(licenseExpressions, out var joinedLicenseExpression))
             {
                 this.Logger.LogInformation(
-                    "Resolved no licenses for package: {PackageUrl} due to '{SpecialLicense}' license with missing or invalid expressions",
-                    packageUrl, specialLicense.LicenseIdentifier);
+                    "Resolved no licenses for package: {PackageUrl} due to placeholder '{LicensePlaceholder}' in declared license with missing or invalid expressions",
+                    packageUrl, licensePlaceholder.LicenseIdentifier);
                 return null;
             }
 
             if (joinedLicenseExpression != null &&
-                SpecialLicense.TryGetByLicenseIdentifier(joinedLicenseExpression,
-                    out var specialLicenseFromExpression))
+                LicensePlaceholder.TryGetByLicenseIdentifier(joinedLicenseExpression,
+                    out var licensePlaceholderFromExpression))
             {
                 this.Logger.LogInformation(
-                    "Resolved no licenses for package: {PackageUrl} due to '{SpecialLicense}' declared license and expression with special license '{SpecialLicenseFromExpression}'",
-                    packageUrl, specialLicense.LicenseIdentifier, specialLicenseFromExpression!.LicenseIdentifier);
+                    "Resolved no licenses for package: {PackageUrl} due to placeholder '{LicensePlaceholder}' in declared license and expression with license placeholder '{LicensePlaceholderFromExpression}'",
+                    packageUrl, licensePlaceholder.LicenseIdentifier, licensePlaceholderFromExpression!.LicenseIdentifier);
                 return null;
             }
 

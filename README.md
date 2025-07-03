@@ -147,7 +147,7 @@ The system defines three main rule types:
   * Handles simple license identifiers such as `MIT`, `Apache-2.0`
   * Conditions:
 
-    * Must not be a special license type (`NONE`, `NOASSERTION`, `OTHER`)
+    * Must not be a license placeholder (`NONE`, `NOASSERTION`, `OTHER`)
     * Must not be an SPDX expression
     * Must not be a license reference (e.g., starts with `LicenseRef-`)
   * Returns the license ID as a direct CycloneDX ID
@@ -165,7 +165,7 @@ The system defines three main rule types:
 
 3. **FallbackLicenseResolveRule**
 
-  * Handles special license types:
+  * Handles license placeholder:
 
     * `NONE` means no license declared
     * `NOASSERTION` means the license could not be determined
@@ -174,7 +174,7 @@ The system defines three main rule types:
 
     1. Checks for discovered expressions from ClearlyDefined
     2. Combines them using `OR` if multiple are found
-    3. Validates that the result is not one of the special license types
+    3. Validates that the result is not one of the license placeholders
   * Only if all conditions are met, the combined expression is returned
 
 ###### Decision Process
@@ -188,7 +188,7 @@ The system defines three main rule types:
 
 * A simple license `MIT` uses **LicenseIdResolveRule**
 * A compound expression `MIT OR Apache-2.0` uses **SpdxExpressionResolveRule**
-* A special license `NOASSERTION` with alternative expressions uses **FallbackLicenseResolveRule**, if conditions are met; otherwise, the license remains unchanged
+* A license placeholder `NOASSERTION` with alternative expressions uses **FallbackLicenseResolveRule**, if conditions are met; otherwise, the license remains unchanged
 
 
 ## Issues and Contributions

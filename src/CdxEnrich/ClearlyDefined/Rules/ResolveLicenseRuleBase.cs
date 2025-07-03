@@ -37,13 +37,13 @@ namespace CdxEnrich.ClearlyDefined.Rules
         }
         
         /// <summary>
-        /// Checks if a license string is a special license type (e.g NONE, NOASSERTION, OTHER)
+        /// Checks if a license string is a license placeholder (e.g NONE, NOASSERTION, OTHER)
         /// </summary>
         /// <param name="declared"></param>
         /// <returns></returns>
-        protected bool IsSpecialLicense(string declared)
+        protected bool IsLicensePlaceholder(string declared)
         {
-            return SpecialLicense.All.Any(x => x.IsInDeclaredLicense(declared));
+            return LicensePlaceholder.All.Any(x => x.IsInDeclaredLicense(declared));
         }
 
         /// <summary>

@@ -14,43 +14,43 @@ namespace CdxEnrich.Tests.ClearlyDefined
             this._fixture = new LicenseResolverFixture();
         }
         
-        public static IEnumerable<object[]> SuccessSpecialLicenseWithExpression()
+        public static IEnumerable<object[]> SuccessLicensePlaceholderWithExpression()
         {
-            foreach (var specialLicense in SpecialLicense.All)
+            foreach (var licensePlaceholder in LicensePlaceholder.All)
             {
-                yield return ["MIT OR Apache-2.0", specialLicense, new [] {"MIT", "Apache-2.0"}]; //Multiple expressions
-                yield return ["MIT OR Apache-2.0", specialLicense,  new [] {"MIT OR Apache-2.0"}]; //One expressions, with OR operator
-                yield return ["MIT WITH Apache-2.0", specialLicense,  new [] {"MIT WITH Apache-2.0"}]; //One expressions, with WITH operator
-                yield return ["MIT AND Apache-2.0", specialLicense,  new [] {"MIT AND Apache-2.0"}]; //One expressions, with AND operator
-                yield return ["MIT", specialLicense, new []{"MIT"}]; //One expressions, no operator
+                yield return ["MIT OR Apache-2.0", licensePlaceholder, new [] {"MIT", "Apache-2.0"}]; //Multiple expressions
+                yield return ["MIT OR Apache-2.0", licensePlaceholder,  new [] {"MIT OR Apache-2.0"}]; //One expressions, with OR operator
+                yield return ["MIT WITH Apache-2.0", licensePlaceholder,  new [] {"MIT WITH Apache-2.0"}]; //One expressions, with WITH operator
+                yield return ["MIT AND Apache-2.0", licensePlaceholder,  new [] {"MIT AND Apache-2.0"}]; //One expressions, with AND operator
+                yield return ["MIT", licensePlaceholder, new []{"MIT"}]; //One expressions, no operator
             }
         }
         
-        public static IEnumerable<object[]> FailingSpecialLicenseWithExpression()
+        public static IEnumerable<object[]> FailingLicensePlaceholderWithExpression()
         {
-            foreach (var specialLicense in SpecialLicense.All)
+            foreach (var licensePlaceholder in LicensePlaceholder.All)
             {
-                yield return [specialLicense, new [] {"LicenseRef-scancode-unknown-license-reference"}]; //One expression 'LicenseRef-scancode-unknown-license-reference' without operator
-                yield return [specialLicense,  new [] {"MIT OR LicenseRef-scancode-unknown-license-reference"}]; //One expression 'LicenseRef-scancode-unknown-license-reference' with operator before it
-                yield return [specialLicense,  new [] {"LicenseRef-scancode-unknown-license-reference OR MIT"}]; //One expression 'LicenseRef-scancode-unknown-license-reference' with operator after it
-                yield return [specialLicense,  new [] {"MIT", "LicenseRef-scancode-unknown-license-reference"}]; // Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator before it
-                yield return [specialLicense,  new [] {"LicenseRef-scancode-unknown-license-reference", "MIT"}]; //Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it
-                yield return [specialLicense, Array.Empty<string>()]; //Without any expressions
-                foreach (var specialLicenseFromExpression in SpecialLicense.All)
+                yield return [licensePlaceholder, new [] {"LicenseRef-scancode-unknown-license-reference"}]; //One expression 'LicenseRef-scancode-unknown-license-reference' without operator
+                yield return [licensePlaceholder,  new [] {"MIT OR LicenseRef-scancode-unknown-license-reference"}]; //One expression 'LicenseRef-scancode-unknown-license-reference' with operator before it
+                yield return [licensePlaceholder,  new [] {"LicenseRef-scancode-unknown-license-reference OR MIT"}]; //One expression 'LicenseRef-scancode-unknown-license-reference' with operator after it
+                yield return [licensePlaceholder,  new [] {"MIT", "LicenseRef-scancode-unknown-license-reference"}]; // Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator before it
+                yield return [licensePlaceholder,  new [] {"LicenseRef-scancode-unknown-license-reference", "MIT"}]; //Multiple expressions 'LicenseRef-scancode-unknown-license-reference' expression with operator after it
+                yield return [licensePlaceholder, Array.Empty<string>()]; //Without any expressions
+                foreach (var licensePlaceholderFromExpression in LicensePlaceholder.All)
                 {
-                    yield return [specialLicense, new[] { specialLicenseFromExpression.LicenseIdentifier }]; //One expression that is a special license
+                    yield return [licensePlaceholder, new[] { licensePlaceholderFromExpression.LicenseIdentifier }]; //One expression that is a license placeholder
                 }
             }
         }
         
         [Test]
-        [TestCaseSource(nameof(SuccessSpecialLicenseWithExpression))]
-        public void Resolve_WhenDeclaredContainsSpecialLicense_AndTryGetLicenseFromExpressionsSucceeds_ReturnsLicenseChoiceWithExpression(
-            string expected, SpecialLicense specialLicense, string[] expressions)
+        [TestCaseSource(nameof(SuccessLicensePlaceholderWithExpression))]
+        public void Resolve_WhenDeclaredContainsLicensePlaceholder_AndTryGetLicenseFromExpressionsSucceeds_ReturnsLicenseChoiceWithExpression(
+            string expected, LicensePlaceholder licensePlaceholder, string[] expressions)
         {
             // Arrange
-            var dataLicensed = this._fixture.CreateLicenseDeclaredForSpecialLicenseAndExpressions(
-                specialLicense,
+            var dataLicensed = this._fixture.CreateLicenseDeclaredForLicensePlaceholderAndExpressions(
+                licensePlaceholder,
                 expressions.ToList());
 
             // Act
@@ -66,13 +66,13 @@ namespace CdxEnrich.Tests.ClearlyDefined
         }
 
         [Test]
-        [TestCaseSource(nameof(FailingSpecialLicenseWithExpression))]
-        public void Resolve_WhenDeclaredContainsSpecialLicense_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
-            SpecialLicense specialLicense, string[] expressions)
+        [TestCaseSource(nameof(FailingLicensePlaceholderWithExpression))]
+        public void Resolve_WhenDeclaredContainsLicensePlaceholder_AndTryGetLicenseFromMultipleExpressionsFails_ReturnsNull(
+            LicensePlaceholder licensePlaceholder, string[] expressions)
         {
             // Arrange
-            var dataLicensed = this._fixture.CreateLicenseDeclaredForSpecialLicenseAndExpressions(
-                specialLicense,
+            var dataLicensed = this._fixture.CreateLicenseDeclaredForLicensePlaceholderAndExpressions(
+                licensePlaceholder,
                 expressions.ToList());
 
             // Act
@@ -239,10 +239,10 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 };
             }
 
-            public ClearlyDefinedResponse.LicensedData CreateLicenseDeclaredForSpecialLicenseAndExpressions(
-                SpecialLicense specialLicense, List<string> expressions)
+            public ClearlyDefinedResponse.LicensedData CreateLicenseDeclaredForLicensePlaceholderAndExpressions(
+                LicensePlaceholder licensePlaceholder, List<string> expressions)
             {
-                return this.CreateLicenseDeclaredAndExpressions(specialLicense.LicenseIdentifier, expressions);
+                return this.CreateLicenseDeclaredAndExpressions(licensePlaceholder.LicenseIdentifier, expressions);
             }
         }
     }
