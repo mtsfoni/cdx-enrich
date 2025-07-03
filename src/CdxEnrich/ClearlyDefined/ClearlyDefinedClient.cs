@@ -66,6 +66,13 @@ namespace CdxEnrich.ClearlyDefined
                             retryDelay);
                         return ValueTask.FromResult(true);
                     }
+                    
+                    // Handle timeouts
+                    if (args.Outcome.Exception is TimeoutRejectedException)
+                    {
+                        this._logger.LogWarning("Timeout detected. Will retry after delay: {Delay}", retryDelay);
+                        return ValueTask.FromResult(true);
+                    }
 
                     return ValueTask.FromResult(false);
                 },
