@@ -23,14 +23,15 @@ namespace CdxEnrich.ClearlyDefined
         private readonly ResiliencePipeline _resiliencePipeline;
 
         // Token Bucket Rate Limiter for max. 2k requests per minute
+        private const int RequestsPerSecond = 33; // 33 per second = 1980 per minute
         private static readonly TokenBucketRateLimiter UnlimitedLeakyBucketTrafficSmoother = new(
             new TokenBucketRateLimiterOptions
             {
-                TokenLimit = 33,
+                TokenLimit = RequestsPerSecond,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = int.MaxValue,
                 ReplenishmentPeriod = TimeSpan.FromSeconds(1),
-                TokensPerPeriod = 33,  // 33 per second = 1980 per minute
+                TokensPerPeriod = RequestsPerSecond,
                 AutoReplenishment = true
             });
         
@@ -47,22 +48,33 @@ namespace CdxEnrich.ClearlyDefined
             var builder = new ResiliencePipelineBuilder();
 
             // Add retry strategy
+            var retryDelay = TimeSpan.FromSeconds(1);
             builder.AddRetry(new RetryStrategyOptions
             {
                 MaxRetryAttempts = 3,
-                Delay = TimeSpan.FromSeconds(1),
+                Delay = retryDelay,
                 BackoffType = DelayBackoffType.Exponential,
                 UseJitter = true, // Random variation of wait time
                 ShouldHandle = args =>
                 {
                     // Handle HTTP errors
                     if (args.Outcome.Exception is HttpRequestException)
+                    {
+                        this._logger.LogWarning(
+                            "HTTP request error detected. Will retry after delay: {Delay}",
+                            retryDelay);
                         return ValueTask.FromResult(true);
+                    }
+                        
 
                     // Handle rate limit errors if the result is an HttpResponseMessage
-                    if (args.Outcome.Result is HttpResponseMessage response &&
-                        response.StatusCode == HttpStatusCode.TooManyRequests)
+                    if (args.Outcome.Result is HttpResponseMessage { StatusCode: HttpStatusCode.TooManyRequests })
+                    {
+                        _logger.LogWarning(
+                            "Rate limit error detected. Will retry after delay: {Delay}",
+                            retryDelay);
                         return ValueTask.FromResult(true);
+                    }
 
                     return ValueTask.FromResult(false);
                 },
@@ -97,10 +109,10 @@ namespace CdxEnrich.ClearlyDefined
             // Add timeout strategy
             builder.AddTimeout(new TimeoutStrategyOptions
             {
-                Timeout = TimeSpan.FromSeconds(30),
+                Timeout = TimeSpan.FromSeconds(60),
                 OnTimeout = args =>
                 {
-                    this._logger.LogWarning("Timeout on ClearlyDefined API call after 30 seconds");
+                    this._logger.LogWarning("Timeout on ClearlyDefined API call after 60 seconds");
                     return ValueTask.CompletedTask;
                 }
             });
