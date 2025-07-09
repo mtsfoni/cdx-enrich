@@ -1,5 +1,4 @@
-﻿using CdxEnrich;
-using CdxEnrich.Actions;
+﻿using CdxEnrich.Actions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CdxEnrich.Tests.General
@@ -14,7 +13,7 @@ namespace CdxEnrich.Tests.General
             _fixture = new Fixture();
         }
 
-        public class Fixture
+        private class Fixture
         {
             private readonly ServiceProvider _serviceProvider;
 
