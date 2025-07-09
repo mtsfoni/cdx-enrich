@@ -1,4 +1,5 @@
 ﻿using CdxEnrich;
+using CdxEnrich.Actions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CdxEnrich.Tests.General
@@ -27,7 +28,8 @@ namespace CdxEnrich.Tests.General
 
             public Runner CreateSut()
             {
-                return new Runner();
+                var replaceActions = this._serviceProvider.GetRequiredService<IEnumerable<IReplaceAction>>();
+                return new Runner(replaceActions);
             }
         }
 

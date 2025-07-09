@@ -35,8 +35,9 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByBomRef
         public void InvalidConfigsReturnError(string configPath)
         {
             var configContent = File.ReadAllText(configPath);
+            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByBomRef();
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(CdxEnrich.Actions.ReplaceLicenseByBomRef.CheckConfig);
+                .Bind(replaceAction.CheckConfig);
 
             Assert.That(checkConfigResult is Failure);
         }
@@ -46,8 +47,9 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByBomRef
         public void ValidConfigsReturnSuccess(string configPath)
         {
             var configContent = File.ReadAllText(configPath);
+            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByBomRef();
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(CdxEnrich.Actions.ReplaceLicenseByBomRef.CheckConfig);
+                .Bind(replaceAction.CheckConfig);
 
             Assert.That(checkConfigResult is Success);
         }
@@ -81,12 +83,13 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByBomRef
             var extension = Path.GetExtension(bomPath);
             CycloneDXFormat inputFormat = extension.Equals(".json", StringComparison.CurrentCultureIgnoreCase) ? CycloneDXFormat.JSON : CycloneDXFormat.XML;
             string bomContent = File.ReadAllText(bomPath);
+            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByBomRef();
 
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                        .Bind(CdxEnrich.Actions.ReplaceLicenseByBomRef.CheckConfig))
-                    .Map(CdxEnrich.Actions.ReplaceLicenseByBomRef.Execute);
+                        .Bind(replaceAction.CheckConfig))
+                    .Map(replaceAction.Execute);
 
             Assert.That(executionResult is Success);
 

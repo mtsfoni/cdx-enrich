@@ -11,7 +11,12 @@
                 _ => throw new InvalidOperationException("Unknown result type")
             };
         }
-
+        
+        public static Result<T> AggregateBind<T, TAction>(this Result<T> result, IEnumerable<TAction> actions, Func<TAction, Func<T, Result<T>>> funcSelector)
+        {
+            return actions.Aggregate(result, (current, action) => current.Bind(funcSelector(action)));
+        }
+        
         public static Result<TOutput> Map<TInput, TOutput>(this Result<TInput> input, Func<TInput, TOutput> fun)
         {
             return input switch
@@ -20,6 +25,11 @@
                 Error<TInput> error => Error.From<TOutput>(error),
                 _ => throw new InvalidOperationException("Unknown result type")
             };
+        }
+        
+        public static Result<T> AggregateMap<T, TAction>(this Result<T> result, IEnumerable<TAction> actions, Func<TAction, Func<T, T>> funcSelector)
+        {
+            return actions.Aggregate(result, (current, action) => current.Map(funcSelector(action)));
         }
 
         public static Result<T> Tee<T>(this Result<T> input, Action<T> action)

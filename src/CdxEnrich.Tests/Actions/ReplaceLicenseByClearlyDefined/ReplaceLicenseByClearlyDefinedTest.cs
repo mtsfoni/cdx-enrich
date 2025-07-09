@@ -61,12 +61,13 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         {
             var inputFormat = GetCycloneDxFormat(bomPath);
             string bomContent = File.ReadAllText(bomPath);
+            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined();
 
             var checkConfigResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                         ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                            .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig))
-                    .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckBomAndConfigCombination);
+                            .Bind(replaceAction.CheckConfig))
+                    .Bind(replaceAction.CheckBomAndConfigCombination);
 
             Assert.That(checkConfigResult is Failure);
         }
@@ -76,8 +77,9 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         public void ValidConfigsReturnSuccess(string configPath)
         {
             var configContent = File.ReadAllText(configPath);
+            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined();
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig);
+                .Bind(replaceAction.CheckConfig);
 
             Assert.That(checkConfigResult is Success);
         }
@@ -88,13 +90,14 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         {
             var inputFormat = GetCycloneDxFormat(bomPath);
             string bomContent = File.ReadAllText(bomPath);
+            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined();
 
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                    .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig))
-                    .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckBomAndConfigCombination)
-                .Map(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.Execute);
+                    .Bind(replaceAction.CheckConfig))
+                    .Bind(replaceAction.CheckBomAndConfigCombination)
+                .Map(replaceAction.Execute);
 
             Assert.That(executionResult is Success);
 

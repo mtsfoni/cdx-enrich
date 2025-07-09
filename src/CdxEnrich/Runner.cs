@@ -7,7 +7,7 @@ using CdxEnrich.Actions;
 
 namespace CdxEnrich
 {
-    public class Runner : IRunner
+    public class Runner(IEnumerable<IReplaceAction> replaceActions) : IRunner
     {
         public static Result<InputTuple> CombineBomAndConfig(Result<Bom> bom, Result<ConfigRoot> config)
         {
@@ -112,20 +112,13 @@ namespace CdxEnrich
 
         public Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent, CycloneDXFormat outputFileFormat)
         {
-
-           return
-                CombineBomAndConfig(
+            return CombineBomAndConfig(
                     BomSerialization.DeserializeBom(inputFileContent, inputFormat),
                     ConfigLoader.ParseConfig(configFileContent)
-                        .Bind(ReplaceLicenseByBomRef.CheckConfig)
-                        .Bind(ReplaceLicensesByUrl.CheckConfig)
-                        .Bind(ReplaceLicenseByClearlyDefined.CheckConfig))
-                    .Bind(ReplaceLicenseByClearlyDefined.CheckBomAndConfigCombination)
-                .Map(ReplaceLicenseByBomRef.Execute)
-                .Map(ReplaceLicensesByUrl.Execute)
-                .Map(ReplaceLicenseByClearlyDefined.Execute)
+                        .AggregateBind(replaceActions, action => action.CheckConfig))
+                .AggregateBind(replaceActions, action => action.CheckBomAndConfigCombination)
+                .AggregateMap(replaceActions, action => action.Execute)
                 .Bind(inputs => BomSerialization.SerializeBom(inputs, outputFileFormat));
-
         }
     }
 

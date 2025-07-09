@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using CdxEnrich.Actions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CdxEnrich
@@ -79,6 +80,9 @@ namespace CdxEnrich
         internal static void ConfigureServices(ServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<IRunner, Runner>();
+            serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByBomRef>();
+            serviceCollection.AddTransient<IReplaceAction, ReplaceLicensesByUrl>();
+            serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByClearlyDefined>();
         }
     }
 }

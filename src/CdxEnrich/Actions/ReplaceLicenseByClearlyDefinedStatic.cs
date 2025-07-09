@@ -8,7 +8,7 @@ using PackageUrl;
 
 namespace CdxEnrich.Actions
 {
-    public static class ReplaceLicenseByClearlyDefined
+    public class ReplaceLicenseByClearlyDefined : ReplaceAction
     {
         private static readonly ILogger Logger = new ConsoleLogger(nameof(ReplaceLicenseByClearlyDefined));
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
@@ -69,13 +69,13 @@ namespace CdxEnrich.Actions
         }
 
 
-        public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
+        public override Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
             return RefMustNotBeNullOrEmpty(config)
                 .Bind(RefMustBeUnique);
         }
         
-        public static Result<InputTuple> CheckBomAndConfigCombination(InputTuple inputs)
+        public override Result<InputTuple> CheckBomAndConfigCombination(InputTuple inputs)
         {
             var configEntries = inputs.Config.ReplaceLicenseByClearlyDefined?
                 .Where(item => item.Ref != null)
@@ -121,7 +121,7 @@ namespace CdxEnrich.Actions
             return new Ok<InputTuple>(inputs);
         }
 
-        public static InputTuple Execute(InputTuple inputs)
+        public override InputTuple Execute(InputTuple inputs)
         {
             var tasks = new List<Task>();
 
