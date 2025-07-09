@@ -8,9 +8,8 @@ using PackageUrl;
 
 namespace CdxEnrich.Actions
 {
-    public class ReplaceLicenseByClearlyDefined : ReplaceAction
+    public class ReplaceLicenseByClearlyDefined(ILogger<ReplaceLicenseByClearlyDefined> logger) : ReplaceAction
     {
-        private static readonly ILogger Logger = new ConsoleLogger(nameof(ReplaceLicenseByClearlyDefined));
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
 
         private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
@@ -149,13 +148,13 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error processing components {Message}", ex.Message);
+                logger.LogError(ex, "Error processing components {Message}", ex.Message);
             }
 
             return inputs;
         }
 
-        private static async Task ProcessComponentAsync(Component component, PackageURL packageUrl, Provider provider)
+        private async Task ProcessComponentAsync(Component component, PackageURL packageUrl, Provider provider)
         {
             try
             {
@@ -164,7 +163,7 @@ namespace CdxEnrich.Actions
             
                 if (licensedData == null || licensedData.Declared == null || licensedData.Facets == null)
                 {
-                    Logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
+                    logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
                     return;
                 }
             
@@ -180,7 +179,7 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error processing component {PackageUrl}: {Message}", packageUrl, ex.Message);
+                logger.LogError(ex, "Error processing component {PackageUrl}: {Message}", packageUrl, ex.Message);
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using CdxEnrich.Actions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace CdxEnrich
 {
@@ -83,6 +84,12 @@ namespace CdxEnrich
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByBomRef>();
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicensesByUrl>();
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByClearlyDefined>();
+            
+            serviceCollection.AddLogging(x => 
+            {
+                x.AddConsole();
+                x.SetMinimumLevel(LogLevel.Information);
+            });
         }
     }
 }

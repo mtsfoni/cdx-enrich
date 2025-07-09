@@ -1,11 +1,23 @@
-﻿using CdxEnrich.Config;
+﻿using CdxEnrich.Actions;
+using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
+using CdxEnrich.Logging;
 using CdxEnrich.Serialization;
 
 namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
 {
     internal class ReplaceLicenseByClearlyDefinedTest
     {
+        private readonly Fixture _fixture = new();
+
+        private class Fixture
+        {
+            public IReplaceAction CreateReplaceAction()
+            {
+                return new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined(new ConsoleLogger<CdxEnrich.Actions.ReplaceLicenseByClearlyDefined>());
+            }
+        }
+
         private static string[] GetConfigs(string startingWith)
         {
             string testFilesPath = Path.Combine(Environment.CurrentDirectory, "../../..", "Actions/ReplaceLicenseByClearlyDefined/testcases/configs");
@@ -61,7 +73,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         {
             var inputFormat = GetCycloneDxFormat(bomPath);
             string bomContent = File.ReadAllText(bomPath);
-            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined();
+            var replaceAction = this._fixture.CreateReplaceAction();
 
             var checkConfigResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
@@ -77,7 +89,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         public void ValidConfigsReturnSuccess(string configPath)
         {
             var configContent = File.ReadAllText(configPath);
-            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined();
+            var replaceAction = this._fixture.CreateReplaceAction();
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
                 .Bind(replaceAction.CheckConfig);
 
@@ -90,7 +102,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         {
             var inputFormat = GetCycloneDxFormat(bomPath);
             string bomContent = File.ReadAllText(bomPath);
-            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined();
+            var replaceAction = this._fixture.CreateReplaceAction();
 
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
