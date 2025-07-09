@@ -7,7 +7,7 @@ using CdxEnrich.Actions;
 
 namespace CdxEnrich
 {
-    public static class Runner
+    public class Runner : IRunner
     {
         public static Result<InputTuple> CombineBomAndConfig(Result<Bom> bom, Result<ConfigRoot> config)
         {
@@ -26,7 +26,7 @@ namespace CdxEnrich
         }
 
 
-        static public int Enrich(string inputFilePath, CycloneDXFormatOption inputFormat, string outputFilePath, IEnumerable<string> configPaths, CycloneDXFormatOption outputFileFormat)
+        public int Enrich(string inputFilePath, CycloneDXFormatOption inputFormat, string outputFilePath, IEnumerable<string> configPaths, CycloneDXFormatOption outputFileFormat)
         {
             try
             {
@@ -110,7 +110,7 @@ namespace CdxEnrich
             }
         }
 
-        static public Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent, CycloneDXFormat outputFileFormat)
+        public Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent, CycloneDXFormat outputFileFormat)
         {
 
            return
@@ -127,5 +127,14 @@ namespace CdxEnrich
                 .Bind(inputs => BomSerialization.SerializeBom(inputs, outputFileFormat));
 
         }
+    }
+
+    public interface IRunner
+    {
+        int Enrich(string inputFilePath, CycloneDXFormatOption inputFormat, string outputFilePath,
+            IEnumerable<string> configPaths, CycloneDXFormatOption outputFileFormat);
+
+        Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent,
+            CycloneDXFormat outputFileFormat);
     }
 }

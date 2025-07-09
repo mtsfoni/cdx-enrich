@@ -1,12 +1,34 @@
 ﻿using CdxEnrich;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CdxEnrich.Tests.General
 {
     public class BomEnricher_Test
     {
+        private Fixture _fixture;
+
         [SetUp]
         public void Setup()
         {
+            _fixture = new Fixture();
+        }
+
+        public class Fixture
+        {
+            private readonly ServiceProvider _serviceProvider;
+
+            public Fixture()
+            {
+                var serviceCollection = new ServiceCollection();
+                Program.ConfigureServices(serviceCollection);
+
+                this._serviceProvider = serviceCollection.BuildServiceProvider();
+            }
+
+            public Runner CreateSut()
+            {
+                return new Runner();
+            }
         }
 
 
@@ -30,8 +52,8 @@ namespace CdxEnrich.Tests.General
 
 
 
-
-            var result = Runner.Enrich(bom, inputFormat, config, outputFormat);
+            var runner = this._fixture.CreateSut();
+            var result = runner.Enrich(bom, inputFormat, config, outputFormat);
 
             var settings = new VerifySettings();
             settings.UseDirectory("testcases/snapshots");
