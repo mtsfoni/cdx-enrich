@@ -1,4 +1,6 @@
 ﻿using System.CommandLine;
+using CdxEnrich.Actions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CdxEnrich
 {
@@ -48,6 +50,11 @@ namespace CdxEnrich
                 getDefaultValue: () => CycloneDXFormatOption.Auto
             );
 
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            var runner = serviceProvider.GetRequiredService<IRunner>();
             // Create the root command and add options
             var rootCommand = new RootCommand();
             rootCommand.AddArgument(inputFileArg);
@@ -58,7 +65,7 @@ namespace CdxEnrich
             rootCommand.Description = "A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.";
             rootCommand.SetHandler((context) =>
                 context.ExitCode =
-                    Runner.Enrich
+                    runner.Enrich
                         (context.ParseResult.GetValueForArgument(inputFileArg) ?? "",
                         context.ParseResult.GetValueForOption(inputFileFormatOption),
                         context.ParseResult.GetValueForOption(outputFileOption) ?? "",
@@ -68,6 +75,15 @@ namespace CdxEnrich
 
             var result = rootCommand.Invoke(args);
             return result;
+        }
+
+        internal static void ConfigureServices(ServiceCollection serviceCollection)
+        {
+            serviceCollection.AddLogging();
+            serviceCollection.AddTransient<IRunner, Runner>();
+            serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByBomRef>();
+            serviceCollection.AddTransient<IReplaceAction, ReplaceLicensesByUrl>();
+            serviceCollection.AddReplaceLicenseByClearlyDefined();
         }
     }
 }

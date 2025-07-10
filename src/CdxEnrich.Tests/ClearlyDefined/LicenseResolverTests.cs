@@ -1,4 +1,6 @@
 ﻿using CdxEnrich.ClearlyDefined;
+using CdxEnrich.ClearlyDefined.Rules;
+using Microsoft.Extensions.Logging;
 using PackageUrl;
 
 namespace CdxEnrich.Tests.ClearlyDefined
@@ -199,7 +201,13 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
         private class LicenseResolverFixture
         {
-            public LicenseResolver Resolver { get; } = new();
+            public LicenseResolverFixture()
+            {
+                var loggerFactory = new LoggerFactory();
+                this.Resolver = new LicenseResolver(loggerFactory.CreateLogger<LicenseResolver>(), new ResolveLicenseRuleFactory(loggerFactory));
+            }
+            
+            public LicenseResolver Resolver { get; }
             public PackageURL PackageUrl { get; } = new("nuget", null, "Test.Package", "1.0.0", null, null);
 
             public ClearlyDefinedResponse.LicensedData CreateLicenseDeclaredWith(string declared)

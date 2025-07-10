@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
 using Polly;
 using Polly.Retry;
@@ -17,17 +16,18 @@ namespace CdxEnrich.ClearlyDefined
 
     public class ClearlyDefinedClient : IClearlyDefinedClient
     {
-        private const string ClearlyDefinedApiBase = "https://api.clearlydefined.io/definitions";
+        public static readonly Uri ClearlyDefinedApiBaseAddress = new ("https://api.clearlydefined.io");
         private readonly HttpClient _httpClient;
         private readonly ILogger<ClearlyDefinedClient> _logger;
         private readonly ResiliencePipeline _resiliencePipeline;
         private readonly RequestLimiter _requestLimiter;
         private const int MaxRetryAttempts = 3;
 
-        public ClearlyDefinedClient(HttpClient? httpClient = null, ILogger<ClearlyDefinedClient>? logger = null)
+        public ClearlyDefinedClient(ILogger<ClearlyDefinedClient> logger, IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
-            _logger = logger ?? NullLogger<ClearlyDefinedClient>.Instance;
+            httpClientFactory.CreateClient(nameof(ClearlyDefinedClient));
+            _httpClient = httpClientFactory.CreateClient(nameof(ClearlyDefinedClient));
+            _logger = logger;
             _resiliencePipeline = this.CreateResiliencePipeline();
             _requestLimiter =
                 new RequestLimiter(maxConcurrentRequests: 10, requestsPerSecond: 33,
@@ -128,19 +128,19 @@ namespace CdxEnrich.ClearlyDefined
         public async Task<ClearlyDefinedResponse.LicensedData?> GetClearlyDefinedLicensedDataAsync(
             PackageURL packageUrl, Provider provider)
         {
-            var apiUrl = CreateClearlyDefinedApiUrl(packageUrl, provider);
+            var requestPath = this.CreateRequestPath(packageUrl, provider);
 
             return await _requestLimiter.ExecuteWithLimitsAsync(
-                apiUrl, async () =>
+                requestPath, async () =>
                 {
                     var response = await _resiliencePipeline.ExecuteAsync<HttpResponseMessage>(
-                        async cancellationToken => await _httpClient.GetAsync(apiUrl, cancellationToken),
+                        async cancellationToken => await _httpClient.GetAsync(requestPath, cancellationToken),
                         CancellationToken.None);
 
                     if (!response.IsSuccessStatusCode)
                     {
                         _logger.LogError("API call unsuccessful after retry {RetryAttempts} attempts: {StatusCode} for {ApiUrl}",
-                            MaxRetryAttempts, response.StatusCode, apiUrl);
+                            MaxRetryAttempts, response.StatusCode, requestPath);
                         return null;
                     }
 
@@ -153,21 +153,21 @@ namespace CdxEnrich.ClearlyDefined
         }
 
         /// <summary>
-        /// Creates the API URL for ClearlyDefined
+        /// Creates the request path for the ClearlyDefined API based on the PackageURL and provider.
         /// </summary>
-        private string CreateClearlyDefinedApiUrl(PackageURL packageUrl, Provider provider)
+        private string CreateRequestPath(PackageURL packageUrl, Provider provider)
         {
             // Case 1: Namespace is present
             if (packageUrl.Namespace != null)
             {
                 return
-                    $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+                    $"definitions/{packageUrl.Type}/{provider.Value}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
             }
             // Case 2: No namespace present, use "-" as placeholder
             else
             {
                 return
-                    $"{ClearlyDefinedApiBase}/{packageUrl.Type}/{provider.Value}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
+                    $"definitions/{packageUrl.Type}/{provider.Value}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
             }
         }
     }

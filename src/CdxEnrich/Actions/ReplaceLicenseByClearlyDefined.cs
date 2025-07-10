@@ -1,23 +1,19 @@
 ﻿using CdxEnrich.ClearlyDefined;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
-using CdxEnrich.Logging;
 using CycloneDX.Models;
 using Microsoft.Extensions.Logging;
 using PackageUrl;
 
 namespace CdxEnrich.Actions
 {
-    public static class ReplaceLicenseByClearlyDefined
+    public class ReplaceLicenseByClearlyDefined(
+        ILogger<ReplaceLicenseByClearlyDefined> logger, 
+        IClearlyDefinedClient clearlyDefinedClient,
+        ILicenseResolver licenseResolver
+        ) : ReplaceAction
     {
-        private static readonly ILogger Logger = new ConsoleLogger(nameof(ReplaceLicenseByClearlyDefined));
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
-
-        private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
-            logger: new ConsoleLogger<ClearlyDefinedClient>());
-
-        private static readonly LicenseResolver LicenseResolver =
-            new (new ConsoleLogger<LicenseResolver>());
 
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
         {
@@ -69,13 +65,13 @@ namespace CdxEnrich.Actions
         }
 
 
-        public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
+        public override Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
             return RefMustNotBeNullOrEmpty(config)
                 .Bind(RefMustBeUnique);
         }
         
-        public static Result<InputTuple> CheckBomAndConfigCombination(InputTuple inputs)
+        public override Result<InputTuple> CheckBomAndConfigCombination(InputTuple inputs)
         {
             var configEntries = inputs.Config.ReplaceLicenseByClearlyDefined?
                 .Where(item => item.Ref != null)
@@ -121,7 +117,7 @@ namespace CdxEnrich.Actions
             return new Ok<InputTuple>(inputs);
         }
 
-        public static InputTuple Execute(InputTuple inputs)
+        public override InputTuple Execute(InputTuple inputs)
         {
             var tasks = new List<Task>();
 
@@ -149,27 +145,27 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error processing components {Message}", ex.Message);
+                logger.LogError(ex, "Error processing components {Message}", ex.Message);
             }
 
             return inputs;
         }
 
-        private static async Task ProcessComponentAsync(Component component, PackageURL packageUrl, Provider provider)
+        private async Task ProcessComponentAsync(Component component, PackageURL packageUrl, Provider provider)
         {
             try
             {
                 // Fetching license data from ClearlyDefined
-                var licensedData = await ClearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
+                var licensedData = await clearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
             
                 if (licensedData == null || licensedData.Declared == null || licensedData.Facets == null)
                 {
-                    Logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
+                    logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
                     return;
                 }
             
                 // Using the resolver to determine the LicenseChoice
-                var licenseChoice = LicenseResolver.Resolve(packageUrl, licensedData);
+                var licenseChoice = licenseResolver.Resolve(packageUrl, licensedData);
 
                 if (licenseChoice == null)
                 {
@@ -180,7 +176,7 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error processing component {PackageUrl}: {Message}", packageUrl, ex.Message);
+                logger.LogError(ex, "Error processing component {PackageUrl}: {Message}", packageUrl, ex.Message);
             }
         }
 

@@ -6,20 +6,15 @@ using PackageUrl;
 
 namespace CdxEnrich.ClearlyDefined
 {
-    public class LicenseResolver
+    public interface ILicenseResolver
     {
-        private readonly ILogger<LicenseResolver> _logger;
-        private readonly List<IResolveLicenseRule> _rules = new();
-
-        public LicenseResolver(ILogger<LicenseResolver>? logger = null)
-        {
-            _logger = logger ?? NullLogger<LicenseResolver>.Instance;
-            
-            _rules.Add(new LicenseIdResolveRule(_logger));
-            _rules.Add(new SpdxExpressionResolveRule(_logger));
-            var licensePlaceholderResolveRules = LicensePlaceholder.All.Select(x => new PlaceholderLicenseResolveRule(_logger, x));
-            _rules.AddRange(licensePlaceholderResolveRules);
-        }
+        LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
+    }
+    
+    public class LicenseResolver(ILogger<LicenseResolver> logger, ResolveLicenseRuleFactory ruleFactory)
+        : ILicenseResolver
+    {
+        private readonly IEnumerable<IResolveLicenseRule> _rules = ruleFactory.Create();
 
         public LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
         {
@@ -27,12 +22,12 @@ namespace CdxEnrich.ClearlyDefined
             
             if(selectedRules.Count == 0)
             {
-                _logger.LogInformation("No applicable license rules found for package: {PackageUrl}", packageUrl);
+                logger.LogInformation("No applicable license rules found for package: {PackageUrl}", packageUrl);
                 return null;
             }
             if (selectedRules.Count > 1)
             {
-                _logger.LogError(
+                logger.LogError(
                     "Multiple license rules found ({RuleNames}) for package: {PackageUrl}. Applying no rule to prevent unexpected or incorrect results.",
                     string.Join(", ", selectedRules.Select(r => r.GetType().Name)),
                     packageUrl);
