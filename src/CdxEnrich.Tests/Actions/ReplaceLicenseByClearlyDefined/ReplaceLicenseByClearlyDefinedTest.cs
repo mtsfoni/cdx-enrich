@@ -15,8 +15,8 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
             public IReplaceAction CreateReplaceAction()
             {
                 var serviceCollection = new ServiceCollection();
-                Program.AddLogging(serviceCollection);
-                Program.AddReplaceLicenseByClearlyDefined(serviceCollection);
+                serviceCollection.AddLogging();
+                serviceCollection.AddReplaceLicenseByClearlyDefined();
                 var sp = serviceCollection.BuildServiceProvider();
                 return sp.GetRequiredService<IReplaceAction>();
             }
