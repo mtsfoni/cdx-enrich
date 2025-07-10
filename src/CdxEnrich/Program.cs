@@ -82,21 +82,35 @@ namespace CdxEnrich
 
         internal static void ConfigureServices(ServiceCollection serviceCollection)
         {
+            AddLogging(serviceCollection);
             serviceCollection.AddTransient<IRunner, Runner>();
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByBomRef>();
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicensesByUrl>();
-            
-            serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByClearlyDefined>();
-            serviceCollection.AddTransient<IClearlyDefinedClient, ClearlyDefinedClient>();
-            
-            serviceCollection.AddTransient<ILicenseResolver, LicenseResolver>();
-            serviceCollection.AddTransient<ResolveLicenseRuleFactory>();
-            
+            AddReplaceLicenseByClearlyDefined(serviceCollection);
+        }
+
+        internal static void AddLogging(ServiceCollection serviceCollection)
+        {
             serviceCollection.AddLogging(x => 
             {
                 x.AddConsole();
                 x.SetMinimumLevel(LogLevel.Information);
             });
+        }
+
+        internal static void AddReplaceLicenseByClearlyDefined(ServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByClearlyDefined>();
+            serviceCollection.AddTransient<IClearlyDefinedClient, ClearlyDefinedClient>();
+            serviceCollection.AddHttpClient(nameof(ClearlyDefinedClient),
+                client =>
+                {
+                    client.Timeout = TimeSpan.FromSeconds(60);
+                    client.BaseAddress = ClearlyDefinedClient.ClearlyDefinedApiBaseAddress;
+                }
+            );
+            serviceCollection.AddTransient<ILicenseResolver, LicenseResolver>();
+            serviceCollection.AddTransient<ResolveLicenseRuleFactory>();
         }
     }
 }

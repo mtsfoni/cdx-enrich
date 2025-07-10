@@ -23,13 +23,10 @@ namespace CdxEnrich.ClearlyDefined
         private readonly RequestLimiter _requestLimiter;
         private const int MaxRetryAttempts = 3;
 
-        public ClearlyDefinedClient(ILogger<ClearlyDefinedClient> logger, HttpClient? httpClient = null)
+        public ClearlyDefinedClient(ILogger<ClearlyDefinedClient> logger, IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient ?? new HttpClient
-            {
-                Timeout = TimeSpan.FromSeconds(60), 
-                BaseAddress = ClearlyDefinedApiBaseAddress
-            };
+            httpClientFactory.CreateClient(nameof(ClearlyDefinedClient));
+            _httpClient = httpClientFactory.CreateClient(nameof(ClearlyDefinedClient));
             _logger = logger;
             _resiliencePipeline = this.CreateResiliencePipeline();
             _requestLimiter =

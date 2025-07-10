@@ -122,9 +122,10 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 this.HttpClient = new HttpClient(this.HttpHandler)
                 {
                     BaseAddress = ClearlyDefinedClient.ClearlyDefinedApiBaseAddress
-                        
                 };
-                this.Client = new ClearlyDefinedClient(this.Logger, this.HttpClient);
+                var httpClientFactoryMock = Substitute.For<IHttpClientFactory>();
+                httpClientFactoryMock.CreateClient(Arg.Any<string>()).Returns(this.HttpClient);
+                this.Client = new ClearlyDefinedClient(this.Logger, httpClientFactoryMock);
             }
 
             public ILogger<ClearlyDefinedClient> Logger { get; }

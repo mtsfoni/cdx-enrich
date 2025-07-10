@@ -1,11 +1,8 @@
 ﻿using CdxEnrich.Actions;
-using CdxEnrich.ClearlyDefined;
-using CdxEnrich.ClearlyDefined.Rules;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
-using CdxEnrich.Logging;
 using CdxEnrich.Serialization;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
 {
@@ -17,19 +14,11 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         {
             public IReplaceAction CreateReplaceAction()
             {
-                return new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined(
-                    new ConsoleLogger<CdxEnrich.Actions.ReplaceLicenseByClearlyDefined>(),
-                    new ClearlyDefinedClient(logger: new ConsoleLogger<ClearlyDefinedClient>(), 
-                        httpClient: new HttpClient
-                        {
-                            Timeout = TimeSpan.FromSeconds(60),
-                            BaseAddress = ClearlyDefinedClient.ClearlyDefinedApiBaseAddress
-                        }),
-                    new LicenseResolver(
-                        new ConsoleLogger<LicenseResolver>(), 
-                        new ResolveLicenseRuleFactory(new LoggerFactory())
-                        )
-                    );
+                var serviceCollection = new ServiceCollection();
+                Program.AddLogging(serviceCollection);
+                Program.AddReplaceLicenseByClearlyDefined(serviceCollection);
+                var sp = serviceCollection.BuildServiceProvider();
+                return sp.GetRequiredService<IReplaceAction>();
             }
         }
 
