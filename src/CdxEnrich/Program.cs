@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using CdxEnrich.Actions;
+using CdxEnrich.ClearlyDefined;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -84,6 +85,7 @@ namespace CdxEnrich
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByBomRef>();
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicensesByUrl>();
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByClearlyDefined>();
+            serviceCollection.AddTransient<IClearlyDefinedClient, ClearlyDefinedClient>();
             
             serviceCollection.AddLogging(x => 
             {

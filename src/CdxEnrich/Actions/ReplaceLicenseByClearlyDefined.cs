@@ -8,13 +8,13 @@ using PackageUrl;
 
 namespace CdxEnrich.Actions
 {
-    public class ReplaceLicenseByClearlyDefined(ILogger<ReplaceLicenseByClearlyDefined> logger) : ReplaceAction
+    public class ReplaceLicenseByClearlyDefined(
+        ILogger<ReplaceLicenseByClearlyDefined> logger, 
+        IClearlyDefinedClient clearlyDefinedClient
+        ) : ReplaceAction
     {
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
-
-        private static readonly IClearlyDefinedClient ClearlyDefinedClient = new ClearlyDefinedClient(
-            logger: new ConsoleLogger<ClearlyDefinedClient>());
-
+        
         private static readonly LicenseResolver LicenseResolver =
             new (new ConsoleLogger<LicenseResolver>());
 
@@ -159,7 +159,7 @@ namespace CdxEnrich.Actions
             try
             {
                 // Fetching license data from ClearlyDefined
-                var licensedData = await ClearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
+                var licensedData = await clearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
             
                 if (licensedData == null || licensedData.Declared == null || licensedData.Facets == null)
                 {

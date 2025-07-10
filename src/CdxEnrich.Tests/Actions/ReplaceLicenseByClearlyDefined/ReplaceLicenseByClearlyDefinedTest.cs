@@ -1,4 +1,5 @@
 ﻿using CdxEnrich.Actions;
+using CdxEnrich.ClearlyDefined;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.Logging;
@@ -14,7 +15,10 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         {
             public IReplaceAction CreateReplaceAction()
             {
-                return new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined(new ConsoleLogger<CdxEnrich.Actions.ReplaceLicenseByClearlyDefined>());
+                return new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined(
+                    new ConsoleLogger<CdxEnrich.Actions.ReplaceLicenseByClearlyDefined>(),
+                    new ClearlyDefinedClient(logger: new ConsoleLogger<ClearlyDefinedClient>())
+                    );
             }
         }
 
