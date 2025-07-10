@@ -1,7 +1,6 @@
 ﻿using CdxEnrich.ClearlyDefined;
 using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
-using CdxEnrich.Logging;
 using CycloneDX.Models;
 using Microsoft.Extensions.Logging;
 using PackageUrl;
@@ -10,13 +9,11 @@ namespace CdxEnrich.Actions
 {
     public class ReplaceLicenseByClearlyDefined(
         ILogger<ReplaceLicenseByClearlyDefined> logger, 
-        IClearlyDefinedClient clearlyDefinedClient
+        IClearlyDefinedClient clearlyDefinedClient,
+        ILicenseResolver licenseResolver
         ) : ReplaceAction
     {
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
-        
-        private static readonly LicenseResolver LicenseResolver =
-            new (new ConsoleLogger<LicenseResolver>());
 
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
         {
@@ -168,7 +165,7 @@ namespace CdxEnrich.Actions
                 }
             
                 // Using the resolver to determine the LicenseChoice
-                var licenseChoice = LicenseResolver.Resolve(packageUrl, licensedData);
+                var licenseChoice = licenseResolver.Resolve(packageUrl, licensedData);
 
                 if (licenseChoice == null)
                 {

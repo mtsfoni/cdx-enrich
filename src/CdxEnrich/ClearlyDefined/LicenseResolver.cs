@@ -6,7 +6,12 @@ using PackageUrl;
 
 namespace CdxEnrich.ClearlyDefined
 {
-    public class LicenseResolver
+    public interface ILicenseResolver
+    {
+        LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
+    }
+    
+    public class LicenseResolver : ILicenseResolver
     {
         private readonly ILogger<LicenseResolver> _logger;
         private readonly List<IResolveLicenseRule> _rules = new();

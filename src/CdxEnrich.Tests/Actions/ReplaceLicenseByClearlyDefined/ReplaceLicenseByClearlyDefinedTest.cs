@@ -17,7 +17,8 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
             {
                 return new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined(
                     new ConsoleLogger<CdxEnrich.Actions.ReplaceLicenseByClearlyDefined>(),
-                    new ClearlyDefinedClient(logger: new ConsoleLogger<ClearlyDefinedClient>())
+                    new ClearlyDefinedClient(new HttpClient { Timeout = TimeSpan.FromSeconds(60) }, logger: new ConsoleLogger<ClearlyDefinedClient>()),
+                    new LicenseResolver(new ConsoleLogger<LicenseResolver>())
                     );
             }
         }

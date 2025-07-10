@@ -84,8 +84,10 @@ namespace CdxEnrich
             serviceCollection.AddTransient<IRunner, Runner>();
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByBomRef>();
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicensesByUrl>();
+            
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByClearlyDefined>();
             serviceCollection.AddTransient<IClearlyDefinedClient, ClearlyDefinedClient>();
+            serviceCollection.AddTransient<ILicenseResolver, LicenseResolver>();
             
             serviceCollection.AddLogging(x => 
             {
