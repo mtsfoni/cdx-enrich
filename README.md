@@ -66,7 +66,7 @@ Each configuration file can contain different sets of transformations, and they 
 
 ## Configuration File
 
-The configuration file defines the transformations to be applied to the SBOM. Currently, two actions are supported: `ReplaceLicensesByURL` and `ReplaceLicenseByBomRef`.
+The configuration file defines the transformations to be applied to the SBOM. Currently, three actions are supported: `ReplaceLicensesByURL`, `ReplaceLicenseByBomRef` and `ReplaceLicenseByClearlyDefined`.
 
 ### Example Configuration
 
@@ -82,7 +82,7 @@ ReplaceLicenseByBomRef:
   Id: "MIT"
 
 ReplaceLicenseByClearlyDefined:
-  - Ref: "pkg:nuget/System.Collections@4.0.11"
+  - Ref: "pkg:nuget/System.Buffers@4.4.0"
 ```
 
 ### Actions
