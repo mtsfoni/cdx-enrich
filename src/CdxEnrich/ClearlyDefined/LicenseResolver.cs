@@ -16,9 +16,9 @@ namespace CdxEnrich.ClearlyDefined
         private readonly ILogger<LicenseResolver> _logger;
         private readonly List<IResolveLicenseRule> _rules = new();
 
-        public LicenseResolver(ILogger<LicenseResolver>? logger = null)
+        public LicenseResolver(ILogger<LicenseResolver> logger)
         {
-            _logger = logger ?? NullLogger<LicenseResolver>.Instance;
+            _logger = logger;
             
             _rules.Add(new LicenseIdResolveRule(_logger));
             _rules.Add(new SpdxExpressionResolveRule(_logger));
