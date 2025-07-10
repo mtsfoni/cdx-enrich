@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using CdxEnrich.Actions;
 using CdxEnrich.ClearlyDefined;
+using CdxEnrich.ClearlyDefined.Rules;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -87,7 +88,9 @@ namespace CdxEnrich
             
             serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByClearlyDefined>();
             serviceCollection.AddTransient<IClearlyDefinedClient, ClearlyDefinedClient>();
+            
             serviceCollection.AddTransient<ILicenseResolver, LicenseResolver>();
+            serviceCollection.AddTransient<ResolveLicenseRuleFactory>();
             
             serviceCollection.AddLogging(x => 
             {
