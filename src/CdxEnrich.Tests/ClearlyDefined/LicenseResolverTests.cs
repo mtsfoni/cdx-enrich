@@ -205,8 +205,8 @@ namespace CdxEnrich.Tests.ClearlyDefined
             {
                 var loggerFactory = new LoggerFactory();
                 this.Resolver = new LicenseResolver(loggerFactory.CreateLogger<LicenseResolver>(), new ResolveLicenseRuleFactory(loggerFactory));
-                
             }
+            
             public LicenseResolver Resolver { get; }
             public PackageURL PackageUrl { get; } = new("nuget", null, "Test.Package", "1.0.0", null, null);
 

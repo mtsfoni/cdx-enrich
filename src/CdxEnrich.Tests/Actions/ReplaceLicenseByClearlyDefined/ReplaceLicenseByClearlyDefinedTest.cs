@@ -74,15 +74,10 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
                 public ClearlyDefinedClientFake()
                 {
                     var comparer = new ClearlyDefinedRequestComparer();
-                    this._requestRegistry =
-                        new Dictionary<(PackageURL packageUrl, Provider provider), ClearlyDefinedResponse.LicensedData>(
-                            comparer);
+                    this._requestRegistry = new Dictionary<(PackageURL packageUrl, Provider provider), ClearlyDefinedResponse.LicensedData>(comparer);
                 }
 
-                private readonly
-                    IDictionary<(PackageURL packageUrl, Provider provider), ClearlyDefinedResponse.LicensedData>
-                    _requestRegistry;
-
+                private readonly IDictionary<(PackageURL packageUrl, Provider provider), ClearlyDefinedResponse.LicensedData> _requestRegistry;
 
                 public void SetupRequest((PackageURL packageUrl, Provider provider) request,
                     ClearlyDefinedResponse.LicensedData licensedData)
@@ -102,8 +97,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
                     return Task.FromResult<ClearlyDefinedResponse.LicensedData?>(null);
                 }
 
-                private class
-                    ClearlyDefinedRequestComparer : IEqualityComparer<(PackageURL packageUrl, Provider provider)>
+                private class ClearlyDefinedRequestComparer : IEqualityComparer<(PackageURL packageUrl, Provider provider)>
                 {
                     public bool Equals((PackageURL packageUrl, Provider provider) x,
                         (PackageURL packageUrl, Provider provider) y)
@@ -121,10 +115,8 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
 
         private static string[] GetConfigs(string startingWith)
         {
-            string testFilesPath = Path.Combine(Environment.CurrentDirectory, "../../..",
-                "Actions/ReplaceLicenseByClearlyDefined/testcases/configs");
-            var files = Directory.GetFiles(testFilesPath)
-                .Where(s => Path.GetFileNameWithoutExtension(s).StartsWith(startingWith)).ToArray();
+            string testFilesPath = Path.Combine(Environment.CurrentDirectory, "../../..", "Actions/ReplaceLicenseByClearlyDefined/testcases/configs");
+            var files = Directory.GetFiles(testFilesPath).Where(s => Path.GetFileNameWithoutExtension(s).StartsWith(startingWith)).ToArray();
             if (files.Length == 0)
             {
                 throw new Exception("No Testfiles found!");
@@ -136,9 +128,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         private static CycloneDXFormat GetCycloneDxFormat(string bomPath)
         {
             var extension = Path.GetExtension(bomPath);
-            CycloneDXFormat inputFormat = extension.Equals(".json", StringComparison.CurrentCultureIgnoreCase)
-                ? CycloneDXFormat.JSON
-                : CycloneDXFormat.XML;
+            CycloneDXFormat inputFormat = extension.Equals(".json", StringComparison.CurrentCultureIgnoreCase) ? CycloneDXFormat.JSON : CycloneDXFormat.XML;
             return inputFormat;
         }
 
@@ -148,8 +138,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
 
             foreach (string filePath in GetConfigs(startingWith))
             {
-                string testFilesPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../../..",
-                    "Actions/ReplaceLicenseByClearlyDefined/testcases/boms"));
+                string testFilesPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../../..", "Actions/ReplaceLicenseByClearlyDefined/testcases/boms"));
 
                 foreach (string bomPath in Directory.GetFiles(testFilesPath))
                 {
@@ -213,10 +202,10 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
 
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
-                        ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                            .Bind(replaceAction.CheckConfig))
+                    ConfigLoader.ParseConfig(File.ReadAllText(configPath))
+                    .Bind(replaceAction.CheckConfig))
                     .Bind(replaceAction.CheckBomAndConfigCombination)
-                    .Map(replaceAction.Execute);
+                .Map(replaceAction.Execute);
 
             Assert.That(executionResult is Success);
 

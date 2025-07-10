@@ -32,10 +32,10 @@ namespace CdxEnrich
             );
 
             var configFileOption = new Option<IEnumerable<string>>(
-                    aliases: ["-c", "--config-files"],
-                    description: "Path to one or more configuration files."
-                )
-                { AllowMultipleArgumentsPerToken = true };
+                aliases: ["-c", "--config-files"],
+                description: "Path to one or more configuration files."
+            )
+            { AllowMultipleArgumentsPerToken = true };
 
 
             var outputFileFormatOption = new Option<CycloneDXFormatOption>(
@@ -62,12 +62,11 @@ namespace CdxEnrich
             rootCommand.AddOption(outputFileOption);
             rootCommand.AddOption(outputFileFormatOption);
             rootCommand.AddOption(configFileOption);
-            rootCommand.Description =
-                "A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.";
+            rootCommand.Description = "A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.";
             rootCommand.SetHandler((context) =>
                 context.ExitCode =
                     runner.Enrich
-                    (context.ParseResult.GetValueForArgument(inputFileArg) ?? "",
+                        (context.ParseResult.GetValueForArgument(inputFileArg) ?? "",
                         context.ParseResult.GetValueForOption(inputFileFormatOption),
                         context.ParseResult.GetValueForOption(outputFileOption) ?? "",
                         context.ParseResult.GetValueForOption(configFileOption) ?? new List<string>(),
