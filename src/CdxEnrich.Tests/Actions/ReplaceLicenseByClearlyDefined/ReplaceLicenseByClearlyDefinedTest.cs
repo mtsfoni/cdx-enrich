@@ -19,7 +19,12 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
             {
                 return new CdxEnrich.Actions.ReplaceLicenseByClearlyDefined(
                     new ConsoleLogger<CdxEnrich.Actions.ReplaceLicenseByClearlyDefined>(),
-                    new ClearlyDefinedClient(new HttpClient { Timeout = TimeSpan.FromSeconds(60) }, logger: new ConsoleLogger<ClearlyDefinedClient>()),
+                    new ClearlyDefinedClient(logger: new ConsoleLogger<ClearlyDefinedClient>(), 
+                        httpClient: new HttpClient
+                        {
+                            Timeout = TimeSpan.FromSeconds(60),
+                            BaseAddress = ClearlyDefinedClient.ClearlyDefinedApiBaseAddress
+                        }),
                     new LicenseResolver(
                         new ConsoleLogger<LicenseResolver>(), 
                         new ResolveLicenseRuleFactory(new LoggerFactory())
