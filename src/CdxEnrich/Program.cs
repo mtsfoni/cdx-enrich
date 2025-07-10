@@ -1,10 +1,6 @@
 ﻿using System.CommandLine;
 using CdxEnrich.Actions;
-using CdxEnrich.ClearlyDefined;
-using CdxEnrich.ClearlyDefined.Rules;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace CdxEnrich
 {
