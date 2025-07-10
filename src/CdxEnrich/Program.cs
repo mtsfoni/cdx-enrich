@@ -2,6 +2,7 @@
 using CdxEnrich.Actions;
 using CdxEnrich.ClearlyDefined;
 using CdxEnrich.ClearlyDefined.Rules;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -35,10 +36,10 @@ namespace CdxEnrich
             );
 
             var configFileOption = new Option<IEnumerable<string>>(
-                aliases: ["-c", "--config-files"],
-                description: "Path to one or more configuration files."
-            )
-            { AllowMultipleArgumentsPerToken = true };
+                    aliases: ["-c", "--config-files"],
+                    description: "Path to one or more configuration files."
+                )
+                { AllowMultipleArgumentsPerToken = true };
 
 
             var outputFileFormatOption = new Option<CycloneDXFormatOption>(
@@ -65,11 +66,12 @@ namespace CdxEnrich
             rootCommand.AddOption(outputFileOption);
             rootCommand.AddOption(outputFileFormatOption);
             rootCommand.AddOption(configFileOption);
-            rootCommand.Description = "A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.";
+            rootCommand.Description =
+                "A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.";
             rootCommand.SetHandler((context) =>
                 context.ExitCode =
                     runner.Enrich
-                        (context.ParseResult.GetValueForArgument(inputFileArg) ?? "",
+                    (context.ParseResult.GetValueForArgument(inputFileArg) ?? "",
                         context.ParseResult.GetValueForOption(inputFileFormatOption),
                         context.ParseResult.GetValueForOption(outputFileOption) ?? "",
                         context.ParseResult.GetValueForOption(configFileOption) ?? new List<string>(),
@@ -91,10 +93,16 @@ namespace CdxEnrich
 
         internal static void AddLogging(ServiceCollection serviceCollection)
         {
-            serviceCollection.AddLogging(x => 
+            serviceCollection.AddLogging(x =>
             {
-                x.AddConsole();
+                x.AddSimpleConsole(options =>
+                {
+                    options.IncludeScopes = true;
+                    options.SingleLine = true;
+                    options.TimestampFormat = "HH:mm:ss ";
+                });
                 x.SetMinimumLevel(LogLevel.Information);
+                x.AddFilter("System.Net.Http.HttpClient", LogLevel.None);
             });
         }
 
