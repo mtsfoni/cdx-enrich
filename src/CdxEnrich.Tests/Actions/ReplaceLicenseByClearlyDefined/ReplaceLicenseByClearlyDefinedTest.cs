@@ -31,39 +31,84 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
             private static void SetupClearlyDefinedClientFake(ServiceCollection serviceCollection)
             {
                 var fake = new ClearlyDefinedClientFake();
+                fake.SetupRequest((new PackageURL("pkg:nuget/System.Collections@4.0.11"), PackageType.Npm.DefaultProvider),
+                    CreateResponse("LicenseRef-scancode-ms-net-library AND OTHER",             
+                        "LicenseRef-scancode-ms-net-library",
+                        "LicenseRef-scancode-ms-net-library-2018-11",
+                        "LicenseRef-scancode-unknown-license-reference AND MIT")
+                );
                 fake.SetupRequest((new PackageURL("pkg:npm/lodash@4.17.21"), PackageType.Npm.DefaultProvider),
-                    SetupWithDeclaredResponse("CC0-1.0 AND MIT")
+                    CreateResponse("CC0-1.0 AND MIT")
                 );
                 fake.SetupRequest(
                     (new PackageURL("pkg:maven/org.apache.commons/commons-lang3@3.12.0"),
                         PackageType.Maven.DefaultProvider),
-                    SetupWithDeclaredResponse("Apache-2.0")
+                    CreateResponse("Apache-2.0")
                 );
                 fake.SetupRequest((new PackageURL("pkg:pypi/requests@2.28.1"), PackageType.Pypi.DefaultProvider),
-                    SetupWithDeclaredResponse("Apache-2.0")
+                    CreateResponse("Apache-2.0",
+                        "Apache-2.0",
+                        "Apache-2.0 AND MIT",
+                        "Apache-2.0 AND NOASSERTION",
+                        "NOASSERTION")
                 );
                 fake.SetupRequest((new PackageURL("pkg:gem/rails@7.0.4"), PackageType.Gem.DefaultProvider),
-                    SetupWithDeclaredResponse("MIT")
+                    CreateResponse("MIT",
+                "MIT AND Ruby")
+                );
+                fake.SetupRequest((new PackageURL("pkg:go/github.com/gorilla/mux@v1.8.0"), PackageType.Go.DefaultProvider),
+                    CreateResponse(null)
+                );
+                fake.SetupRequest((new PackageURL("pkg:deb/debian/curl@7.74.0-1.3+deb11u7"), PackageType.Deb.DefaultProvider),
+                    CreateResponse(null)
                 );
                 fake.SetupRequest((new PackageURL("pkg:pod/Alamofire@5.6.2"), PackageType.Pod.DefaultProvider),
-                    SetupWithDeclaredResponse("MIT")
+                    CreateResponse("MIT",
+                        "MIT",
+                        "MIT AND NOASSERTION",
+                        "NOASSERTION")
+                );
+                fake.SetupRequest((new PackageURL("pkg:composer/laravel/framework@10.0.0"), PackageType.Composer.DefaultProvider),
+                    CreateResponse(null)
                 );
                 fake.SetupRequest((new PackageURL("pkg:crate/serde@1.0.152"), PackageType.Crate.DefaultProvider),
-                    SetupWithDeclaredResponse("MIT OR Apache-2.0")
+                    CreateResponse("MIT OR Apache-2.0",
+                        "((Apache-2.0 WITH LLVM-exception AND LicenseRef-scancode-generic-cla) AND Apache-2.0 AND MIT) AND LicenseRef-scancode-unknown-license-reference",
+                        "(Apache-2.0 OR MIT) AND (MIT OR Apache-2.0)",
+                        "Apache-2.0",
+                        "MIT")
+                );
+                fake.SetupRequest((new PackageURL("pkg:conda/pandas@1.5.3"), PackageType.Conda.DefaultProvider),
+                    CreateResponse(null)
+                );
+                fake.SetupRequest((new PackageURL("pkg:condasrc/numpy@1.24.3"), PackageType.Condasrc.DefaultProvider),
+                    CreateResponse(null)
+                );
+                fake.SetupRequest((new PackageURL("pkg:debsrc/debian/wget@1.21.3-1"), PackageType.Debsrc.DefaultProvider),
+                    CreateResponse(null)
+                );
+                fake.SetupRequest((new PackageURL("pkg:git/github.com/expressjs/express@4.18.2"), PackageType.Git.DefaultProvider),
+                    CreateResponse(null)
+                );
+                fake.SetupRequest((new PackageURL("pkg:sourcearchive/apache/commons-text@1.10.0"), PackageType.SourceArchive.DefaultProvider),
+                    CreateResponse(null)
                 );
                 serviceCollection.AddTransient<IClearlyDefinedClient>(_ => fake);
             }
 
-            private static ClearlyDefinedResponse.LicensedData SetupWithDeclaredResponse(string expression)
+            private static ClearlyDefinedResponse.LicensedData CreateResponse(string? declared, params string[] expressions)
             {
                 return new ClearlyDefinedResponse.LicensedData
                 {
-                    Declared = expression,
+                    Declared = declared,
                     Facets = new ClearlyDefinedResponse.Facets
                     {
                         Core = new ClearlyDefinedResponse.Core
                         {
-                            Discovered = new ClearlyDefinedResponse.Discovered()
+                            Discovered = new ClearlyDefinedResponse.Discovered
+                            {
+                                Expressions = expressions.ToList()
+                            }
                         }
                     }
                 };
