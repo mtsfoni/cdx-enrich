@@ -25,7 +25,6 @@ namespace CdxEnrich.ClearlyDefined
 
         public ClearlyDefinedClient(ILogger<ClearlyDefinedClient> logger, IHttpClientFactory httpClientFactory)
         {
-            httpClientFactory.CreateClient(nameof(ClearlyDefinedClient));
             _httpClient = httpClientFactory.CreateClient(nameof(ClearlyDefinedClient));
             _logger = logger;
             _resiliencePipeline = this.CreateResiliencePipeline();
