@@ -82,7 +82,7 @@ ReplaceLicenseByBomRef:
   Id: "MIT"
 
 ReplaceLicenseByClearlyDefined:
-  - Ref: "pkg:nuget/System.Buffers@4.4.0"
+- Ref: "pkg:nuget/System.Buffers@4.4.0"
 ```
 
 ### Actions
