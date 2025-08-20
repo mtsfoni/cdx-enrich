@@ -41,6 +41,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 foreach (var licensePlaceholderFromExpression in LicensePlaceholder.All)
                 {
                     yield return [licensePlaceholder, new[] { licensePlaceholderFromExpression.LicenseIdentifier }]; //One expression that is a license placeholder
+                    yield return [licensePlaceholder, new[] { $"MIT OR {licensePlaceholderFromExpression.LicenseIdentifier}" }]; //One expression contains a license placeholder
                 }
             }
         }

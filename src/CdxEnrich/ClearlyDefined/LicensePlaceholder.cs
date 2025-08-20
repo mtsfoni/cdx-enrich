@@ -39,18 +39,21 @@
         {
             return declared.Contains(LicenseIdentifier);
         }
-        
+
         /// <summary>
-        /// Tries to get a LicensePlaceholder by its license identifier.
+        /// Extracts a list of license placeholders that are contained within the specified license expression.
         /// </summary>
-        /// <param name="licenseIdentifier"></param>
-        /// <param name="licensePlaceholder"></param>
-        /// <returns></returns>
-        public static bool TryGetByLicenseIdentifier(string licenseIdentifier, out LicensePlaceholder? licensePlaceholder)
+        /// <param name="licenseExpression">The license expression to evaluate.</param>
+        /// <returns>A list of license placeholders found within the provided license expression.</returns>
+        public static IList<LicensePlaceholder> ExtractContaining(string? licenseExpression)
         {
-            licensePlaceholder = All.FirstOrDefault(x =>
-                x.LicenseIdentifier.Equals(licenseIdentifier, StringComparison.OrdinalIgnoreCase));
-            return licensePlaceholder != null;
+            if (licenseExpression == null)
+            {
+                return [];
+            }
+            
+            return All.Where(x => licenseExpression.Contains(x.LicenseIdentifier, StringComparison.OrdinalIgnoreCase))
+                .ToList();
         }
 
         // For records, ToString() is automatically overridden and returns a formatted string with all properties

@@ -28,13 +28,12 @@ namespace CdxEnrich.ClearlyDefined.Rules
                 return null;
             }
 
-            if (joinedLicenseExpression != null &&
-                LicensePlaceholder.TryGetByLicenseIdentifier(joinedLicenseExpression,
-                    out var licensePlaceholderFromExpression))
+            var containingLicencePlaceholder = LicensePlaceholder.ExtractContaining(joinedLicenseExpression);
+            if (containingLicencePlaceholder.Any())
             {
                 this.Logger.LogInformation(
-                    "Resolved no licenses for package: {PackageUrl} due to placeholder '{LicensePlaceholder}' in declared license and expression with license placeholder '{LicensePlaceholderFromExpression}'",
-                    packageUrl, licensePlaceholder.LicenseIdentifier, licensePlaceholderFromExpression!.LicenseIdentifier);
+                    "Resolved no licenses for package: {PackageUrl} due to placeholder '{LicensePlaceholder}' in declared license and expression with license placeholders '{LicensePlaceholderFromExpression}'",
+                    packageUrl, licensePlaceholder.LicenseIdentifier, string.Join(",", containingLicencePlaceholder));
                 return null;
             }
 
