@@ -127,7 +127,7 @@ namespace CdxEnrich.ClearlyDefined
         public async Task<ClearlyDefinedResponse.LicensedData?> GetClearlyDefinedLicensedDataAsync(
             PackageURL packageUrl, Provider provider)
         {
-            var requestPath = this.CreateRequestPath(packageUrl, provider);
+            var requestPath = CreateRequestPath(packageUrl, provider);
 
             return await _requestLimiter.ExecuteWithLimitsAsync(
                 requestPath, async () =>
@@ -154,20 +154,9 @@ namespace CdxEnrich.ClearlyDefined
         /// <summary>
         /// Creates the request path for the ClearlyDefined API based on the PackageURL and provider.
         /// </summary>
-        private string CreateRequestPath(PackageURL packageUrl, Provider provider)
+        private static string CreateRequestPath(PackageURL packageUrl, Provider provider)
         {
-            // Case 1: Namespace is present
-            if (packageUrl.Namespace != null)
-            {
-                return
-                    $"definitions/{packageUrl.Type}/{provider.Value}/{packageUrl.Namespace}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
-            }
-            // Case 2: No namespace present, use "-" as placeholder
-            else
-            {
-                return
-                    $"definitions/{packageUrl.Type}/{provider.Value}/-/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
-            }
+            return $"definitions/{packageUrl.Type}/{provider.Value}/{packageUrl.Namespace ?? "-"}/{packageUrl.Name}/{packageUrl.Version}?expand=-files";
         }
     }
 }
