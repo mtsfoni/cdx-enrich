@@ -11,18 +11,15 @@ namespace CdxEnrich.Actions
     {
         private readonly ILogger<ReplaceLicenseByClearlyDefined> _logger;
         private readonly IClearlyDefinedClient _clearlyDefinedClient;
-        private readonly ILicenseResolver _licenseResolver;
         
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
 
         public ReplaceLicenseByClearlyDefined(
             ILogger<ReplaceLicenseByClearlyDefined> logger,
-            IClearlyDefinedClient clearlyDefinedClient,
-            ILicenseResolver licenseResolver)
+            IClearlyDefinedClient clearlyDefinedClient)
         {
             _logger = logger;
             _clearlyDefinedClient = clearlyDefinedClient;
-            _licenseResolver = licenseResolver;
         }
 
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
@@ -155,14 +152,14 @@ namespace CdxEnrich.Actions
             // Fetching license data from ClearlyDefined
             var licensedData = await _clearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
         
-            if (licensedData == null || licensedData.Declared == null || licensedData.Facets == null)
+            if (licensedData?.Declared == null || licensedData.Facets == null)
             {
                 _logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
                 return;
             }
         
-            // Using the resolver to determine the LicenseChoice
-            var licenseChoice = _licenseResolver.Resolve(packageUrl, licensedData);
+            // Using the static resolver to determine the LicenseChoice
+            var licenseChoice = LicenseResolver.Resolve(_logger, packageUrl, licensedData);
 
             if (licenseChoice == null)
             {

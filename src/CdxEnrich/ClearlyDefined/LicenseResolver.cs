@@ -1,41 +1,120 @@
-﻿using CdxEnrich.ClearlyDefined.Rules;
 using CycloneDX.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
 
 namespace CdxEnrich.ClearlyDefined
 {
-    public interface ILicenseResolver
+    public static class LicenseResolver
     {
-        LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed);
-    }
-    
-    public class LicenseResolver(ILogger<LicenseResolver> logger, ResolveLicenseRuleFactory ruleFactory)
-        : ILicenseResolver
-    {
-        private readonly IEnumerable<IResolveLicenseRule> _rules = ruleFactory.Create();
-
-        public LicenseChoice? Resolve(PackageURL packageUrl, ClearlyDefinedResponse.LicensedData dataLicensed)
+        public static LicenseChoice? Resolve(
+            ILogger logger,
+            PackageURL packageUrl,
+            ClearlyDefinedResponse.LicensedData licensedData)
         {
-            var selectedRules =_rules.Where(x => x.CanResolve(dataLicensed)).ToList();
+            var declared = licensedData.Declared;
             
-            if(selectedRules.Count == 0)
+            if (string.IsNullOrEmpty(declared))
             {
-                logger.LogInformation("No applicable license rules found for package: {PackageUrl}", packageUrl);
-                return null;
-            }
-            if (selectedRules.Count > 1)
-            {
-                logger.LogError(
-                    "Multiple license rules found ({RuleNames}) for package: {PackageUrl}. Applying no rule to prevent unexpected or incorrect results.",
-                    string.Join(", ", selectedRules.Select(r => r.GetType().Name)),
-                    packageUrl);
+                logger.LogInformation("No declared license for package: {PackageUrl}", packageUrl);
                 return null;
             }
 
-            var selectedRule = selectedRules.Single();
-            return selectedRule.Resolve(packageUrl, dataLicensed);
+            // Handle placeholders (NONE, NOASSERTION, OTHER) - try discovered expressions
+            if (IsLicensePlaceholder(declared))
+            {
+                return ResolvePlaceholder(logger, packageUrl, licensedData);
+            }
+
+            // Handle SPDX expressions (contains operators) or LicenseRef
+            if (IsExpression(declared) || IsLicenseRef(declared))
+            {
+                logger.LogInformation(
+                    "Resolved license expression: {DeclaredLicense} for package: {PackageUrl}",
+                    declared, packageUrl);
+                
+                return new LicenseChoice { Expression = declared };
+            }
+
+            // Handle simple license ID
+            logger.LogInformation(
+                "Resolved license ID ({DeclaredLicenseId}) for package: {PackageUrl}",
+                declared, packageUrl);
+            
+            return new LicenseChoice
+            {
+                License = new License { Id = declared }
+            };
+        }
+
+        private static LicenseChoice? ResolvePlaceholder(
+            ILogger logger,
+            PackageURL packageUrl,
+            ClearlyDefinedResponse.LicensedData licensedData)
+        {
+            var licenseExpressions = licensedData.Facets?.Core.Discovered.Expressions;
+
+            if (!TryGetJoinedLicenseExpression(licenseExpressions, out var joinedExpression))
+            {
+                logger.LogInformation(
+                    "Resolved no licenses for package: {PackageUrl} due to placeholder '{Placeholder}' in declared license with missing or invalid expressions",
+                    packageUrl, licensedData.Declared);
+                return null;
+            }
+
+            var containingPlaceholders = LicensePlaceholder.ExtractContaining(joinedExpression);
+            if (containingPlaceholders.Any())
+            {
+                logger.LogInformation(
+                    "Resolved no licenses for package: {PackageUrl} due to placeholder '{Placeholder}' in declared license and expression with license placeholders '{ExpressionPlaceholders}'",
+                    packageUrl, licensedData.Declared, string.Join(",", containingPlaceholders));
+                return null;
+            }
+
+            logger.LogInformation(
+                "Resolved license expressions ({LicenseExpressions}) for package: {PackageUrl}",
+                joinedExpression, packageUrl);
+
+            return new LicenseChoice { Expression = joinedExpression };
+        }
+
+        private static bool IsExpression(string declared)
+        {
+            return declared.Contains(" OR ") ||
+                   declared.Contains(" AND ") ||
+                   declared.Contains(" WITH ");
+        }
+
+        private static bool IsLicenseRef(string declared)
+        {
+            return declared.StartsWith("LicenseRef-");
+        }
+
+        private static bool IsLicensePlaceholder(string declared)
+        {
+            return LicensePlaceholder.All.Any(x => x.IsInDeclaredLicense(declared));
+        }
+
+        private static bool TryGetJoinedLicenseExpression(
+            List<string>? licenseExpressions,
+            out string? joinedLicenseExpression)
+        {
+            if (licenseExpressions == null || 
+                !licenseExpressions.Any() ||
+                ContainsUnknownScancodeLicenseReference(licenseExpressions))
+            {
+                joinedLicenseExpression = null;
+                return false;
+            }
+
+            joinedLicenseExpression = string.Join(" OR ", licenseExpressions);
+            return true;
+        }
+
+        private static bool ContainsUnknownScancodeLicenseReference(List<string> licenseExpressions)
+        {
+            return licenseExpressions.Exists(expression =>
+                expression.Contains("LicenseRef-scancode-unknown-license-reference",
+                    StringComparison.OrdinalIgnoreCase));
         }
     }
 }

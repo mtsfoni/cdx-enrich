@@ -1,6 +1,5 @@
 ﻿using CdxEnrich.Actions;
 using CdxEnrich.ClearlyDefined;
-using CdxEnrich.ClearlyDefined.Rules;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -34,8 +33,6 @@ namespace CdxEnrich
                     client.BaseAddress = ClearlyDefinedClient.ClearlyDefinedApiBaseAddress;
                 }
             );
-            serviceCollection.AddTransient<ILicenseResolver, LicenseResolver>();
-            serviceCollection.AddTransient<ResolveLicenseRuleFactory>();
         }
     }
 }
