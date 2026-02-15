@@ -81,107 +81,101 @@ namespace CdxEnrich.Actions
                 .Bind(RefsMustBeUnique);
         }
 
-        public InputTuple Execute(InputTuple inputs)
+        public Result<InputTuple> Execute(InputTuple inputs)
         {
-            var tasks = new List<Task>();
-
-            var configEntries = inputs.Config.ReplaceLicenseByClearlyDefined?
-                .Where(item => item.Ref != null)
-                .ToList();
-            
-            if(configEntries == null)
-            {
-                return inputs;
-            }
-
-            foreach (var configEntry in configEntries)
-            {
-                var configEntryRef = configEntry.Ref!;
-                var component = GetComponentByBomRef(inputs.Bom, configEntryRef);
-                
-                // Graceful: Component not found? Skip it
-                if (component == null)
-                {
-                    _logger.LogWarning("Component with BomRef '{Ref}' not found in BOM, skipping", configEntryRef);
-                    continue;
-                }
-                
-                // Graceful: No PURL? Skip it
-                if (string.IsNullOrEmpty(component.Purl))
-                {
-                    _logger.LogWarning("Component with BomRef '{Ref}' has no PURL set, skipping", configEntryRef);
-                    continue;
-                }
-                
-                // Graceful: Invalid PURL format? Skip it
-                if (!TryParsePurl(component.Purl, out var packageUrl) || packageUrl == null)
-                {
-                    _logger.LogWarning("Invalid PURL format '{Purl}' for BomRef '{Ref}', skipping", component.Purl, configEntryRef);
-                    continue;
-                }
-                
-                // Graceful: Unsupported package type? Skip it
-                if (!PackageType.TryFromPurlType(packageUrl.Type, out var packageType))
-                {
-                    _logger.LogInformation("Package type '{Type}' is not supported by ClearlyDefined for BomRef '{Ref}', skipping", packageUrl.Type, configEntryRef);
-                    continue;
-                }
-                
-                if (!IsSupported(packageType))
-                {
-                    _logger.LogInformation("Package type '{Type}' is currently not supported by cdx-enrich for BomRef '{Ref}', skipping", packageType.Name, configEntryRef);
-                    continue;
-                }
-                
-                var provider = packageType.DefaultProvider;
-                tasks.Add(ProcessComponentAsync(component, packageUrl, provider));
-            }
-
             try
             {
+                var tasks = new List<Task>();
+
+                var configEntries = inputs.Config.ReplaceLicenseByClearlyDefined?
+                    .Where(item => item.Ref != null)
+                    .ToList();
+                
+                if(configEntries == null)
+                {
+                    return new Ok<InputTuple>(inputs);
+                }
+
+                foreach (var configEntry in configEntries)
+                {
+                    var configEntryRef = configEntry.Ref!;
+                    var component = GetComponentByBomRef(inputs.Bom, configEntryRef);
+                    
+                    // Graceful: Component not found? Skip it
+                    if (component == null)
+                    {
+                        _logger.LogWarning("Component with BomRef '{Ref}' not found in BOM, skipping", configEntryRef);
+                        continue;
+                    }
+                    
+                    // Graceful: No PURL? Skip it
+                    if (string.IsNullOrEmpty(component.Purl))
+                    {
+                        _logger.LogWarning("Component with BomRef '{Ref}' has no PURL set, skipping", configEntryRef);
+                        continue;
+                    }
+                    
+                    // Graceful: Invalid PURL format? Skip it
+                    if (!TryParsePurl(component.Purl, out var packageUrl) || packageUrl == null)
+                    {
+                        _logger.LogWarning("Invalid PURL format '{Purl}' for BomRef '{Ref}', skipping", component.Purl, configEntryRef);
+                        continue;
+                    }
+                    
+                    // Graceful: Unsupported package type? Skip it
+                    if (!PackageType.TryFromPurlType(packageUrl.Type, out var packageType))
+                    {
+                        _logger.LogInformation("Package type '{Type}' is not supported by ClearlyDefined for BomRef '{Ref}', skipping", packageUrl.Type, configEntryRef);
+                        continue;
+                    }
+                    
+                    if (!IsSupported(packageType))
+                    {
+                        _logger.LogInformation("Package type '{Type}' is currently not supported by cdx-enrich for BomRef '{Ref}', skipping", packageType.Name, configEntryRef);
+                        continue;
+                    }
+                    
+                    var provider = packageType.DefaultProvider;
+                    tasks.Add(ProcessComponentAsync(component, packageUrl, provider));
+                }
+
+                // If API is down, network fails, etc. - catch and return Error
                 Task.WhenAll(tasks).GetAwaiter().GetResult();
+
+                return new Ok<InputTuple>(inputs);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing components {Message}", ex.Message);
+                return ExternalApiError.Create<InputTuple>("ClearlyDefined", ex.Message);
             }
-
-            return inputs;
         }
 
         private async Task ProcessComponentAsync(Component component, PackageURL packageUrl, Provider provider)
         {
-            try
+            // Fetching license data from ClearlyDefined
+            var licensedData = await _clearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
+        
+            if (licensedData == null || licensedData.Declared == null || licensedData.Facets == null)
             {
-                // Fetching license data from ClearlyDefined
-                var licensedData = await _clearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
-            
-                if (licensedData == null || licensedData.Declared == null || licensedData.Facets == null)
-                {
-                    _logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
-                    return;
-                }
-            
-                // Using the resolver to determine the LicenseChoice
-                var licenseChoice = _licenseResolver.Resolve(packageUrl, licensedData);
-
-                if (licenseChoice == null)
-                {
-                    return;
-                }
-
-                component.Licenses = [licenseChoice];
+                _logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
+                return;
             }
-            catch (Exception ex)
+        
+            // Using the resolver to determine the LicenseChoice
+            var licenseChoice = _licenseResolver.Resolve(packageUrl, licensedData);
+
+            if (licenseChoice == null)
             {
-                _logger.LogError(ex, "Error processing component {PackageUrl}: {Message}", packageUrl, ex.Message);
+                return;
             }
+
+            component.Licenses = [licenseChoice];
         }
 
         private static bool TryParsePurl(string purlString, out PackageURL? packageUrl)
         {
             packageUrl = null;
-
+            
             try
             {
                 packageUrl = new PackageURL(purlString);

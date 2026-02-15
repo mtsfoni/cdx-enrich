@@ -83,4 +83,16 @@ namespace CdxEnrich
         }
     }
 
+    public class ExternalApiError(string apiName, string exceptionMessage) : IErrorType
+    {
+        static readonly string baseErrorMessage = "Error calling external API '{0}': {1}";
+
+        public string ErrorMessage => string.Format(baseErrorMessage, apiName, exceptionMessage);
+
+        public static Error<TData> Create<TData>(string apiName, string exceptionMessage)
+        {
+            return new Error<TData>(new ExternalApiError(apiName, exceptionMessage));
+        }
+    }
+
 }

@@ -136,7 +136,7 @@ namespace CdxEnrich
                         .Bind(replaceLicenseByClearlyDefined.CheckConfig))
                 .Map(ReplaceLicenseByBomRef.Execute)
                 .Map(ReplaceLicensesByUrl.Execute)
-                .Map(replaceLicenseByClearlyDefined.Execute)
+                .Bind(replaceLicenseByClearlyDefined.Execute)
                 .Bind(inputs => BomSerialization.SerializeBom(inputs, outputFileFormat));
         }
     }

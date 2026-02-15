@@ -232,7 +232,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
                     .Bind(replaceAction.CheckConfig))
-                .Map(replaceAction.Execute);
+                .Bind(replaceAction.Execute);
 
             Assert.That(executionResult is Success);
 
