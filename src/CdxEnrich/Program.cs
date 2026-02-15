@@ -55,22 +55,24 @@ namespace CdxEnrich
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var runner = serviceProvider.GetRequiredService<IRunner>();
             
-            var rootCommand = new RootCommand();
-            rootCommand.AddArgument(inputFileArg);
-            rootCommand.AddOption(inputFileFormatOption);
-            rootCommand.AddOption(outputFileOption);
-            rootCommand.AddOption(outputFileFormatOption);
-            rootCommand.AddOption(configFileOption);
-            rootCommand.Description = "A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.";
-            rootCommand.SetHandler((context) =>
-                context.ExitCode =
-                    runner.Enrich
-                        (context.ParseResult.GetValueForArgument(inputFileArg) ?? "",
-                        context.ParseResult.GetValueForOption(inputFileFormatOption),
-                        context.ParseResult.GetValueForOption(outputFileOption) ?? "",
-                        context.ParseResult.GetValueForOption(configFileOption) ?? new List<string>(),
-                        context.ParseResult.GetValueForOption(outputFileFormatOption))
-            );
+            // Create the root command and add options
+            var rootCommand = new RootCommand("A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.");
+            
+            rootCommand.Add(inputFileArg);
+            rootCommand.Add(inputFileFormatOption);
+            rootCommand.Add(outputFileOption);
+            rootCommand.Add(outputFileFormatOption);
+            rootCommand.Add(configFileOption);
+
+            rootCommand.SetAction(parseResult =>
+            {
+                return runner.Enrich(
+                    parseResult.GetValue(inputFileArg) ?? "",
+                    parseResult.GetValue(inputFileFormatOption),
+                    parseResult.GetValue(outputFileOption) ?? "",
+                    parseResult.GetValue(configFileOption) ?? new List<string>(),
+                    parseResult.GetValue(outputFileFormatOption));
+            });
 
             return rootCommand.Parse(args).Invoke();
         }
