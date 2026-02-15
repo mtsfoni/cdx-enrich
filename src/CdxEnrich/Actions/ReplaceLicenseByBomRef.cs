@@ -4,11 +4,11 @@ using CycloneDX.Models;
 
 namespace CdxEnrich.Actions
 {
-    public class ReplaceLicenseByBomRef : ReplaceAction
+    public static class ReplaceLicenseByBomRef
     {
         static readonly string moduleName = nameof(ReplaceLicenseByBomRef);
 
-        private static Component? GetComponentByBomRef(Bom bom, string bomRef)
+        public static Component? GetComponentByBomRef(Bom bom, string bomRef)
         {
             return
                 bom.Components.Find(comp => comp.BomRef == bomRef);
@@ -50,7 +50,7 @@ namespace CdxEnrich.Actions
             }
         }
 
-        public override Result<ConfigRoot> CheckConfig(ConfigRoot config)
+        public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
             return
                 MustHaveEitherIdOrName(config)
@@ -58,7 +58,7 @@ namespace CdxEnrich.Actions
                 .Bind(BomRefMustNotBeNullOrEmpty);
         }
 
-        public override InputTuple Execute(InputTuple inputs)
+        public static InputTuple Execute(InputTuple inputs)
         {
             inputs.Config.ReplaceLicenseByBomRef?
                    .Where(rep => rep.Ref != null)

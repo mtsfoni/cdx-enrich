@@ -1,12 +1,10 @@
-﻿using CdxEnrich;
-using CdxEnrich.Config;
+﻿using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CycloneDX.Models;
 
-
 namespace CdxEnrich.Actions
 {
-    public class ReplaceLicensesByUrl : ReplaceAction
+    public static class ReplaceLicensesByUrl
     {
         static readonly string moduleName = nameof(ReplaceLicensesByUrl);
 
@@ -56,7 +54,7 @@ namespace CdxEnrich.Actions
             }
         }
 
-        public override Result<ConfigRoot> CheckConfig(ConfigRoot config)
+        public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
             return
                 MustHaveEitherIdorName(config)
@@ -64,7 +62,7 @@ namespace CdxEnrich.Actions
                 .Bind(BomRefMustNotBeNullorEmpty);
         }
 
-        public override InputTuple Execute(InputTuple inputs)
+        public static InputTuple Execute(InputTuple inputs)
         {
             inputs.Config.ReplaceLicensesByURL?
                 .Where(rep => rep.URL != null)

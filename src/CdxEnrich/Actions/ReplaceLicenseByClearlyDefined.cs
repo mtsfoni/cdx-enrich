@@ -7,13 +7,23 @@ using PackageUrl;
 
 namespace CdxEnrich.Actions
 {
-    public class ReplaceLicenseByClearlyDefined(
-        ILogger<ReplaceLicenseByClearlyDefined> logger, 
-        IClearlyDefinedClient clearlyDefinedClient,
-        ILicenseResolver licenseResolver
-        ) : ReplaceAction
+    public class ReplaceLicenseByClearlyDefined
     {
+        private readonly ILogger<ReplaceLicenseByClearlyDefined> _logger;
+        private readonly IClearlyDefinedClient _clearlyDefinedClient;
+        private readonly ILicenseResolver _licenseResolver;
+        
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
+
+        public ReplaceLicenseByClearlyDefined(
+            ILogger<ReplaceLicenseByClearlyDefined> logger,
+            IClearlyDefinedClient clearlyDefinedClient,
+            ILicenseResolver licenseResolver)
+        {
+            _logger = logger;
+            _clearlyDefinedClient = clearlyDefinedClient;
+            _licenseResolver = licenseResolver;
+        }
 
         private static readonly IList<PackageType> NotSupportedPackageTypes = new List<PackageType>
         {
@@ -65,13 +75,13 @@ namespace CdxEnrich.Actions
         }
 
 
-        public override Result<ConfigRoot> CheckConfig(ConfigRoot config)
+        public Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
             return RefMustNotBeNullOrEmpty(config)
                 .Bind(RefMustBeUnique);
         }
         
-        public override Result<InputTuple> CheckBomAndConfigCombination(InputTuple inputs)
+        public Result<InputTuple> CheckBomAndConfigCombination(InputTuple inputs)
         {
             var configEntries = inputs.Config.ReplaceLicenseByClearlyDefined?
                 .Where(item => item.Ref != null)
@@ -117,7 +127,7 @@ namespace CdxEnrich.Actions
             return new Ok<InputTuple>(inputs);
         }
 
-        public override InputTuple Execute(InputTuple inputs)
+        public InputTuple Execute(InputTuple inputs)
         {
             var tasks = new List<Task>();
 
@@ -145,7 +155,7 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error processing components {Message}", ex.Message);
+                _logger.LogError(ex, "Error processing components {Message}", ex.Message);
             }
 
             return inputs;
@@ -156,16 +166,16 @@ namespace CdxEnrich.Actions
             try
             {
                 // Fetching license data from ClearlyDefined
-                var licensedData = await clearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
+                var licensedData = await _clearlyDefinedClient.GetClearlyDefinedLicensedDataAsync(packageUrl, provider);
             
                 if (licensedData == null || licensedData.Declared == null || licensedData.Facets == null)
                 {
-                    logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
+                    _logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
                     return;
                 }
             
                 // Using the resolver to determine the LicenseChoice
-                var licenseChoice = licenseResolver.Resolve(packageUrl, licensedData);
+                var licenseChoice = _licenseResolver.Resolve(packageUrl, licensedData);
 
                 if (licenseChoice == null)
                 {
@@ -176,7 +186,7 @@ namespace CdxEnrich.Actions
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error processing component {PackageUrl}: {Message}", packageUrl, ex.Message);
+                _logger.LogError(ex, "Error processing component {PackageUrl}: {Message}", packageUrl, ex.Message);
             }
         }
 

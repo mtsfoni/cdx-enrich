@@ -31,8 +31,8 @@ namespace CdxEnrich.Tests.General
 
             public Runner CreateSut()
             {
-                var replaceActions = this._serviceProvider.GetRequiredService<IEnumerable<IReplaceAction>>();
-                return new Runner(replaceActions);
+                var replaceLicenseByClearlyDefined = this._serviceProvider.GetRequiredService<ReplaceLicenseByClearlyDefined>();
+                return new Runner(replaceLicenseByClearlyDefined);
             }
         }
 
@@ -55,14 +55,8 @@ namespace CdxEnrich.Tests.General
             string config = File.ReadAllText(configPath);
             string bom = File.ReadAllText(bomPath);
 
-<<<<<<< HEAD
-            var result = Runner.Enrich(bom, inputFormat, config, outputFormat);
-=======
-
-
             var runner = this._fixture.CreateSut();
             var result = runner.Enrich(bom, inputFormat, config, outputFormat);
->>>>>>> feature/3-Replace-SBOM-Licenses-with-ClearlyDefined-Discovered-Licenses
 
             // Validate the result is a valid BOM if successful
             if (result is Ok<string> successResult)

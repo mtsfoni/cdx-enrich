@@ -14,7 +14,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
 
         private class Fixture
         {
-            public IReplaceAction CreateReplaceAction(bool useFake = true)
+            public CdxEnrich.Actions.ReplaceLicenseByClearlyDefined CreateReplaceAction(bool useFake = true)
             {
                 var serviceCollection = new ServiceCollection();
                 serviceCollection.AddLogging();
@@ -25,7 +25,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
                 }
 
                 var sp = serviceCollection.BuildServiceProvider();
-                return sp.GetRequiredService<IReplaceAction>();
+                return sp.GetRequiredService<CdxEnrich.Actions.ReplaceLicenseByClearlyDefined>();
             }
 
             private static void SetupClearlyDefinedClientFake(ServiceCollection serviceCollection)

@@ -25,7 +25,7 @@ namespace CdxEnrich
 
         internal static void AddReplaceLicenseByClearlyDefined(this ServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByClearlyDefined>();
+            serviceCollection.AddTransient<ReplaceLicenseByClearlyDefined>();
             serviceCollection.AddTransient<IClearlyDefinedClient, ClearlyDefinedClient>();
             serviceCollection.AddHttpClient(nameof(ClearlyDefinedClient),
                 client =>
