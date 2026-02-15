@@ -113,7 +113,12 @@ namespace CdxEnrich.Actions
                     }
                     
                     // Graceful: Invalid PURL format? Skip it
-                    if (!TryParsePurl(component.Purl, out var packageUrl) || packageUrl == null)
+                    PackageURL? packageUrl;
+                    try
+                    {
+                        packageUrl = new PackageURL(component.Purl);
+                    }
+                    catch
                     {
                         _logger.LogWarning("Invalid PURL format '{Purl}' for BomRef '{Ref}', skipping", component.Purl, configEntryRef);
                         continue;
@@ -167,21 +172,6 @@ namespace CdxEnrich.Actions
             }
 
             component.Licenses = [licenseChoice];
-        }
-
-        private static bool TryParsePurl(string purlString, out PackageURL? packageUrl)
-        {
-            packageUrl = null;
-            
-            try
-            {
-                packageUrl = new PackageURL(purlString);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }
