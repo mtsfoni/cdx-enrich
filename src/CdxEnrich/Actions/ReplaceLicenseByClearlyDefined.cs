@@ -53,7 +53,7 @@ namespace CdxEnrich.Actions
             return new Ok<ConfigRoot>(config);
         }
         
-        private static Result<ConfigRoot> RefMustBeUnique(ConfigRoot config)
+        private static Result<ConfigRoot> RefsMustBeUnique(ConfigRoot config)
         {
             var duplicateRefs = config.ReplaceLicenseByClearlyDefined?.GroupBy(x => x.Ref)
                 .Where(g => g.Count() > 1)
@@ -78,7 +78,7 @@ namespace CdxEnrich.Actions
         public Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
             return RefMustNotBeNullOrEmpty(config)
-                .Bind(RefMustBeUnique);
+                .Bind(RefsMustBeUnique);
         }
         
         public Result<InputTuple> CheckBomAndConfigCombination(InputTuple inputs)

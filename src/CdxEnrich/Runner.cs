@@ -18,11 +18,11 @@ namespace CdxEnrich
     
     public class Runner : IRunner
     {
-        private readonly ReplaceLicenseByClearlyDefined _replaceLicenseByClearlyDefined;
+        private readonly ReplaceLicenseByClearlyDefined replaceLicenseByClearlyDefined;
 
         public Runner(ReplaceLicenseByClearlyDefined replaceLicenseByClearlyDefined)
         {
-            _replaceLicenseByClearlyDefined = replaceLicenseByClearlyDefined;
+            this.replaceLicenseByClearlyDefined = replaceLicenseByClearlyDefined;
         }
         
         public static Result<InputTuple> CombineBomAndConfig(Result<Bom> bom, Result<ConfigRoot> config)
@@ -133,11 +133,11 @@ namespace CdxEnrich
                     ConfigLoader.ParseConfig(configFileContent)
                         .Bind(ReplaceLicenseByBomRef.CheckConfig)
                         .Bind(ReplaceLicensesByUrl.CheckConfig)
-                        .Bind(_replaceLicenseByClearlyDefined.CheckConfig))
-                .Bind(_replaceLicenseByClearlyDefined.CheckBomAndConfigCombination)
+                        .Bind(replaceLicenseByClearlyDefined.CheckConfig))
+                .Bind(replaceLicenseByClearlyDefined.CheckBomAndConfigCombination)
                 .Map(ReplaceLicenseByBomRef.Execute)
                 .Map(ReplaceLicensesByUrl.Execute)
-                .Map(_replaceLicenseByClearlyDefined.Execute)
+                .Map(replaceLicenseByClearlyDefined.Execute)
                 .Bind(inputs => BomSerialization.SerializeBom(inputs, outputFileFormat));
         }
     }
