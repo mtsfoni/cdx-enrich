@@ -1,0 +1,8 @@
+{
+  "banner": "never",
+  "render_markdown": true,
+  "theme": "auto",
+  "trusted_folders": [
+    "/workspace"
+  ]
+}

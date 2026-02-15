@@ -367,3 +367,5 @@ FodyWeavers.xsd
 **/*received.txt
 
 /src/MTsfoni.CycloneDXLincenseEnricher/Properties/launchSettings.json
+
+.agent/.env
