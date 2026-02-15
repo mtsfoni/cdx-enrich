@@ -1,4 +1,6 @@
 ﻿using System.CommandLine;
+using CdxEnrich.Actions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CdxEnrich
 {
@@ -47,26 +49,39 @@ namespace CdxEnrich
                 DefaultValueFactory = _ => CycloneDXFormatOption.Auto
             };
 
-            // Create the root command and add options
-            var rootCommand = new RootCommand("A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.");
-            
-            rootCommand.Add(inputFileArg);
-            rootCommand.Add(inputFileFormatOption);
-            rootCommand.Add(outputFileOption);
-            rootCommand.Add(outputFileFormatOption);
-            rootCommand.Add(configFileOption);
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
 
-            rootCommand.SetAction(parseResult =>
-            {
-                return Runner.Enrich(
-                    parseResult.GetValue(inputFileArg) ?? "",
-                    parseResult.GetValue(inputFileFormatOption),
-                    parseResult.GetValue(outputFileOption) ?? "",
-                    parseResult.GetValue(configFileOption) ?? new List<string>(),
-                    parseResult.GetValue(outputFileFormatOption));
-            });
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            var runner = serviceProvider.GetRequiredService<IRunner>();
+            
+            var rootCommand = new RootCommand();
+            rootCommand.AddArgument(inputFileArg);
+            rootCommand.AddOption(inputFileFormatOption);
+            rootCommand.AddOption(outputFileOption);
+            rootCommand.AddOption(outputFileFormatOption);
+            rootCommand.AddOption(configFileOption);
+            rootCommand.Description = "A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.";
+            rootCommand.SetHandler((context) =>
+                context.ExitCode =
+                    runner.Enrich
+                        (context.ParseResult.GetValueForArgument(inputFileArg) ?? "",
+                        context.ParseResult.GetValueForOption(inputFileFormatOption),
+                        context.ParseResult.GetValueForOption(outputFileOption) ?? "",
+                        context.ParseResult.GetValueForOption(configFileOption) ?? new List<string>(),
+                        context.ParseResult.GetValueForOption(outputFileFormatOption))
+            );
 
             return rootCommand.Parse(args).Invoke();
+        }
+
+        internal static void ConfigureServices(ServiceCollection serviceCollection)
+        {
+            serviceCollection.AddLogging();
+            serviceCollection.AddTransient<IRunner, Runner>();
+            serviceCollection.AddTransient<IReplaceAction, ReplaceLicenseByBomRef>();
+            serviceCollection.AddTransient<IReplaceAction, ReplaceLicensesByUrl>();
+            serviceCollection.AddReplaceLicenseByClearlyDefined();
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿using CdxEnrich;
-using CdxEnrich.Config;
+﻿using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.Serialization;
 using CdxEnrich.Actions;
 using CycloneDX;
 using VerifyNUnit;
 
-namespace CdxEnrich.Tests.Actions
+namespace CdxEnrich.Tests.Actions.ReplaceLicenseByBomRef
 {
     internal class ReplaceLicenseByBomRefTest
     {
@@ -39,8 +38,9 @@ namespace CdxEnrich.Tests.Actions
         public void InvalidConfigsReturnError(string configPath)
         {
             var configContent = File.ReadAllText(configPath);
+            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByBomRef();
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(ReplaceLicenseByBomRef.CheckConfig);
+                .Bind(replaceAction.CheckConfig);
 
             Assert.That(checkConfigResult is Failure);
         }
@@ -50,8 +50,9 @@ namespace CdxEnrich.Tests.Actions
         public void ValidConfigsReturnSuccess(string configPath)
         {
             var configContent = File.ReadAllText(configPath);
+            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByBomRef();
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(ReplaceLicenseByBomRef.CheckConfig);
+                .Bind(replaceAction.CheckConfig);
 
             Assert.That(checkConfigResult is Success);
         }
@@ -85,12 +86,13 @@ namespace CdxEnrich.Tests.Actions
             var extension = Path.GetExtension(bomPath);
             CycloneDXFormat inputFormat = extension.Equals(".json", StringComparison.CurrentCultureIgnoreCase) ? CycloneDXFormat.JSON : CycloneDXFormat.XML;
             string bomContent = File.ReadAllText(bomPath);
+            var replaceAction = new CdxEnrich.Actions.ReplaceLicenseByBomRef();
 
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                        .Bind(ReplaceLicenseByBomRef.CheckConfig))
-                    .Map(ReplaceLicenseByBomRef.Execute);
+                        .Bind(replaceAction.CheckConfig))
+                    .Map(replaceAction.Execute);
 
             Assert.That(executionResult is Success);
 

@@ -70,5 +70,17 @@ namespace CdxEnrich
             return new Error<TData>(new InvalidConfigError(configSection, desciption));
         }
     }
+    
+    public class InvalidBomAndConfigCombinationError(string desciption) : IErrorType
+    {
+        static readonly string baseErrorMessage = "Bom and Config combination has invalid content in section {0}: {1}";
+
+        public string ErrorMessage => string.Format(baseErrorMessage, Environment.NewLine, desciption);
+
+        public static Error<TData> Create<TData>(string desciption)
+        {
+            return new Error<TData>(new InvalidBomAndConfigCombinationError(desciption));
+        }
+    }
 
 }

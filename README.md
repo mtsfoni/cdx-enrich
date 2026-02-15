@@ -66,7 +66,7 @@ Each configuration file can contain different sets of transformations, and they 
 
 ## Configuration File
 
-The configuration file defines the transformations to be applied to the SBOM. Currently, two actions are supported: `ReplaceLicensesByURL` and `ReplaceLicenseByBomRef`.
+The configuration file defines the transformations to be applied to the SBOM. Currently, three actions are supported: `ReplaceLicensesByURL`, `ReplaceLicenseByBomRef` and `ReplaceLicenseByClearlyDefined`.
 
 ### Example Configuration
 
@@ -79,7 +79,10 @@ ReplaceLicensesByURL:
 
 ReplaceLicenseByBomRef:
 - Ref: "pkg:nuget/Json.More.Net@1.9.0"
-  Id: "MIT"  
+  Id: "MIT"
+
+ReplaceLicenseByClearlyDefined:
+- Ref: "pkg:nuget/System.Buffers@4.4.0"
 ```
 
 ### Actions
@@ -101,6 +104,92 @@ This action replaces licenses in a specific component identified by its BOM refe
 - One of:
   - **Id:** The new SPDX License ID.
   - **Name:** The new license name.
+
+#### ReplaceLicenseByClearlyDefined
+
+This action replaces licenses in components by automatically retrieving license data from the ClearlyDefined service. Components are identified by their Package URL (PURL).
+
+- **Ref:** The BOM reference of the component whose license is to be replaced.
+
+This action supports the following package types:
+- Crate (Provider: Crates.io)
+- Gem (Provider: RubyGems)
+- Maven (Provider: Maven Central)
+- npm (Provider: npmjs)
+- NuGet (Provider: NuGet)
+- Pod (Provider: Cocoapods)
+- PyPI (Provider: PyPI)
+
+The following package types are supported by ClearlyDefined, but are currently **not implemented** in CdxEnrich:
+- Composer (Provider: Packagist)
+- Conda (Provider: CondaForge)
+- Condasrc (Provider: CondaForge)
+- Deb (Provider: Debian)
+- Debsrc (Provider: Debian)
+- Git (Provider: GitHub)
+- Go (Provider: GitHub)
+- SourceArchive (Provider: GitHub)
+
+##### License Resolution Rules
+
+The action 'ReplaceLicenseByClearlyDefined' uses a rule-based system to convert license data from ClearlyDefined into a CycloneDX-compatible format. The rules are prioritized, and only one rule is applied per case to avoid inconsistencies.
+
+###### Basic Principle
+
+License resolution follows a clear priority sequence. Only one rule is applied per case. If multiple rules are applicable, none is applied to avoid inconsistent results.
+
+###### Rule Types
+
+The system defines three main rule types:
+
+1. **LicenseIdResolveRule**
+
+  * Handles simple license identifiers such as `MIT`, `Apache-2.0`
+  * Conditions:
+
+    * Must not be a license placeholder (`NONE`, `NOASSERTION`, `OTHER`)
+    * Must not be an SPDX expression
+    * Must not be a license reference (e.g., starts with `LicenseRef-`)
+  * Returns the license ID as a direct CycloneDX ID
+
+2. **SpdxExpressionResolveRule**
+
+  * Handles SPDX expressions and license references:
+
+    * Expressions include operators like `OR`, `AND`, `WITH`
+    * References begin with `LicenseRef-`
+  * Conditions:
+
+    * Must not be a license placeholder
+  * Returns the full SPDX expression as-is
+
+3. **PlaceholderLicenseResolveRule**
+
+  * Handles license placeholder:
+
+    * `NONE` means no license declared
+    * `NOASSERTION` means the license could not be determined
+    * `OTHER` represents a non-standard license
+  * Tries the following:
+
+    1. Checks for discovered expressions from ClearlyDefined
+    2. Combines them using `OR` if multiple are found
+    3. Validates that the result is not one of the license placeholders
+  * Only if all conditions are met, the combined expression is returned
+
+###### Decision Process
+
+1. All applicable rules are identified
+2. If no rule is applicable, the original license remains unchanged
+3. If more than one rule is applicable, an error is logged and the license remains unchanged
+4. If exactly one rule is applicable, it is applied and its result returned
+
+###### Examples
+
+* A simple license `MIT` uses **LicenseIdResolveRule**
+* A compound expression `MIT OR Apache-2.0` uses **SpdxExpressionResolveRule**
+* A license placeholder `NOASSERTION` with alternative expressions uses **PlaceholderLicenseResolveRule**, if conditions are met; otherwise, the license remains unchanged
+
 
 ## Issues and Contributions
 

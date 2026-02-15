@@ -1,15 +1,14 @@
-﻿using CdxEnrich;
-using CdxEnrich.Config;
+﻿using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CycloneDX.Models;
 
 namespace CdxEnrich.Actions
 {
-    public static class ReplaceLicenseByBomRef
+    public class ReplaceLicenseByBomRef : ReplaceAction
     {
         static readonly string moduleName = nameof(ReplaceLicenseByBomRef);
 
-        public static Component? GetComponentByBomRef(Bom bom, string bomRef)
+        private static Component? GetComponentByBomRef(Bom bom, string bomRef)
         {
             return
                 bom.Components.Find(comp => comp.BomRef == bomRef);
@@ -51,7 +50,7 @@ namespace CdxEnrich.Actions
             }
         }
 
-        public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
+        public override Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
             return
                 MustHaveEitherIdOrName(config)
@@ -59,7 +58,7 @@ namespace CdxEnrich.Actions
                 .Bind(BomRefMustNotBeNullOrEmpty);
         }
 
-        public static InputTuple Execute(InputTuple inputs)
+        public override InputTuple Execute(InputTuple inputs)
         {
             inputs.Config.ReplaceLicenseByBomRef?
                    .Where(rep => rep.Ref != null)
@@ -84,7 +83,6 @@ namespace CdxEnrich.Actions
                    });
 
             return inputs;
-
         }
     }
 }

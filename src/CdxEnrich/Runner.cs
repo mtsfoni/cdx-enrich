@@ -7,7 +7,16 @@ using CdxEnrich.Actions;
 
 namespace CdxEnrich
 {
-    public static class Runner
+    public interface IRunner
+    {
+        int Enrich(string inputFilePath, CycloneDXFormatOption inputFormat, string outputFilePath,
+            IEnumerable<string> configPaths, CycloneDXFormatOption outputFileFormat);
+
+        Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent,
+            CycloneDXFormat outputFileFormat);
+    }
+    
+    public class Runner(IEnumerable<IReplaceAction> replaceActions) : IRunner
     {
         public static Result<InputTuple> CombineBomAndConfig(Result<Bom> bom, Result<ConfigRoot> config)
         {
@@ -26,7 +35,7 @@ namespace CdxEnrich
         }
 
 
-        static public int Enrich(string inputFilePath, CycloneDXFormatOption inputFormat, string outputFilePath, IEnumerable<string> configPaths, CycloneDXFormatOption outputFileFormat)
+        public int Enrich(string inputFilePath, CycloneDXFormatOption inputFormat, string outputFilePath, IEnumerable<string> configPaths, CycloneDXFormatOption outputFileFormat)
         {
             try
             {
@@ -110,16 +119,15 @@ namespace CdxEnrich
             }
         }
 
-        static public Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent, CycloneDXFormat outputFileFormat)
+        public Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent, CycloneDXFormat outputFileFormat)
         {
-            return
-                CombineBomAndConfig(
+            return CombineBomAndConfig(
                     BomSerialization.DeserializeBom(inputFileContent, inputFormat),
-                    ConfigLoader.ParseConfig(configFileContent))
-                .Map(ReplaceLicenseByBomRef.Execute)
-                .Map(ReplaceLicensesByUrl.Execute)
+                    ConfigLoader.ParseConfig(configFileContent)
+                        .AggregateBind(replaceActions, action => action.CheckConfig))
+                .AggregateBind(replaceActions, action => action.CheckBomAndConfigCombination)
+                .AggregateMap(replaceActions, action => action.Execute)
                 .Bind(inputs => BomSerialization.SerializeBom(inputs, outputFileFormat));
-
         }
     }
 }

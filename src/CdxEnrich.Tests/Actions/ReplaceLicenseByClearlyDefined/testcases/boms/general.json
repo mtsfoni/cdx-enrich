@@ -1,0 +1,227 @@
+﻿{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-03-15T12:00:00Z",
+    "tools": [
+      {
+        "vendor": "Example",
+        "name": "SBOM Generator",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Collections@4.0.11",
+      "name": "System.Collections",
+      "version": "4.0.11",
+      "purl": "pkg:nuget/System.Collections@4.0.11",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/lodash@4.17.21",
+      "name": "lodash",
+      "version": "4.17.21",
+      "purl": "pkg:npm/lodash@4.17.21",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:maven/org.apache.commons/commons-lang3@3.12.0",
+      "name": "commons-lang3",
+      "version": "3.12.0",
+      "purl": "pkg:maven/org.apache.commons/commons-lang3@3.12.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/requests@2.28.1",
+      "name": "requests",
+      "version": "2.28.1",
+      "purl": "pkg:pypi/requests@2.28.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:gem/rails@7.0.4",
+      "name": "rails",
+      "version": "7.0.4",
+      "purl": "pkg:gem/rails@7.0.4",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:go/github.com/gorilla/mux@v1.8.0",
+      "name": "mux",
+      "version": "v1.8.0",
+      "purl": "pkg:go/github.com/gorilla/mux@v1.8.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7",
+      "name": "curl",
+      "version": "7.74.0-1.3+deb11u7",
+      "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pod/Alamofire@5.6.2",
+      "name": "Alamofire",
+      "version": "5.6.2",
+      "purl": "pkg:pod/Alamofire@5.6.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:composer/laravel/framework@10.0.0",
+      "name": "laravel/framework",
+      "version": "10.0.0",
+      "purl": "pkg:composer/laravel/framework@10.0.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:crate/serde@1.0.152",
+      "name": "serde",
+      "version": "1.0.152",
+      "purl": "pkg:crate/serde@1.0.152",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:conda/pandas@1.5.3",
+      "name": "pandas",
+      "version": "1.5.3",
+      "purl": "pkg:conda/pandas@1.5.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:condasrc/numpy@1.24.3",
+      "name": "numpy",
+      "version": "1.24.3",
+      "purl": "pkg:condasrc/numpy@1.24.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:debsrc/debian/wget@1.21.3-1",
+      "name": "wget",
+      "version": "1.21.3-1",
+      "purl": "pkg:debsrc/debian/wget@1.21.3-1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:git/github.com/expressjs/express@4.18.2",
+      "name": "express",
+      "version": "4.18.2",
+      "purl": "pkg:git/github.com/expressjs/express@4.18.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:sourcearchive/apache/commons-text@1.10.0",
+      "name": "commons-text",
+      "version": "1.10.0",
+      "purl": "pkg:sourcearchive/apache/commons-text@1.10.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    }
+  ]
+}
