@@ -80,52 +80,6 @@ namespace CdxEnrich.Actions
             return RefMustNotBeNullOrEmpty(config)
                 .Bind(RefsMustBeUnique);
         }
-        
-        public Result<InputTuple> CheckBomAndConfigCombination(InputTuple inputs)
-        {
-            var configEntries = inputs.Config.ReplaceLicenseByClearlyDefined?
-                .Where(item => item.Ref != null)
-                .ToList();
-            
-            if(configEntries == null)
-            {
-                return new Ok<InputTuple>(inputs);
-            }
-
-            foreach (var configEntryRef in configEntries.Select(x => x.Ref))
-            {
-                var component = GetComponentByBomRef(inputs.Bom, configEntryRef!);
-                if (component == null)
-                {
-                    return InvalidBomAndConfigCombinationError.Create<InputTuple>(
-                        $"Component with bom ref '{configEntryRef}' not found in the BOM.");
-                }
-
-                if (string.IsNullOrEmpty(component.Purl))
-                {
-                    return InvalidBomAndConfigCombinationError.Create<InputTuple>($"Component with bom ref '{configEntryRef}' does not have a PURL set.");
-                }
-
-                if (!TryParsePurl(component.Purl, out var packageUrl))
-                {
-                    return InvalidBomAndConfigCombinationError.Create<InputTuple>($"Invalid PURL format: '{component.Purl}'");
-                }
-
-                PackageType? packageType = null;
-                if (packageUrl != null && !PackageType.TryFromPurlType(packageUrl.Type, out packageType))
-                {
-                    return InvalidBomAndConfigCombinationError.Create<InputTuple>(
-                        $"Package type '{packageUrl.Type}' is not supported by ClearlyDefined. Supported types are: {string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value))}");
-                }
-
-                if (packageType != null && !IsSupported(packageType))
-                {
-                    return InvalidBomAndConfigCombinationError.Create<InputTuple>(
-                        $"Package type '{packageType.Name}' is currently not supported by CdxEnrich. Supported types are: {string.Join(", ", PackageType.All.Where(IsSupported).Select(pt => pt.Value))}");
-                }
-            }
-            return new Ok<InputTuple>(inputs);
-        }
 
         public InputTuple Execute(InputTuple inputs)
         {
@@ -140,11 +94,45 @@ namespace CdxEnrich.Actions
                 return inputs;
             }
 
-            foreach (var configEntryRef in configEntries.Select(x => x.Ref))
+            foreach (var configEntry in configEntries)
             {
-                var component = GetComponentByBomRef(inputs.Bom, configEntryRef!);
-                var packageUrl = new PackageURL(component!.Purl);
-                var packageType = PackageType.FromPurlType(packageUrl.Type);
+                var configEntryRef = configEntry.Ref!;
+                var component = GetComponentByBomRef(inputs.Bom, configEntryRef);
+                
+                // Graceful: Component not found? Skip it
+                if (component == null)
+                {
+                    _logger.LogWarning("Component with BomRef '{Ref}' not found in BOM, skipping", configEntryRef);
+                    continue;
+                }
+                
+                // Graceful: No PURL? Skip it
+                if (string.IsNullOrEmpty(component.Purl))
+                {
+                    _logger.LogWarning("Component with BomRef '{Ref}' has no PURL set, skipping", configEntryRef);
+                    continue;
+                }
+                
+                // Graceful: Invalid PURL format? Skip it
+                if (!TryParsePurl(component.Purl, out var packageUrl) || packageUrl == null)
+                {
+                    _logger.LogWarning("Invalid PURL format '{Purl}' for BomRef '{Ref}', skipping", component.Purl, configEntryRef);
+                    continue;
+                }
+                
+                // Graceful: Unsupported package type? Skip it
+                if (!PackageType.TryFromPurlType(packageUrl.Type, out var packageType))
+                {
+                    _logger.LogInformation("Package type '{Type}' is not supported by ClearlyDefined for BomRef '{Ref}', skipping", packageUrl.Type, configEntryRef);
+                    continue;
+                }
+                
+                if (!IsSupported(packageType))
+                {
+                    _logger.LogInformation("Package type '{Type}' is currently not supported by cdx-enrich for BomRef '{Ref}', skipping", packageType.Name, configEntryRef);
+                    continue;
+                }
+                
                 var provider = packageType.DefaultProvider;
                 tasks.Add(ProcessComponentAsync(component, packageUrl, provider));
             }

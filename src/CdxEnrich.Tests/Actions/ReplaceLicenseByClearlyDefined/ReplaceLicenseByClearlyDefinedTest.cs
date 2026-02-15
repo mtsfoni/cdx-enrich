@@ -209,23 +209,6 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
         }
 
         [Test]
-        [TestCaseSource(nameof(GetInputPairs), new object[] { "invalid" })]
-        public void InvalidBomAndConfigCombinationsReturnError(string configPath, string bomPath)
-        {
-            var inputFormat = GetCycloneDxFormat(bomPath);
-            string bomContent = File.ReadAllText(bomPath);
-            var replaceAction = this._fixture.CreateReplaceAction();
-
-            var checkConfigResult =
-                Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
-                        ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                            .Bind(replaceAction.CheckConfig))
-                    .Bind(replaceAction.CheckBomAndConfigCombination);
-
-            Assert.That(checkConfigResult is Failure);
-        }
-
-        [Test]
         [TestCaseSource(nameof(GetConfigs), new object[] { "valid" })]
         public void ValidConfigsReturnSuccess(string configPath)
         {
@@ -249,7 +232,6 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
                     .Bind(replaceAction.CheckConfig))
-                    .Bind(replaceAction.CheckBomAndConfigCombination)
                 .Map(replaceAction.Execute);
 
             Assert.That(executionResult is Success);
