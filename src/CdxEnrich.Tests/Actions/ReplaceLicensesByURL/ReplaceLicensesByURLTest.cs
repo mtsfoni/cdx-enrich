@@ -3,6 +3,7 @@ using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.Serialization;
 using CdxEnrich.Actions;
+using CycloneDX;
 using VerifyNUnit;
 
 namespace CdxEnrich.Tests.Actions
@@ -92,6 +93,12 @@ namespace CdxEnrich.Tests.Actions
                 .Map(ReplaceLicensesByUrl.Execute);
 
             Assert.That(executionResult is Success);
+
+            // Validate the output BOM against CycloneDX schema
+            BomValidationHelper.AssertValidBom(
+                executionResult.Data.Bom,
+                SpecificationVersion.v1_5,
+                $"ReplaceLicensesByUrl with {Path.GetFileName(configPath)} and {Path.GetFileName(bomPath)}");
 
             var settings = new VerifySettings();
             settings.UseDirectory("testcases/snapshots");

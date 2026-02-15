@@ -1,4 +1,7 @@
 ﻿using CdxEnrich;
+using CdxEnrich.FunctionalHelpers;
+using CdxEnrich.Serialization;
+using CycloneDX;
 
 namespace CdxEnrich.Tests.General
 {
@@ -28,10 +31,17 @@ namespace CdxEnrich.Tests.General
             string config = File.ReadAllText(configPath);
             string bom = File.ReadAllText(bomPath);
 
-
-
-
             var result = Runner.Enrich(bom, inputFormat, config, outputFormat);
+
+            // Validate the result is a valid BOM if successful
+            if (result is Ok<string> successResult)
+            {
+                var bomResult = BomSerialization.DeserializeBom(successResult.Data, outputFormat);
+                if (bomResult is Ok<CycloneDX.Models.Bom> bomOk)
+                {
+                    BomValidationHelper.AssertValidBom(bomOk.Data, SpecificationVersion.v1_5, $"Enrich with {bomName} + {configName} → {outputFormat}");
+                }
+            }
 
             var settings = new VerifySettings();
             settings.UseDirectory("testcases/snapshots");
