@@ -1,6 +1,4 @@
 ﻿using CdxEnrich.ClearlyDefined;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
 
 namespace CdxEnrich.Tests.ClearlyDefined
@@ -57,7 +55,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 expressions.ToList());
 
             // Act
-            var result = LicenseResolver.Resolve(this._fixture.Logger, this._fixture.PackageUrl, dataLicensed);
+            var result = LicenseResolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -79,7 +77,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 expressions.ToList());
 
             // Act
-            var result = LicenseResolver.Resolve(this._fixture.Logger, this._fixture.PackageUrl, dataLicensed);
+            var result = LicenseResolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Null);
@@ -92,7 +90,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith("MIT");
 
             // Act
-            var result = LicenseResolver.Resolve(this._fixture.Logger, this._fixture.PackageUrl, dataLicensed);
+            var result = LicenseResolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -108,7 +106,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith("MIT OR Apache-2.0");
 
             // Act
-            var result = LicenseResolver.Resolve(this._fixture.Logger, this._fixture.PackageUrl, dataLicensed);
+            var result = LicenseResolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -126,7 +124,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith("LicenseRef-scancode-ms-net-library-2018-11");
 
             // Act
-            var result = LicenseResolver.Resolve(this._fixture.Logger, this._fixture.PackageUrl, dataLicensed);
+            var result = LicenseResolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -150,7 +148,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith(declared);
 
             // Act
-            var result = LicenseResolver.Resolve(this._fixture.Logger, this._fixture.PackageUrl, dataLicensed);
+            var result = LicenseResolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -168,7 +166,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
             var dataLicensed = this._fixture.CreateLicenseDeclaredWith("GPL-2.0-or-later WITH Classpath-exception-2.0");
 
             // Act
-            var result = LicenseResolver.Resolve(this._fixture.Logger, this._fixture.PackageUrl, dataLicensed);
+            var result = LicenseResolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -188,7 +186,7 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 ["Apache-2.0", "GPL-3.0"]);
 
             // Act
-            var result = LicenseResolver.Resolve(this._fixture.Logger, this._fixture.PackageUrl, dataLicensed);
+            var result = LicenseResolver.Resolve(this._fixture.PackageUrl, dataLicensed);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -202,7 +200,6 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
         private class LicenseResolverFixture
         {
-            public ILogger Logger { get; } = NullLogger.Instance;
             public PackageURL PackageUrl { get; } = new("nuget", null, "Test.Package", "1.0.0", null, null);
 
             public ClearlyDefinedResponse.LicensedData CreateLicenseDeclaredWith(string declared)

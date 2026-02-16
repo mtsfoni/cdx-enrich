@@ -1,7 +1,6 @@
 using System.Net;
 using System.Text.Json;
 using CdxEnrich.ClearlyDefined;
-using Microsoft.Extensions.Logging;
 using NSubstitute;
 
 namespace CdxEnrich.Tests.ClearlyDefined
@@ -12,7 +11,6 @@ namespace CdxEnrich.Tests.ClearlyDefined
         {
             public ClearlyDefinedClientFixture()
             {
-                this.Logger = Substitute.For<ILogger<ClearlyDefinedClient>>();
                 this.HttpHandler = new TestHttpMessageHandler();
                 this.HttpClient = new HttpClient(this.HttpHandler)
                 {
@@ -20,10 +18,9 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 };
                 var httpClientFactoryMock = Substitute.For<IHttpClientFactory>();
                 httpClientFactoryMock.CreateClient(Arg.Any<string>()).Returns(this.HttpClient);
-                this.Client = new ClearlyDefinedClient(this.Logger, httpClientFactoryMock);
+                this.Client = new ClearlyDefinedClient(httpClientFactoryMock);
             }
 
-            public ILogger<ClearlyDefinedClient> Logger { get; }
             public TestHttpMessageHandler HttpHandler { get; }
             public HttpClient HttpClient { get; }
             public ClearlyDefinedClient Client { get; }
@@ -102,45 +99,6 @@ namespace CdxEnrich.Tests.ClearlyDefined
                 Assert.That(this.HttpHandler.RequestsReceived[0].Method, Is.EqualTo(HttpMethod.Get));
                 Assert.That(this.HttpHandler.RequestsReceived[0].RequestUri, Is.Not.Null);
                 Assert.That(this.HttpHandler.RequestsReceived[0].RequestUri.ToString(), Does.Contain(contains));
-            }
-
-            /// <summary>
-            ///     Verifies that the logger received an error message containing the specified text
-            /// </summary>
-            public void VerifyLoggerReceivedError(string messageContains)
-            {
-                this.Logger.Received(1).Log(
-                    Arg.Is(LogLevel.Error),
-                    Arg.Any<EventId>(),
-                    Arg.Is<object>(o => o.ToString()!.Contains(messageContains)),
-                    Arg.Any<Exception>(),
-                    Arg.Any<Func<object, Exception, string>>()!);
-            }
-
-            /// <summary>
-            ///     Verifies that the logger received a warning message containing the specified text
-            /// </summary>
-            public void VerifyLoggerReceivedWarning(string messageContains)
-            {
-                this.Logger.Received(1).Log(
-                    Arg.Is(LogLevel.Warning),
-                    Arg.Any<EventId>(),
-                    Arg.Is<object>(o => o.ToString()!.Contains(messageContains)),
-                    Arg.Any<Exception>(),
-                    Arg.Any<Func<object, Exception, string>>()!);
-            }
-
-            /// <summary>
-            ///     Verifies that the logger received an exception of the specified type
-            /// </summary>
-            public void VerifyLoggerReceivedExceptionOfType<T>() where T : Exception
-            {
-                this.Logger.Received(1).Log(
-                    Arg.Is(LogLevel.Error),
-                    Arg.Any<EventId>(),
-                    Arg.Any<object>(),
-                    Arg.Is<Exception>(ex => ex is T),
-                    Arg.Any<Func<object, Exception, string>>()!);
             }
 
             /// <summary>

@@ -1,4 +1,9 @@
-﻿namespace CdxEnrich.FunctionalHelpers
+﻿using System.Diagnostics.CodeAnalysis;
+
+#pragma warning disable S101
+#pragma warning disable S1694
+
+namespace CdxEnrich.FunctionalHelpers
 {
     public abstract class Result<TData>
     {
@@ -6,7 +11,9 @@
     }
 
 
+
     public interface Success { }
+
     public interface Failure
     {
         public IErrorType ErrorType { get; }
@@ -54,3 +61,5 @@
     }
 
 }
+#pragma warning restore S101
+#pragma warning restore S1694

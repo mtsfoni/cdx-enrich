@@ -16,15 +16,9 @@ namespace CdxEnrich
             CycloneDXFormat outputFileFormat);
     }
     
-    public class Runner : IRunner
+    public class Runner(ReplaceLicenseByClearlyDefined replaceLicenseByClearlyDefined)
+        : IRunner
     {
-        private readonly ReplaceLicenseByClearlyDefined replaceLicenseByClearlyDefined;
-
-        public Runner(ReplaceLicenseByClearlyDefined replaceLicenseByClearlyDefined)
-        {
-            this.replaceLicenseByClearlyDefined = replaceLicenseByClearlyDefined;
-        }
-        
         public static Result<InputTuple> CombineBomAndConfig(Result<Bom> bom, Result<ConfigRoot> config)
         {
 
@@ -46,9 +40,7 @@ namespace CdxEnrich
         {
             try
             {
-                CycloneDXFormat explicitInputFormat;
-                CycloneDXFormat explicitOutputFormat;
-
+                CycloneDXFormat explicitInputFormat, explicitOutputFormat;
 
                 explicitInputFormat = inputFormat switch
                 {
@@ -104,8 +96,8 @@ namespace CdxEnrich
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("An error occurred when trying to enrich the bom");
-                        Console.WriteLine(((Failure)enrichResult).ErrorMessage);
+                        Console.Error.WriteLine("An error occurred when trying to enrich the bom");
+                        Console.Error.WriteLine(((Failure)enrichResult).ErrorMessage);
                         Console.ResetColor();
                         return 1;
                     }
@@ -117,10 +109,10 @@ namespace CdxEnrich
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("An unexpected error occurred:");
-                Console.WriteLine($"Error Type: {ex.GetType()}");
-                Console.WriteLine($"Error Message: {ex.Message}");
-                Console.WriteLine("Please check the input and try again. If the problem persists, consult the documentation or contact support.");
+                Console.Error.WriteLine("An unexpected error occurred:");
+                Console.Error.WriteLine($"Error Type: {ex.GetType()}");
+                Console.Error.WriteLine($"Error Message: {ex.Message}");
+                Console.Error.WriteLine("Please check the input and try again. If the problem persists, consult the documentation or contact support.");
                 Console.ResetColor();
                 return 1;
             }

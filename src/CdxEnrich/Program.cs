@@ -49,6 +49,11 @@ namespace CdxEnrich
                 DefaultValueFactory = _ => CycloneDXFormatOption.Auto
             };
 
+            var verboseOption = new Option<bool>("--verbose", "-v")
+            {
+                Description = "Enable verbose output (show informational messages)."
+            };
+
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
@@ -63,9 +68,13 @@ namespace CdxEnrich
             rootCommand.Add(outputFileOption);
             rootCommand.Add(outputFileFormatOption);
             rootCommand.Add(configFileOption);
+            rootCommand.Add(verboseOption);
 
             rootCommand.SetAction(parseResult =>
             {
+                // Set verbose mode before running
+                Log.SetVerbose(parseResult.GetValue(verboseOption));
+                
                 return runner.Enrich(
                     parseResult.GetValue(inputFileArg) ?? "",
                     parseResult.GetValue(inputFileFormatOption),
@@ -79,9 +88,7 @@ namespace CdxEnrich
 
         internal static void ConfigureServices(ServiceCollection serviceCollection)
         {
-            serviceCollection.AddLogging();
             serviceCollection.AddTransient<IRunner, Runner>();
-            serviceCollection.AddTransient<ReplaceLicenseByClearlyDefined>();
             serviceCollection.AddReplaceLicenseByClearlyDefined();
         }
     }

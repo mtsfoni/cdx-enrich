@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using Microsoft.Extensions.Logging;
 using PackageUrl;
 using Polly;
 using Polly.Retry;
@@ -18,19 +17,16 @@ namespace CdxEnrich.ClearlyDefined
     {
         public static readonly Uri ClearlyDefinedApiBaseAddress = new ("https://api.clearlydefined.io");
         private readonly HttpClient _httpClient;
-        private readonly ILogger<ClearlyDefinedClient> _logger;
         private readonly ResiliencePipeline _resiliencePipeline;
         private readonly RequestLimiter _requestLimiter;
         private const int MaxRetryAttempts = 3;
 
-        public ClearlyDefinedClient(ILogger<ClearlyDefinedClient> logger, IHttpClientFactory httpClientFactory)
+        public ClearlyDefinedClient(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient(nameof(ClearlyDefinedClient));
-            _logger = logger;
             _resiliencePipeline = this.CreateResiliencePipeline();
             _requestLimiter =
-                new RequestLimiter(maxConcurrentRequests: 10, requestsPerSecond: 33,
-                    _logger); // 33 per second = 1980 per minute
+                new RequestLimiter(maxConcurrentRequests: 10, requestsPerSecond: 33); // 33 per second = 1980 per minute
         }
 
         private ResiliencePipeline CreateResiliencePipeline()
@@ -51,25 +47,21 @@ namespace CdxEnrich.ClearlyDefined
                     // Handle HTTP errors
                     if (args.Outcome.Exception is HttpRequestException)
                     {
-                        this._logger.LogWarning(
-                            "HTTP request error detected. Will retry after delay: {Delay}",
-                            retryDelay);
+                        Log.Warn($"HTTP request error detected. Will retry after delay: {retryDelay}");
                         return ValueTask.FromResult(true);
                     }
 
                     // Handle rate limit errors if the result is an HttpResponseMessage
                     if (args.Outcome.Result is HttpResponseMessage { StatusCode: HttpStatusCode.TooManyRequests })
                     {
-                        _logger.LogWarning(
-                            "Rate limit error detected. Will retry after delay: {Delay}",
-                            retryDelay);
+                        Log.Warn($"Rate limit error detected. Will retry after delay: {retryDelay}");
                         return ValueTask.FromResult(true);
                     }
                     
                     // Handle timeouts
                     if (args.Outcome.Exception is TimeoutRejectedException)
                     {
-                        this._logger.LogWarning("Timeout detected. Will retry after delay: {Delay}", retryDelay);
+                        Log.Warn($"Timeout detected. Will retry after delay: {retryDelay}");
                         return ValueTask.FromResult(true);
                     }
 
@@ -80,23 +72,18 @@ namespace CdxEnrich.ClearlyDefined
                     if (args.Outcome.Result is HttpResponseMessage response &&
                         response.StatusCode == HttpStatusCode.TooManyRequests)
                     {
-                        this._logger.LogWarning(
-                            "Rate limit reached on ClearlyDefined API call. Retry attempt {Attempt}/{MaxAttempts} after {Delay}",
-                            args.AttemptNumber, MaxRetryAttempts, args.RetryDelay);
+                        Log.Warn($"Rate limit reached on ClearlyDefined API call. Retry attempt {args.AttemptNumber}/{MaxRetryAttempts} after {args.RetryDelay}");
 
                         // Extract rate limit information from headers if available
                         if (response.Headers.TryGetValues("x-ratelimit-remaining", out var remaining) &&
                             response.Headers.TryGetValues("x-ratelimit-limit", out var limit))
                         {
-                            this._logger.LogInformation("Rate Limit Info: {Remaining}/{Limit} remaining",
-                                string.Join(",", remaining), string.Join(",", limit));
+                            Log.Info($"Rate Limit Info: {string.Join(",", remaining)}/{string.Join(",", limit)} remaining");
                         }
                     }
                     else
                     {
-                        this._logger.LogWarning(
-                            "HTTP error on ClearlyDefined API call. Retry attempt {Attempt}/{MaxAttempts} after {Delay}",
-                            args.AttemptNumber, MaxRetryAttempts, args.RetryDelay);
+                        Log.Warn($"HTTP error on ClearlyDefined API call. Retry attempt {args.AttemptNumber}/{MaxRetryAttempts} after {args.RetryDelay}");
                     }
 
                     return ValueTask.CompletedTask;
@@ -110,7 +97,7 @@ namespace CdxEnrich.ClearlyDefined
                 OnTimeout = args =>
                 {
                     var seconds = args.Timeout.ToString("ss");
-                    this._logger.LogWarning("Timeout on ClearlyDefined API call after {Seconds} seconds", seconds);
+                    Log.Warn($"Timeout on ClearlyDefined API call after {seconds} seconds");
                     return ValueTask.CompletedTask;
                 }
             });
@@ -138,15 +125,12 @@ namespace CdxEnrich.ClearlyDefined
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        _logger.LogError("API call unsuccessful after retry {RetryAttempts} attempts: {StatusCode} for {ApiUrl}",
-                            MaxRetryAttempts, response.StatusCode, requestPath);
+                        Log.Error($"API call unsuccessful after retry {MaxRetryAttempts} attempts: {response.StatusCode} for {requestPath}");
                         return null;
                     }
 
                     var data = await response.Content.ReadFromJsonAsync<ClearlyDefinedResponse>();
-                    _logger.LogInformation(
-                        "Successfully retrieved data from ClearlyDefined API for package: {PackageUrl}",
-                        packageUrl);
+                    Log.Info($"Successfully retrieved data from ClearlyDefined API for package: {packageUrl}");
                     return data?.Licensed;
                 });
         }

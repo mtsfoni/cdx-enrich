@@ -1,5 +1,4 @@
 ﻿using System.Threading.RateLimiting;
-using Microsoft.Extensions.Logging;
 
 namespace CdxEnrich.ClearlyDefined
 {
@@ -10,15 +9,13 @@ namespace CdxEnrich.ClearlyDefined
     {
         private readonly SemaphoreSlim _concurrencyLimiter;
         private readonly TokenBucketRateLimiter _rateLimiter;
-        private readonly ILogger _logger;
 
         /// <summary>
         /// Creates a new RequestLimiter with specified limits.
         /// </summary>
         /// <param name="maxConcurrentRequests">Maximum number of concurrent requests</param>
         /// <param name="requestsPerSecond">Maximum requests per second</param>
-        /// <param name="logger">Logger for diagnostic information</param>
-        public RequestLimiter(int maxConcurrentRequests, int requestsPerSecond, ILogger logger)
+        public RequestLimiter(int maxConcurrentRequests, int requestsPerSecond)
         {
             _concurrencyLimiter = new SemaphoreSlim(maxConcurrentRequests);
             _rateLimiter = new TokenBucketRateLimiter(
@@ -31,7 +28,6 @@ namespace CdxEnrich.ClearlyDefined
                     TokensPerPeriod = requestsPerSecond,
                     AutoReplenishment = true
                 });
-            _logger = logger;
         }
 
         /// <summary>
@@ -49,7 +45,7 @@ namespace CdxEnrich.ClearlyDefined
                 using var lease = await _rateLimiter.AcquireAsync(1);
                 if (!lease.IsAcquired)
                 {
-                    _logger.LogWarning("Rate limit exceeded, request for {RequestIdentifier} was rejected", requestIdentifier);
+                    Log.Warn($"Rate limit exceeded, request for {requestIdentifier} was rejected");
                     return default;
                 }
 
@@ -66,7 +62,7 @@ namespace CdxEnrich.ClearlyDefined
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error executing request: {RequestIdentifier}", requestIdentifier);
+                Log.Error($"Error executing request: {requestIdentifier} - {ex.Message}");
                 return default;
             }
         }

@@ -1,5 +1,4 @@
 using CycloneDX.Models;
-using Microsoft.Extensions.Logging;
 using PackageUrl;
 
 namespace CdxEnrich.ClearlyDefined
@@ -7,7 +6,6 @@ namespace CdxEnrich.ClearlyDefined
     public static class LicenseResolver
     {
         public static LicenseChoice? Resolve(
-            ILogger logger,
             PackageURL packageUrl,
             ClearlyDefinedResponse.LicensedData licensedData)
         {
@@ -15,30 +13,26 @@ namespace CdxEnrich.ClearlyDefined
             
             if (string.IsNullOrEmpty(declared))
             {
-                logger.LogInformation("No declared license for package: {PackageUrl}", packageUrl);
+                Log.Info($"No declared license for package: {packageUrl}");
                 return null;
             }
 
             // Handle placeholders (NONE, NOASSERTION, OTHER) - try discovered expressions
             if (IsLicensePlaceholder(declared))
             {
-                return ResolvePlaceholder(logger, packageUrl, licensedData);
+                return ResolvePlaceholder(packageUrl, licensedData);
             }
 
             // Handle SPDX expressions (contains operators) or LicenseRef
             if (IsExpression(declared) || IsLicenseRef(declared))
             {
-                logger.LogInformation(
-                    "Resolved license expression: {DeclaredLicense} for package: {PackageUrl}",
-                    declared, packageUrl);
+                Log.Info($"Resolved license expression: {declared} for package: {packageUrl}");
                 
                 return new LicenseChoice { Expression = declared };
             }
 
             // Handle simple license ID
-            logger.LogInformation(
-                "Resolved license ID ({DeclaredLicenseId}) for package: {PackageUrl}",
-                declared, packageUrl);
+            Log.Info($"Resolved license ID ({declared}) for package: {packageUrl}");
             
             return new LicenseChoice
             {
@@ -47,7 +41,6 @@ namespace CdxEnrich.ClearlyDefined
         }
 
         private static LicenseChoice? ResolvePlaceholder(
-            ILogger logger,
             PackageURL packageUrl,
             ClearlyDefinedResponse.LicensedData licensedData)
         {
@@ -55,24 +48,18 @@ namespace CdxEnrich.ClearlyDefined
 
             if (!TryGetJoinedLicenseExpression(licenseExpressions, out var joinedExpression))
             {
-                logger.LogInformation(
-                    "Resolved no licenses for package: {PackageUrl} due to placeholder '{Placeholder}' in declared license with missing or invalid expressions",
-                    packageUrl, licensedData.Declared);
+                Log.Info($"Resolved no licenses for package: {packageUrl} due to placeholder '{licensedData.Declared}' in declared license with missing or invalid expressions");
                 return null;
             }
 
             var containingPlaceholders = LicensePlaceholder.ExtractContaining(joinedExpression);
             if (containingPlaceholders.Any())
             {
-                logger.LogInformation(
-                    "Resolved no licenses for package: {PackageUrl} due to placeholder '{Placeholder}' in declared license and expression with license placeholders '{ExpressionPlaceholders}'",
-                    packageUrl, licensedData.Declared, string.Join(",", containingPlaceholders));
+                Log.Info($"Resolved no licenses for package: {packageUrl} due to placeholder '{licensedData.Declared}' in declared license and expression with license placeholders '{string.Join(",", containingPlaceholders)}'");
                 return null;
             }
 
-            logger.LogInformation(
-                "Resolved license expressions ({LicenseExpressions}) for package: {PackageUrl}",
-                joinedExpression, packageUrl);
+            Log.Info($"Resolved license expressions ({joinedExpression}) for package: {packageUrl}");
 
             return new LicenseChoice { Expression = joinedExpression };
         }

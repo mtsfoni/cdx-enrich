@@ -1,12 +1,9 @@
-﻿using CdxEnrich;
-using CdxEnrich.Config;
+﻿using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.Serialization;
-using CdxEnrich.Actions;
 using CycloneDX;
-using VerifyNUnit;
 
-namespace CdxEnrich.Tests.Actions
+namespace CdxEnrich.Tests.Actions.ReplaceLicensesByURL
 {
     internal class ReplaceLicensesByURLTest
     {

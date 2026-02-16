@@ -69,8 +69,6 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
             // Assert
             Assert.That(result, Is.Null);
-
-            this._fixture.VerifyLoggerReceivedError("API call unsuccessful");
         }
 
         [Test]
@@ -86,8 +84,6 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
             // Assert
             Assert.That(result, Is.Null);
-
-            this._fixture.VerifyLoggerReceivedExceptionOfType<HttpRequestException>();
         }
 
         [Test]
@@ -107,7 +103,6 @@ namespace CdxEnrich.Tests.ClearlyDefined
 
             Assert.That(this._fixture.HttpHandler.RequestsReceived.Count, Is.EqualTo(2));
 
-            this._fixture.VerifyLoggerReceivedWarning("Rate limit reached");
         }
 
         // Helper class for HTTP tests

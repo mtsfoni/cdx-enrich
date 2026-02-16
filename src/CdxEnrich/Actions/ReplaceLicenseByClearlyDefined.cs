@@ -9,16 +9,13 @@ namespace CdxEnrich.Actions
 {
     public class ReplaceLicenseByClearlyDefined
     {
-        private readonly ILogger<ReplaceLicenseByClearlyDefined> _logger;
         private readonly IClearlyDefinedClient _clearlyDefinedClient;
         
         private static readonly string ModuleName = nameof(ReplaceLicenseByClearlyDefined);
 
         public ReplaceLicenseByClearlyDefined(
-            ILogger<ReplaceLicenseByClearlyDefined> logger,
             IClearlyDefinedClient clearlyDefinedClient)
         {
-            _logger = logger;
             _clearlyDefinedClient = clearlyDefinedClient;
         }
 
@@ -101,14 +98,14 @@ namespace CdxEnrich.Actions
                     // Graceful: Component not found? Skip it
                     if (component == null)
                     {
-                        _logger.LogWarning("Component with BomRef '{Ref}' not found in BOM, skipping", configEntryRef);
+                        Log.Warn($"Component with BomRef '{configEntryRef}' not found in BOM, skipping");
                         continue;
                     }
                     
                     // Graceful: No PURL? Skip it
                     if (string.IsNullOrEmpty(component.Purl))
                     {
-                        _logger.LogWarning("Component with BomRef '{Ref}' has no PURL set, skipping", configEntryRef);
+                        Log.Warn($"Component with BomRef '{configEntryRef}' has no PURL set, skipping");
                         continue;
                     }
                     
@@ -120,20 +117,20 @@ namespace CdxEnrich.Actions
                     }
                     catch
                     {
-                        _logger.LogWarning("Invalid PURL format '{Purl}' for BomRef '{Ref}', skipping", component.Purl, configEntryRef);
+                        Log.Warn($"Invalid PURL format '{component.Purl}' for BomRef '{configEntryRef}', skipping");
                         continue;
                     }
                     
                     // Graceful: Unsupported package type? Skip it
-                    if (!PackageType.TryFromPurlType(packageUrl.Type, out var packageType))
+                    if (!PackageType.TryFromPurlType(packageUrl.Type, out var packageType) || packageType == null)
                     {
-                        _logger.LogInformation("Package type '{Type}' is not supported by ClearlyDefined for BomRef '{Ref}', skipping", packageUrl.Type, configEntryRef);
+                        Log.Info($"Package type '{packageUrl.Type}' is not supported by ClearlyDefined for BomRef '{configEntryRef}', skipping");
                         continue;
                     }
                     
                     if (!IsSupported(packageType))
                     {
-                        _logger.LogInformation("Package type '{Type}' is currently not supported by cdx-enrich for BomRef '{Ref}', skipping", packageType.Name, configEntryRef);
+                        Log.Info($"Package type '{packageType.Name}' is currently not supported by cdx-enrich for BomRef '{configEntryRef}', skipping");
                         continue;
                     }
                     
@@ -159,12 +156,12 @@ namespace CdxEnrich.Actions
         
             if (licensedData?.Declared == null || licensedData.Facets == null)
             {
-                _logger.LogInformation("No license data found for package: {PackageUrl}", packageUrl);
+                Log.Info($"No license data found for package: {packageUrl}");
                 return;
             }
         
             // Using the static resolver to determine the LicenseChoice
-            var licenseChoice = LicenseResolver.Resolve(_logger, packageUrl, licensedData);
+            var licenseChoice = LicenseResolver.Resolve(packageUrl, licensedData);
 
             if (licenseChoice == null)
             {

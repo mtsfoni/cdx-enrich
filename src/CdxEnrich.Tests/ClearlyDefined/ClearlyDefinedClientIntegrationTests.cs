@@ -1,6 +1,4 @@
 using CdxEnrich.ClearlyDefined;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using PackageUrl;
 
 namespace CdxEnrich.Tests.ClearlyDefined
@@ -20,16 +18,8 @@ namespace CdxEnrich.Tests.ClearlyDefined
         [SetUp]
         public void Setup()
         {
-            var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.AddConsole();
-                builder.SetMinimumLevel(LogLevel.Information);
-            });
-
             var httpClientFactory = new TestHttpClientFactory();
-            _client = new ClearlyDefinedClient(
-                loggerFactory.CreateLogger<ClearlyDefinedClient>(),
-                httpClientFactory);
+            _client = new ClearlyDefinedClient(httpClientFactory);
         }
 
         [Test]
@@ -81,13 +71,12 @@ namespace CdxEnrich.Tests.ClearlyDefined
         {
             // Arrange
             var packageUrl = new PackageURL("pkg:npm/express@4.18.2");
-            var logger = NullLogger.Instance;
 
             // Act
             var licensedData = await _client.GetClearlyDefinedLicensedDataAsync(packageUrl, Provider.Npmjs);
             Assert.That(licensedData, Is.Not.Null, "Should receive data from API");
             
-            var licenseChoice = LicenseResolver.Resolve(logger, packageUrl, licensedData);
+            var licenseChoice = LicenseResolver.Resolve(packageUrl, licensedData);
 
             // Assert
             Assert.That(licenseChoice, Is.Not.Null, "Should resolve license");
