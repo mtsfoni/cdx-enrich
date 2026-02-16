@@ -133,7 +133,7 @@ namespace CdxEnrich
                     ConfigLoader.ParseConfig(configFileContent)
                         .Bind(ReplaceLicenseByBomRef.CheckConfig)
                         .Bind(ReplaceLicensesByUrl.CheckConfig)
-                        .Bind(replaceLicenseByClearlyDefined.CheckConfig))
+                        .Bind(ReplaceLicenseByClearlyDefined.CheckConfig))
                 .Map(ReplaceLicenseByBomRef.Execute)
                 .Map(ReplaceLicensesByUrl.Execute)
                 .Bind(replaceLicenseByClearlyDefined.Execute)

@@ -215,7 +215,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
             var configContent = File.ReadAllText(configPath);
             var replaceAction = this._fixture.CreateReplaceAction();
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(replaceAction.CheckConfig);
+                .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig);
 
             Assert.That(checkConfigResult is Success);
         }
@@ -231,7 +231,7 @@ namespace CdxEnrich.Tests.Actions.ReplaceLicenseByClearlyDefined
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                    .Bind(replaceAction.CheckConfig))
+                    .Bind(CdxEnrich.Actions.ReplaceLicenseByClearlyDefined.CheckConfig))
                 .Bind(replaceAction.Execute);
 
             Assert.That(executionResult is Success);

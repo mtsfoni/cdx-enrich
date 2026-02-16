@@ -72,7 +72,7 @@ namespace CdxEnrich.Actions
         }
 
 
-        public Result<ConfigRoot> CheckConfig(ConfigRoot config)
+        public static Result<ConfigRoot> CheckConfig(ConfigRoot config)
         {
             return RefMustNotBeNullOrEmpty(config)
                 .Bind(RefsMustBeUnique);
