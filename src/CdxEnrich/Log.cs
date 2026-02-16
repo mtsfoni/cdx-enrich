@@ -15,7 +15,18 @@ namespace CdxEnrich
         }
 
         /// <summary>
-        /// Informational message - only shown when --verbose flag is set
+        /// Informational message with module name - only shown when --verbose flag is set
+        /// </summary>
+        public static void Info(string module, string message)
+        {
+            if (_verbose)
+            {
+                Console.WriteLine($"info: [{module}] {message}");
+            }
+        }
+
+        /// <summary>
+        /// Informational message without module name - only shown when --verbose flag is set
         /// </summary>
         public static void Info(string message)
         {
@@ -26,7 +37,15 @@ namespace CdxEnrich
         }
 
         /// <summary>
-        /// Warning message - always shown on stderr
+        /// Warning message with module name - always shown on stderr
+        /// </summary>
+        public static void Warn(string module, string message)
+        {
+            Console.Error.WriteLine($"warn: [{module}] {message}");
+        }
+
+        /// <summary>
+        /// Warning message without module name - always shown on stderr
         /// </summary>
         public static void Warn(string message)
         {
@@ -34,7 +53,15 @@ namespace CdxEnrich
         }
 
         /// <summary>
-        /// Error message - always shown on stderr
+        /// Error message with module name - always shown on stderr
+        /// </summary>
+        public static void Error(string module, string message)
+        {
+            Console.Error.WriteLine($"error: [{module}] {message}");
+        }
+
+        /// <summary>
+        /// Error message without module name - always shown on stderr
         /// </summary>
         public static void Error(string message)
         {

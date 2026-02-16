@@ -98,14 +98,14 @@ namespace CdxEnrich.Actions
                     // Graceful: Component not found? Skip it
                     if (component == null)
                     {
-                        Log.Warn($"Component with BomRef '{configEntryRef}' not found in BOM, skipping");
+                        Log.Warn(ModuleName, $"Component with BomRef '{configEntryRef}' not found in BOM, skipping");
                         continue;
                     }
                     
                     // Graceful: No PURL? Skip it
                     if (string.IsNullOrEmpty(component.Purl))
                     {
-                        Log.Warn($"Component with BomRef '{configEntryRef}' has no PURL set, skipping");
+                        Log.Warn(ModuleName, $"Component with BomRef '{configEntryRef}' has no PURL set, skipping");
                         continue;
                     }
                     
@@ -117,20 +117,20 @@ namespace CdxEnrich.Actions
                     }
                     catch
                     {
-                        Log.Warn($"Invalid PURL format '{component.Purl}' for BomRef '{configEntryRef}', skipping");
+                        Log.Warn(ModuleName, $"Invalid PURL format '{component.Purl}' for BomRef '{configEntryRef}', skipping");
                         continue;
                     }
                     
                     // Graceful: Unsupported package type? Skip it
                     if (!PackageType.TryFromPurlType(packageUrl.Type, out var packageType) || packageType == null)
                     {
-                        Log.Info($"Package type '{packageUrl.Type}' is not supported by ClearlyDefined for BomRef '{configEntryRef}', skipping");
+                        Log.Warn(ModuleName, $"Package type '{packageUrl.Type}' is not supported by ClearlyDefined for BomRef '{configEntryRef}', skipping");
                         continue;
                     }
                     
                     if (!IsSupported(packageType))
                     {
-                        Log.Info($"Package type '{packageType.Name}' is currently not supported by cdx-enrich for BomRef '{configEntryRef}', skipping");
+                        Log.Warn(ModuleName, $"Package type '{packageType.Name}' is currently not supported by cdx-enrich for BomRef '{configEntryRef}', skipping");
                         continue;
                     }
                     
@@ -156,7 +156,7 @@ namespace CdxEnrich.Actions
         
             if (licensedData?.Declared == null || licensedData.Facets == null)
             {
-                Log.Info($"No license data found for package: {packageUrl}");
+                Log.Info(ModuleName, $"No license data found for package: {packageUrl}");
                 return;
             }
         
