@@ -1,4 +1,6 @@
 ﻿using System.CommandLine;
+using CdxEnrich.Actions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CdxEnrich
 {
@@ -47,6 +49,17 @@ namespace CdxEnrich
                 DefaultValueFactory = _ => CycloneDXFormatOption.Auto
             };
 
+            var verboseOption = new Option<bool>("--verbose", "-v")
+            {
+                Description = "Enable verbose output (show informational messages)."
+            };
+
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            var runner = serviceProvider.GetRequiredService<IRunner>();
+            
             // Create the root command and add options
             var rootCommand = new RootCommand("A .NET tool for enriching CycloneDX Bill-of-Materials (BOM) with predefined data.");
             
@@ -55,10 +68,14 @@ namespace CdxEnrich
             rootCommand.Add(outputFileOption);
             rootCommand.Add(outputFileFormatOption);
             rootCommand.Add(configFileOption);
+            rootCommand.Add(verboseOption);
 
             rootCommand.SetAction(parseResult =>
             {
-                return Runner.Enrich(
+                // Set verbose mode before running
+                Log.SetVerbose(parseResult.GetValue(verboseOption));
+                
+                return runner.Enrich(
                     parseResult.GetValue(inputFileArg) ?? "",
                     parseResult.GetValue(inputFileFormatOption),
                     parseResult.GetValue(outputFileOption) ?? "",
@@ -67,6 +84,12 @@ namespace CdxEnrich
             });
 
             return rootCommand.Parse(args).Invoke();
+        }
+
+        internal static void ConfigureServices(ServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<IRunner, Runner>();
+            serviceCollection.AddReplaceLicenseByClearlyDefined();
         }
     }
 }

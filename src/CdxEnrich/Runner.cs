@@ -7,7 +7,17 @@ using CdxEnrich.Actions;
 
 namespace CdxEnrich
 {
-    public static class Runner
+    public interface IRunner
+    {
+        int Enrich(string inputFilePath, CycloneDXFormatOption inputFormat, string outputFilePath,
+            IEnumerable<string> configPaths, CycloneDXFormatOption outputFileFormat);
+
+        Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent,
+            CycloneDXFormat outputFileFormat);
+    }
+    
+    public class Runner(ReplaceLicenseByClearlyDefined replaceLicenseByClearlyDefined)
+        : IRunner
     {
         public static Result<InputTuple> CombineBomAndConfig(Result<Bom> bom, Result<ConfigRoot> config)
         {
@@ -26,13 +36,11 @@ namespace CdxEnrich
         }
 
 
-        static public int Enrich(string inputFilePath, CycloneDXFormatOption inputFormat, string outputFilePath, IEnumerable<string> configPaths, CycloneDXFormatOption outputFileFormat)
+        public int Enrich(string inputFilePath, CycloneDXFormatOption inputFormat, string outputFilePath, IEnumerable<string> configPaths, CycloneDXFormatOption outputFileFormat)
         {
             try
             {
-                CycloneDXFormat explicitInputFormat;
-                CycloneDXFormat explicitOutputFormat;
-
+                CycloneDXFormat explicitInputFormat, explicitOutputFormat;
 
                 explicitInputFormat = inputFormat switch
                 {
@@ -88,8 +96,8 @@ namespace CdxEnrich
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("An error occurred when trying to enrich the bom");
-                        Console.WriteLine(((Failure)enrichResult).ErrorMessage);
+                        Console.Error.WriteLine("An error occurred when trying to enrich the bom");
+                        Console.Error.WriteLine(((Failure)enrichResult).ErrorMessage);
                         Console.ResetColor();
                         return 1;
                     }
@@ -101,25 +109,27 @@ namespace CdxEnrich
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("An unexpected error occurred:");
-                Console.WriteLine($"Error Type: {ex.GetType()}");
-                Console.WriteLine($"Error Message: {ex.Message}");
-                Console.WriteLine("Please check the input and try again. If the problem persists, consult the documentation or contact support.");
+                Console.Error.WriteLine("An unexpected error occurred:");
+                Console.Error.WriteLine($"Error Type: {ex.GetType()}");
+                Console.Error.WriteLine($"Error Message: {ex.Message}");
+                Console.Error.WriteLine("Please check the input and try again. If the problem persists, consult the documentation or contact support.");
                 Console.ResetColor();
                 return 1;
             }
         }
 
-        static public Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent, CycloneDXFormat outputFileFormat)
+        public Result<string> Enrich(string inputFileContent, CycloneDXFormat inputFormat, string configFileContent, CycloneDXFormat outputFileFormat)
         {
-            return
-                CombineBomAndConfig(
+            return CombineBomAndConfig(
                     BomSerialization.DeserializeBom(inputFileContent, inputFormat),
-                    ConfigLoader.ParseConfig(configFileContent))
+                    ConfigLoader.ParseConfig(configFileContent)
+                        .Bind(ReplaceLicenseByBomRef.CheckConfig)
+                        .Bind(ReplaceLicensesByUrl.CheckConfig)
+                        .Bind(ReplaceLicenseByClearlyDefined.CheckConfig))
                 .Map(ReplaceLicenseByBomRef.Execute)
                 .Map(ReplaceLicensesByUrl.Execute)
+                .Bind(replaceLicenseByClearlyDefined.Execute)
                 .Bind(inputs => BomSerialization.SerializeBom(inputs, outputFileFormat));
-
         }
     }
 }

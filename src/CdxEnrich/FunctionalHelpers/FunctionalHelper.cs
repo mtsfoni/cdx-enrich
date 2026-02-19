@@ -11,7 +11,7 @@
                 _ => throw new InvalidOperationException("Unknown result type")
             };
         }
-
+        
         public static Result<TOutput> Map<TInput, TOutput>(this Result<TInput> input, Func<TInput, TOutput> fun)
         {
             return input switch

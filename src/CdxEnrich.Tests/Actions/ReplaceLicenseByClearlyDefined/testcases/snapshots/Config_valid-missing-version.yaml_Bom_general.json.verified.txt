@@ -1,0 +1,238 @@
+﻿{
+  BomFormat: CycloneDX,
+  SpecVersion: v1_4,
+  SpecVersionString: 1.4,
+  Version: 1,
+  NonNullableVersion: 1,
+  Metadata: {
+    Timestamp: DateTime_1,
+    Tools: {
+      Tools: [
+        {
+          Vendor: Example,
+          Name: SBOM Generator,
+          Version: 1.0.0
+        }
+      ]
+    },
+    ProtobufTools: [
+      {
+        Vendor: Example,
+        Name: SBOM Generator,
+        Version: 1.0.0
+      }
+    ]
+  },
+  Components: [
+    {
+      Type: Library,
+      BomRef: pkg:nuget/System.Collections@4.0.11,
+      Name: System.Collections,
+      Version: 4.0.11,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:nuget/System.Collections@4.0.11
+    },
+    {
+      Type: Library,
+      BomRef: pkg:npm/lodash@4.17.21,
+      Name: lodash,
+      Version: 4.17.21,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:npm/lodash@4.17.21
+    },
+    {
+      Type: Library,
+      BomRef: pkg:maven/org.apache.commons/commons-lang3@3.12.0,
+      Name: commons-lang3,
+      Version: 3.12.0,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:maven/org.apache.commons/commons-lang3@3.12.0
+    },
+    {
+      Type: Library,
+      BomRef: pkg:pypi/requests@2.28.1,
+      Name: requests,
+      Version: 2.28.1,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:pypi/requests@2.28.1
+    },
+    {
+      Type: Library,
+      BomRef: pkg:gem/rails@7.0.4,
+      Name: rails,
+      Version: 7.0.4,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:gem/rails@7.0.4
+    },
+    {
+      Type: Library,
+      BomRef: pkg:go/github.com/gorilla/mux@v1.8.0,
+      Name: mux,
+      Version: v1.8.0,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:go/github.com/gorilla/mux@v1.8.0
+    },
+    {
+      Type: Library,
+      BomRef: pkg:deb/debian/curl@7.74.0-1.3+deb11u7,
+      Name: curl,
+      Version: 7.74.0-1.3+deb11u7,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:deb/debian/curl@7.74.0-1.3+deb11u7
+    },
+    {
+      Type: Library,
+      BomRef: pkg:pod/Alamofire@5.6.2,
+      Name: Alamofire,
+      Version: 5.6.2,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:pod/Alamofire@5.6.2
+    },
+    {
+      Type: Library,
+      BomRef: pkg:composer/laravel/framework@10.0.0,
+      Name: laravel/framework,
+      Version: 10.0.0,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:composer/laravel/framework@10.0.0
+    },
+    {
+      Type: Library,
+      BomRef: pkg:crate/serde@1.0.152,
+      Name: serde,
+      Version: 1.0.152,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:crate/serde@1.0.152
+    },
+    {
+      Type: Library,
+      BomRef: pkg:conda/pandas@1.5.3,
+      Name: pandas,
+      Version: 1.5.3,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:conda/pandas@1.5.3
+    },
+    {
+      Type: Library,
+      BomRef: pkg:condasrc/numpy@1.24.3,
+      Name: numpy,
+      Version: 1.24.3,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:condasrc/numpy@1.24.3
+    },
+    {
+      Type: Library,
+      BomRef: pkg:debsrc/debian/wget@1.21.3-1,
+      Name: wget,
+      Version: 1.21.3-1,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:debsrc/debian/wget@1.21.3-1
+    },
+    {
+      Type: Library,
+      BomRef: pkg:git/github.com/expressjs/express@4.18.2,
+      Name: express,
+      Version: 4.18.2,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:git/github.com/expressjs/express@4.18.2
+    },
+    {
+      Type: Library,
+      BomRef: pkg:sourcearchive/apache/commons-text@1.10.0,
+      Name: commons-text,
+      Version: 1.10.0,
+      Licenses: [
+        {
+          License: {
+            Name: Unknown
+          }
+        }
+      ],
+      Purl: pkg:sourcearchive/apache/commons-text@1.10.0
+    }
+  ]
+}

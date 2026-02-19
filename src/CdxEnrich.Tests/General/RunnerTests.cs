@@ -1,15 +1,39 @@
-﻿using CdxEnrich;
+using CdxEnrich;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.Serialization;
 using CycloneDX;
+using CdxEnrich.Actions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CdxEnrich.Tests.General
 {
     public class BomEnricher_Test
     {
+        private Fixture _fixture;
+
         [SetUp]
         public void Setup()
         {
+            _fixture = new Fixture();
+        }
+
+        private class Fixture
+        {
+            private readonly ServiceProvider _serviceProvider;
+
+            public Fixture()
+            {
+                var serviceCollection = new ServiceCollection();
+                Program.ConfigureServices(serviceCollection);
+
+                this._serviceProvider = serviceCollection.BuildServiceProvider();
+            }
+
+            public Runner CreateSut()
+            {
+                var replaceLicenseByClearlyDefined = this._serviceProvider.GetRequiredService<ReplaceLicenseByClearlyDefined>();
+                return new Runner(replaceLicenseByClearlyDefined);
+            }
         }
 
 
@@ -31,7 +55,8 @@ namespace CdxEnrich.Tests.General
             string config = File.ReadAllText(configPath);
             string bom = File.ReadAllText(bomPath);
 
-            var result = Runner.Enrich(bom, inputFormat, config, outputFormat);
+            var runner = this._fixture.CreateSut();
+            var result = runner.Enrich(bom, inputFormat, config, outputFormat);
 
             // Validate the result is a valid BOM if successful
             if (result is Ok<string> successResult)

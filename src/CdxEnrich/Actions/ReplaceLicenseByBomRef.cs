@@ -1,5 +1,4 @@
-﻿using CdxEnrich;
-using CdxEnrich.Config;
+﻿using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CycloneDX.Models;
 
@@ -67,24 +66,20 @@ namespace CdxEnrich.Actions
                    .ForEach(rep =>
                    {
                        var comp = GetComponentByBomRef(inputs.Bom, rep.Ref!);
-                       if (comp != null)
-                       {
-                           comp.Licenses =
-                           [
-                               new LicenseChoice
+                       
+                       comp?.Licenses = [
+                           new LicenseChoice
+                           {
+                               License = new License()
                                {
-                                   License = new License()
-                                   {
-                                       Name = rep.Name,
-                                       Id = rep.Id
-                                   }
-                               },
-                           ];
-                       }
+                                   Name = rep.Name,
+                                   Id = rep.Id
+                               }
+                           },
+                       ];
                    });
 
             return inputs;
-
         }
     }
 }

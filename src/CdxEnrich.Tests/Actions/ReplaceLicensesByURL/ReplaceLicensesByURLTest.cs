@@ -1,12 +1,9 @@
-﻿using CdxEnrich;
-using CdxEnrich.Config;
+﻿using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CdxEnrich.Serialization;
-using CdxEnrich.Actions;
 using CycloneDX;
-using VerifyNUnit;
 
-namespace CdxEnrich.Tests.Actions
+namespace CdxEnrich.Tests.Actions.ReplaceLicensesByURL
 {
     internal class ReplaceLicensesByURLTest
     {
@@ -40,7 +37,7 @@ namespace CdxEnrich.Tests.Actions
         {
             var configContent = File.ReadAllText(configPath);
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(ReplaceLicensesByUrl.CheckConfig);
+                .Bind(CdxEnrich.Actions.ReplaceLicensesByUrl.CheckConfig);
 
             Assert.That(checkConfigResult is Failure);
         }
@@ -51,7 +48,7 @@ namespace CdxEnrich.Tests.Actions
         {
             var configContent = File.ReadAllText(configPath);
             var checkConfigResult = ConfigLoader.ParseConfig(configContent)
-                .Bind(ReplaceLicensesByUrl.CheckConfig);
+                .Bind(CdxEnrich.Actions.ReplaceLicensesByUrl.CheckConfig);
 
             Assert.That(checkConfigResult is Success);
         }
@@ -85,12 +82,12 @@ namespace CdxEnrich.Tests.Actions
             var extension = Path.GetExtension(bomPath);
             CycloneDXFormat inputFormat = extension.Equals(".json", StringComparison.CurrentCultureIgnoreCase) ? CycloneDXFormat.JSON : CycloneDXFormat.XML;
             string bomContent = File.ReadAllText(bomPath);
-
+            
             var executionResult =
                 Runner.CombineBomAndConfig(BomSerialization.DeserializeBom(bomContent, inputFormat),
                     ConfigLoader.ParseConfig(File.ReadAllText(configPath))
-                    .Bind(ReplaceLicensesByUrl.CheckConfig))
-                .Map(ReplaceLicensesByUrl.Execute);
+                    .Bind(CdxEnrich.Actions.ReplaceLicensesByUrl.CheckConfig))
+                .Map(CdxEnrich.Actions.ReplaceLicensesByUrl.Execute);
 
             Assert.That(executionResult is Success);
 

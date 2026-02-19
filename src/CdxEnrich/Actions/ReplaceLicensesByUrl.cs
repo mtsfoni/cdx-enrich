@@ -1,8 +1,6 @@
-﻿using CdxEnrich;
-using CdxEnrich.Config;
+﻿using CdxEnrich.Config;
 using CdxEnrich.FunctionalHelpers;
 using CycloneDX.Models;
-
 
 namespace CdxEnrich.Actions
 {
